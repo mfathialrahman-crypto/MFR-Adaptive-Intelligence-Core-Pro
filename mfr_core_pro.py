@@ -1,0 +1,256 @@
+#!/usr/bin/env python3
+"""
+MFR Adaptive Intelligence Core Pro
+Evidence → Bayesian Reasoning → Verification → Self-Improvement
+
+Superior implementation over the original:
+- Bayesian-style belief updating with Beta prior
+- Proper independence penalty
+- Full audit trail
+- Conflict resolution with explanatory hypotheses
+- Confidence intervals (approximate)
+- Actionable improvement suggestions
+- Deterministic fingerprinting + versioning
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field, asdict
+from datetime import datetime, timezone
+from hashlib import sha256
+from typing import Any, Optional
+import json
+import math
+import uuid
+
+
+VERSION = "2.1.0-pro"
+
+
+@dataclass
+class Evidence:
+    claim: str
+    source: str
+    reliability: float  # 0.0 – 1.0
+    independent: bool = True
+    weight: float = 1.0  # extra multiplier (e.g. sample size / recency)
+    notes: str = ""
+
+    def __post_init__(self):
+        if not 0.0 <= self.reliability <= 1.0:
+            raise ValueError(f"reliability must be in [0,1], got {self.reliability}")
+        if self.weight <= 0:
+            raise ValueError("weight must be positive")
+
+
+@dataclass
+class IntelligenceRecord:
+    question: str
+    evidence: list[Evidence] = field(default_factory=list)
+    alternatives: list[str] = field(default_factory=list)
+    prior_belief: float = 0.5  # neutral prior
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+    record_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+
+    def add_evidence(self, *items: Evidence) -> None:
+        self.evidence.extend(items)
+
+    def analyze(self, alpha_prior: float = 1.0, beta_prior: float = 1.0) -> dict[str, Any]:
+        """
+        Bayesian-inspired analysis.
+        Uses a simple Beta-Binomial style update on support vs opposition,
+        with independence penalty and source deduplication.
+        """
+        audit: list[dict[str, Any]] = []
+        audit.append({"step": "start", "question": self.question, "n_evidence": len(self.evidence)})
+
+        if not self.evidence:
+            return self._insufficient("No evidence provided", audit)
+
+        # 1. Deduplicate by source while respecting independence flag
+        unique_sources: dict[str, Evidence] = {}
+        for ev in self.evidence:
+            key = ev.source
+            if key in unique_sources:
+                # Keep the higher reliability / weight combination
+                existing = unique_sources[key]
+                if (ev.reliability * ev.weight) > (existing.reliability * existing.weight):
+                    unique_sources[key] = ev
+                    audit.append({"step": "dedup", "source": key, "action": "replaced_with_stronger"})
+            else:
+                unique_sources[key] = ev
+
+        evidence = list(unique_sources.values())
+        audit.append({"step": "after_dedup", "unique_sources": len(evidence)})
+
+        if not evidence:
+            return self._insufficient("No independent evidence after deduplication", audit)
+
+        # 2. Group by claim and compute effective support
+        claims: dict[str, list[tuple[float, bool]]] = {}  # claim -> list of (effective_score, independent)
+        for ev in evidence:
+            # Independence penalty: non-independent evidence contributes less
+            ind_factor = 1.0 if ev.independent else 0.55
+            effective = ev.reliability * ev.weight * ind_factor
+            claims.setdefault(ev.claim, []).append((effective, ev.independent))
+
+        # 3. Bayesian-style scoring (Beta prior + soft observations)
+        results = []
+        for claim, scores in claims.items():
+            support_mass = sum(s for s, _ in scores)
+            n_obs = len(scores)
+            n_independent = sum(1 for _, ind in scores if ind)
+
+            # Pseudo-count update
+            alpha = alpha_prior + support_mass
+            beta = beta_prior + (n_obs - support_mass)  # rough opposition mass
+            mean = alpha / (alpha + beta)
+            # Approximate 95% credible interval via normal approximation
+            variance = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1))
+            std = math.sqrt(max(variance, 1e-12))
+            ci_low = max(0.0, mean - 1.96 * std)
+            ci_high = min(1.0, mean + 1.96 * std)
+
+            results.append({
+                "claim": claim,
+                "posterior_mean": round(mean, 4),
+                "ci_95": [round(ci_low, 4), round(ci_high, 4)],
+                "support_mass": round(support_mass, 4),
+                "evidence_count": n_obs,
+                "independent_count": n_independent,
+                "effective_score": round(support_mass * (1 + 0.15 * n_independent), 4),
+            })
+
+        # Rank by effective score then by posterior mean
+        results.sort(key=lambda x: (x["effective_score"], x["posterior_mean"]), reverse=True)
+
+        contradiction = len(results) > 1 and results[0]["posterior_mean"] - results[1]["posterior_mean"] < 0.18
+
+        status = "CONFLICTING_EVIDENCE" if contradiction else "PROVISIONAL_FINDING"
+        top = results[0]
+
+        # 4. Generate improvement suggestions
+        suggestions = self._generate_suggestions(results, evidence, contradiction)
+
+        # 5. Build final report
+        report = {
+            "version": VERSION,
+            "record_id": self.record_id,
+            "status": status,
+            "question": self.question,
+            "confidence": round(top["posterior_mean"], 4),
+            "conclusion": top["claim"] if not contradiction else None,
+            "top_claim": top,
+            "competing_claims": results,
+            "alternatives": self.alternatives,
+            "suggestions": suggestions,
+            "audit_trail": audit,
+            "created_at": self.created_at,
+            "analyzed_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        report["fingerprint"] = fingerprint(report)
+        return report
+
+    def _insufficient(self, reason: str, audit: list) -> dict[str, Any]:
+        audit.append({"step": "insufficient", "reason": reason})
+        return {
+            "version": VERSION,
+            "record_id": self.record_id,
+            "status": "INSUFFICIENT_EVIDENCE",
+            "confidence": 0.0,
+            "conclusion": None,
+            "missing": [reason, "Independent, high-reliability sources"],
+            "suggestions": [
+                "Collect at least two independent sources with reliability ≥ 0.7",
+                "Prefer primary sources over secondary summaries",
+            ],
+            "audit_trail": audit,
+            "created_at": self.created_at,
+            "analyzed_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+    def _generate_suggestions(
+        self, results: list[dict], evidence: list[Evidence], contradiction: bool
+    ) -> list[str]:
+        suggestions = []
+        if contradiction:
+            suggestions.append(
+                "Evidence is conflicting. Seek a higher-reliability independent source that can adjudicate."
+            )
+            suggestions.append(
+                "Consider whether the claims are actually mutually exclusive or can be reconciled under a more nuanced hypothesis."
+            )
+
+        low_ind = sum(1 for e in evidence if not e.independent)
+        if low_ind > 0:
+            suggestions.append(
+                f"{low_ind} piece(s) of evidence marked non-independent; their weight was penalized. Prefer truly independent sources."
+            )
+
+        if len(evidence) < 3:
+            suggestions.append("Sample size is small. Additional independent evidence will tighten the credible interval.")
+
+        top_mean = results[0]["posterior_mean"] if results else 0
+        if top_mean < 0.75 and not contradiction:
+            suggestions.append(
+                "Current confidence is moderate. Look for primary documents or direct measurements to raise reliability."
+            )
+
+        if not suggestions:
+            suggestions.append("Evidence base is solid. Consider stress-testing the top claim against strong counter-evidence.")
+
+        return suggestions
+
+
+def fingerprint(record: dict) -> str:
+    """Content-addressable fingerprint. Stable across runs if content is identical."""
+    # Remove non-deterministic fields before hashing
+    clean = {k: v for k, v in record.items() if k not in ("analyzed_at", "fingerprint", "audit_trail")}
+    payload = json.dumps(clean, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
+    return sha256(payload).hexdigest()
+
+
+def demo() -> None:
+    print("=" * 60)
+    print("MFR Adaptive Intelligence Core Pro – Demo")
+    print("=" * 60)
+
+    # Case 1: Strong agreement
+    rec1 = IntelligenceRecord(
+        question="هل هذا المستند صحيح؟",
+        evidence=[
+            Evidence("المستند صحيح", "source-A", 0.92, independent=True, weight=1.2),
+            Evidence("المستند صحيح", "source-B", 0.88, independent=True),
+            Evidence("المستند صحيح", "source-C", 0.75, independent=False, notes="secondary summary"),
+        ],
+        alternatives=["المستند مزيف", "المستند جزئياً صحيح"],
+    )
+    result1 = rec1.analyze()
+    print("\n[Case 1 – Strong agreement]")
+    print(json.dumps(result1, ensure_ascii=False, indent=2))
+
+    # Case 2: Conflict
+    rec2 = IntelligenceRecord(
+        question="هل النظام آمن؟",
+        evidence=[
+            Evidence("النظام آمن", "audit-firm-X", 0.91, independent=True),
+            Evidence("النظام غير آمن", "researcher-Y", 0.87, independent=True),
+            Evidence("النظام آمن", "internal-report", 0.70, independent=False),
+        ],
+    )
+    result2 = rec2.analyze()
+    print("\n[Case 2 – Conflicting evidence]")
+    print(json.dumps(result2, ensure_ascii=False, indent=2))
+
+    # Case 3: Insufficient
+    rec3 = IntelligenceRecord(question="هل يوجد دليل؟")
+    result3 = rec3.analyze()
+    print("\n[Case 3 – Insufficient]")
+    print(json.dumps(result3, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    demo()
