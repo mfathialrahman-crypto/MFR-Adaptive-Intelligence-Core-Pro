@@ -1,0 +1,24 @@
+name: Run MFR Adaptive Intelligence Core Pro
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Adaptive Intelligence Demo
+        run: |
+          echo "============================================================"
+          echo "MFR Adaptive Intelligence Core Pro - GitHub Actions Execution"
+          echo "============================================================"
+          python mfr_core_pro.py
