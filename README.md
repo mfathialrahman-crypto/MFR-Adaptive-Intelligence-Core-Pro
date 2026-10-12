@@ -6,7 +6,7 @@
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.0-pro**
+Version **2.1.1-pro**
 
 Public cognitive component of the FathiMind ecosystem.  
 A rigorous, transparent, and self-improving evidence analysis engine.
@@ -22,13 +22,14 @@ This core does better:
 - Full audit trail for every decision
 - Automatic generation of actionable improvement suggestions
 - Stable content-addressable fingerprinting
+- Weight-capped soft observations so posteriors stay valid even with extreme weights
 
 ## Installation
 
 ```bash
 git clone https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro.git
 cd MFR-Adaptive-Intelligence-Core-Pro
-python -m pip install -e .  # optional
+python -m pip install -e .  # optional (requires pyproject.toml)
 ```
 
 Or just run the single file:
