@@ -1,0 +1,19 @@
+[project]
+name = "mfr-adaptive-intelligence-core-pro"
+version = "2.1.1"
+description = "Enhanced Adaptive Intelligence Core: Evidence → Bayesian Reasoning → Verification → Self-Improvement"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Mohamed Fathi Alrahman"}]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["mfr_core_pro"]
