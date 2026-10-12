@@ -1,31 +1,43 @@
 # MFR Adaptive Intelligence Core Pro
 
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Actions](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions)
+
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
 Version **2.1.0-pro**
 
-A significantly enhanced intelligence analysis engine that improves upon the original simple averaging approach.
+Public cognitive component of the FathiMind ecosystem.  
+A rigorous, transparent, and self-improving evidence analysis engine.
 
-## Key Improvements over the original
+## Why this exists
 
-| Feature                    | Original                  | Pro Version                          |
-|---------------------------|---------------------------|--------------------------------------|
-| Belief update             | Simple average            | Bayesian-inspired (Beta prior)      |
-| Independence handling     | Binary flag only          | Penalized contribution (0.55×)      |
-| Source deduplication      | Basic                     | Keeps strongest evidence per source |
-| Confidence                | Single float              | Posterior mean + approximate 95% CI |
-| Conflict resolution       | Just "None"               | Ranked claims + explanatory suggestions |
-| Audit trail               | None                      | Full step-by-step log               |
-| Self-improvement          | None                      | Actionable suggestions generated    |
-| Versioning & fingerprint  | Basic SHA-256             | Stable content-addressable + version |
+Most "intelligence" scripts do simple averaging and call it confidence.  
+This core does better:
 
-## Quick Start
+- Bayesian-inspired belief updating (Beta prior)
+- Real independence penalty (non-independent evidence is down-weighted)
+- Approximate 95% credible intervals
+- Full audit trail for every decision
+- Automatic generation of actionable improvement suggestions
+- Stable content-addressable fingerprinting
+
+## Installation
+
+```bash
+git clone https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro.git
+cd MFR-Adaptive-Intelligence-Core-Pro
+python -m pip install -e .  # optional
+```
+
+Or just run the single file:
 
 ```bash
 python mfr_core_pro.py
 ```
 
-## Usage
+## Quick Example
 
 ```python
 from mfr_core_pro import IntelligenceRecord, Evidence
@@ -35,28 +47,45 @@ record = IntelligenceRecord(
     evidence=[
         Evidence("المستند صحيح", "source-A", 0.92, independent=True, weight=1.2),
         Evidence("المستند صحيح", "source-B", 0.88, independent=True),
+        Evidence("المستند صحيح", "source-C", 0.75, independent=False),
     ],
-    alternatives=["المستند مزيف"],
 )
 
 result = record.analyze()
-print(result["status"], result["confidence"], result["conclusion"])
-print("Suggestions:", result["suggestions"])
-print("Fingerprint:", result["fingerprint"])
+print(result["status"])
+print(result["confidence"])
+print(result["conclusion"])
+print(result["suggestions"])
+print(result["fingerprint"])
 ```
 
-## Design Principles
+## Running Tests
 
-1. **Provisional by design** – Never claims certainty.
-2. **Independence matters** – Correlated sources are down-weighted.
-3. **Transparent** – Full audit trail for every decision.
-4. **Actionable** – Always returns concrete next steps.
-5. **Deterministic fingerprint** – Same content → same hash (ignoring timestamps).
+```bash
+python -m unittest test_mfr_core_pro.py -v
+```
+
+## Design Doctrine (aligned with FathiMind)
+
+1. No strong claim at low confidence.
+2. Independence is enforced, not just declared.
+3. Every decision leaves a replayable trace.
+4. The system must suggest its own next improvement.
+5. Provisional findings only — never absolute certainty.
+
+## Part of the FathiMind Stack
+
+- **HelixMind** → measure
+- **MFR-Cognition** → verify
+- **AetherMind** → reason
+- **SovereignEvolution** → evolve
+- **This Core (public)** → transparent adaptive analysis layer
 
 ## License
 
-MIT – Use freely, improve, and cite.
+MIT License — free to use, modify, and distribute with attribution.
 
 ---
 
-Built as a demonstration of rigorous adaptive intelligence engineering.
+Built and continuously evolved by **Mohamed Fathi Alrahman**  
+FathiMind — human-centric cognitive engineering.
