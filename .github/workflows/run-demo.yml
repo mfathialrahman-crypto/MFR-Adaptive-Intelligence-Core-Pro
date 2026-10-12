@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  demo:
+  test-and-demo:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,6 +15,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Run Unit Tests
+        run: |
+          echo "=== Running Unit Tests ==="
+          python -m unittest test_mfr_core_pro.py -v
 
       - name: Run Adaptive Intelligence Demo
         run: |
