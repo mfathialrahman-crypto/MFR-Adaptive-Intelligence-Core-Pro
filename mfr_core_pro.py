@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.0-pro"
+VERSION = "2.1.1-pro"
 
 
 @dataclass
@@ -88,12 +88,15 @@ class IntelligenceRecord:
         if not evidence:
             return self._insufficient("No independent evidence after deduplication", audit)
 
-        # 2. Group by claim and compute effective support
-        claims: dict[str, list[tuple[float, bool]]] = {}  # claim -> list of (effective_score, independent)
+        # 2. Group by claim and compute effective support (capped to prevent invalid posteriors)
+        claims: dict[str, list[tuple[float, bool]]] = {}  # claim -> list of (capped_effective, independent)
         for ev in evidence:
             # Independence penalty: non-independent evidence contributes less
             ind_factor = 1.0 if ev.independent else 0.55
-            effective = ev.reliability * ev.weight * ind_factor
+            # Cap weight influence so each evidence contributes at most 1.0 effective unit
+            # This keeps Beta parameters valid (alpha, beta > 0) even with high weights
+            raw_effective = ev.reliability * min(ev.weight, 3.0) * ind_factor
+            effective = min(1.0, raw_effective)
             claims.setdefault(ev.claim, []).append((effective, ev.independent))
 
         # 3. Bayesian-style scoring (Beta prior + soft observations)
@@ -103,9 +106,13 @@ class IntelligenceRecord:
             n_obs = len(scores)
             n_independent = sum(1 for _, ind in scores if ind)
 
-            # Pseudo-count update
+            # Pseudo-count update: each evidence is a soft observation in [0, 1]
+            # opposition mass = n_obs - support_mass  (always >= 0)
             alpha = alpha_prior + support_mass
-            beta = beta_prior + (n_obs - support_mass)  # rough opposition mass
+            beta = beta_prior + (n_obs - support_mass)
+            # Guard against numerical issues
+            alpha = max(alpha, 1e-6)
+            beta = max(beta, 1e-6)
             mean = alpha / (alpha + beta)
             # Approximate 95% credible interval via normal approximation
             variance = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1))
