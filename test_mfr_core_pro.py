@@ -65,6 +65,26 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(result["status"], "PROVISIONAL_FINDING")
         self.assertIn("suggestions", result)
 
+    def test_high_weight_does_not_break_posterior(self):
+        """High weights must not produce probabilities > 1 or negative parameters."""
+        rec = IntelligenceRecord(
+            question="high weight test",
+            evidence=[
+                Evidence("yes", "A", 0.95, independent=True, weight=10.0),
+                Evidence("yes", "B", 0.90, independent=True, weight=5.0),
+            ],
+        )
+        result = rec.analyze()
+        self.assertEqual(result["status"], "PROVISIONAL_FINDING")
+        conf = result["confidence"]
+        self.assertGreaterEqual(conf, 0.0)
+        self.assertLessEqual(conf, 1.0)
+        top = result["top_claim"]
+        self.assertGreaterEqual(top["posterior_mean"], 0.0)
+        self.assertLessEqual(top["posterior_mean"], 1.0)
+        self.assertGreaterEqual(top["ci_95"][0], 0.0)
+        self.assertLessEqual(top["ci_95"][1], 1.0)
+
     def test_fingerprint_stable(self):
         rec = IntelligenceRecord(
             question="q",
