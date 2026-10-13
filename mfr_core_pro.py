@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.2-pro"
+VERSION = "2.1.3-pro"
 
 
 @dataclass
@@ -61,14 +61,31 @@ class IntelligenceRecord:
     def add_evidence(self, *items: Evidence) -> None:
         self.evidence.extend(items)
 
-    def analyze(self, alpha_prior: float = 1.0, beta_prior: float = 1.0) -> dict[str, Any]:
+    def analyze(self, alpha_prior: float | None = None, beta_prior: float | None = None) -> dict[str, Any]:
         """
         Bayesian-inspired analysis.
         Uses a simple Beta-Binomial style update on support vs opposition,
         with independence penalty and source deduplication.
+        Prior is derived from self.prior_belief unless overridden.
         """
+        if not 0.0 <= self.prior_belief <= 1.0:
+            raise ValueError(f"prior_belief must be in [0,1], got {self.prior_belief}")
+
+        # Derive weak Beta prior from prior_belief (concentration ~2)
+        if alpha_prior is None or beta_prior is None:
+            concentration = 2.0
+            alpha_prior = max(self.prior_belief * concentration, 1e-6)
+            beta_prior = max((1.0 - self.prior_belief) * concentration, 1e-6)
+
         audit: list[dict[str, Any]] = []
-        audit.append({"step": "start", "question": self.question, "n_evidence": len(self.evidence)})
+        audit.append({
+            "step": "start",
+            "question": self.question,
+            "n_evidence": len(self.evidence),
+            "prior_belief": self.prior_belief,
+            "alpha_prior": round(alpha_prior, 4),
+            "beta_prior": round(beta_prior, 4),
+        })
 
         if not self.evidence:
             return self._insufficient("No evidence provided", audit)

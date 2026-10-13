@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.3-pro] - 2026-10-13
+
+### Bayesian prior correctness
+- `prior_belief` is now actually used: mapped to a weak Beta prior (concentration ≈ 2).
+- Validation rejects prior_belief outside [0, 1].
+- Audit trail records the prior parameters used.
+- Added tests confirming prior influence and rejection of invalid priors.
+
 ## [2.1.2-pro] - 2026-10-13
 
 ### Reliability & quality improvements

@@ -140,5 +140,21 @@ class TestAnalyze(unittest.TestCase):
         # After dedup only one evidence remains
         self.assertEqual(result["top_claim"]["evidence_count"], 1)
 
+
+    def test_prior_belief_affects_posterior(self):
+        """prior_belief should influence the posterior when evidence is limited."""
+        ev = [Evidence("yes", "A", 0.6)]
+        rec_neutral = IntelligenceRecord(question="q", evidence=ev, prior_belief=0.5)
+        rec_high = IntelligenceRecord(question="q", evidence=ev, prior_belief=0.8)
+        r_neutral = rec_neutral.analyze()
+        r_high = rec_high.analyze()
+        self.assertGreater(r_high["confidence"], r_neutral["confidence"])
+        self.assertEqual(r_neutral["status"], "PROVISIONAL_FINDING")
+
+    def test_invalid_prior_rejected(self):
+        rec = IntelligenceRecord(question="q", prior_belief=1.5)
+        with self.assertRaises(ValueError):
+            rec.analyze()
+
 if __name__ == "__main__":
     unittest.main()
