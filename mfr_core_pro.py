@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.1-pro"
+VERSION = "2.1.2-pro"
 
 
 @dataclass
@@ -37,10 +37,14 @@ class Evidence:
     notes: str = ""
 
     def __post_init__(self):
+        if not isinstance(self.claim, str) or not self.claim.strip():
+            raise ValueError("claim must be a non-empty string")
+        if not isinstance(self.source, str) or not self.source.strip():
+            raise ValueError("source must be a non-empty string")
         if not 0.0 <= self.reliability <= 1.0:
             raise ValueError(f"reliability must be in [0,1], got {self.reliability}")
-        if self.weight <= 0:
-            raise ValueError("weight must be positive")
+        if not isinstance(self.weight, (int, float)) or self.weight <= 0:
+            raise ValueError("weight must be a positive number")
 
 
 @dataclass
@@ -213,9 +217,17 @@ class IntelligenceRecord:
 
 
 def fingerprint(record: dict) -> str:
-    """Content-addressable fingerprint. Stable across runs if content is identical."""
-    # Remove non-deterministic fields before hashing
-    clean = {k: v for k, v in record.items() if k not in ("analyzed_at", "fingerprint", "audit_trail")}
+    """
+    Content-addressable fingerprint.
+    Stable for identical decision content (question, evidence, alternatives, prior, conclusion, confidence, status).
+    Excludes instance metadata and volatile fields.
+    """
+    volatile = {
+        "analyzed_at", "fingerprint", "audit_trail",
+        "record_id", "created_at", "version"
+    }
+    clean = {k: v for k, v in record.items() if k not in volatile}
+    # Canonicalize evidence-like lists if present for stability
     payload = json.dumps(clean, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
     return sha256(payload).hexdigest()
 

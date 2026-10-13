@@ -94,5 +94,51 @@ class TestAnalyze(unittest.TestCase):
         self.assertTrue(len(r1["fingerprint"]) == 64)
 
 
+
+    def test_empty_claim_rejected(self):
+        with self.assertRaises(ValueError):
+            Evidence("", "src", 0.8)
+        with self.assertRaises(ValueError):
+            Evidence("   ", "src", 0.8)
+
+    def test_empty_source_rejected(self):
+        with self.assertRaises(ValueError):
+            Evidence("claim", "", 0.8)
+        with self.assertRaises(ValueError):
+            Evidence("claim", "   ", 0.8)
+
+    def test_zero_or_negative_weight_rejected(self):
+        with self.assertRaises(ValueError):
+            Evidence("claim", "src", 0.8, weight=0)
+        with self.assertRaises(ValueError):
+            Evidence("claim", "src", 0.8, weight=-1)
+
+    def test_fingerprint_content_addressable_across_instances(self):
+        """Same content must produce the same fingerprint regardless of instance metadata."""
+        ev = [Evidence("yes", "A", 0.9, independent=True), Evidence("yes", "B", 0.85)]
+        rec1 = IntelligenceRecord(question="Is it true?", evidence=ev)
+        rec2 = IntelligenceRecord(question="Is it true?", evidence=ev)
+        r1 = rec1.analyze()
+        r2 = rec2.analyze()
+        self.assertEqual(r1["fingerprint"], r2["fingerprint"])
+        self.assertEqual(len(r1["fingerprint"]), 64)
+        # Different question → different fingerprint
+        rec3 = IntelligenceRecord(question="Different?", evidence=ev)
+        r3 = rec3.analyze()
+        self.assertNotEqual(r1["fingerprint"], r3["fingerprint"])
+
+    def test_dedup_keeps_stronger(self):
+        rec = IntelligenceRecord(
+            question="q",
+            evidence=[
+                Evidence("claim", "same", 0.6, weight=1.0),
+                Evidence("claim", "same", 0.9, weight=1.0),
+            ],
+        )
+        result = rec.analyze()
+        self.assertEqual(result["status"], "PROVISIONAL_FINDING")
+        # After dedup only one evidence remains
+        self.assertEqual(result["top_claim"]["evidence_count"], 1)
+
 if __name__ == "__main__":
     unittest.main()

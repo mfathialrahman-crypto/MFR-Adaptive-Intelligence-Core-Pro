@@ -3,22 +3,27 @@ name: Run MFR Adaptive Intelligence Core Pro
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   test-and-demo:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
 
       - name: Run Unit Tests
         run: |
-          echo "=== Running Unit Tests ==="
+          echo "=== Running Unit Tests (Python ${{ matrix.python-version }}) ==="
           python -m unittest test_mfr_core_pro.py -v
 
       - name: Run Adaptive Intelligence Demo
