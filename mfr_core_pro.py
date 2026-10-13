@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.3-pro"
+VERSION = "2.1.4-pro"
 
 
 @dataclass
@@ -288,5 +288,44 @@ def demo() -> None:
     print(json.dumps(result3, ensure_ascii=False, indent=2))
 
 
+
+def main() -> None:
+    """Minimal CLI for quick analysis."""
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="MFR Adaptive Intelligence Core Pro – evidence analysis"
+    )
+    parser.add_argument("question", help="The question to analyze")
+    parser.add_argument(
+        "--evidence",
+        action="append",
+        nargs=3,
+        metavar=("CLAIM", "SOURCE", "RELIABILITY"),
+        help="Evidence as CLAIM SOURCE RELIABILITY (repeatable). Reliability 0-1.",
+    )
+    parser.add_argument("--prior", type=float, default=0.5, help="Prior belief 0-1 (default 0.5)")
+    parser.add_argument("--demo", action="store_true", help="Run the built-in demo instead")
+    args = parser.parse_args()
+
+    if args.demo or not args.evidence:
+        demo()
+        return
+
+    evidence = []
+    for claim, source, rel_str in args.evidence:
+        try:
+            rel = float(rel_str)
+        except ValueError:
+            print(f"Invalid reliability: {rel_str}", file=sys.stderr)
+            sys.exit(2)
+        evidence.append(Evidence(claim, source, rel))
+
+    rec = IntelligenceRecord(question=args.question, evidence=evidence, prior_belief=args.prior)
+    result = rec.analyze()
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
 if __name__ == "__main__":
-    demo()
+    main()

@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.4-pro] - 2026-10-13
+
+### Developer & user experience
+- Added minimal CLI (`python mfr_core_pro.py "question" --evidence ...`) for quick analysis without writing code.
+- `--demo` flag and `--prior` support.
+- Existing demo and library API unchanged.
+
 ## [2.1.3-pro] - 2026-10-13
 
 ### Bayesian prior correctness
