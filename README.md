@@ -3,12 +3,12 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions)
-[![Version](https://img.shields.io/badge/version-2.1.7--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.8--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.7-pro**  
+Version **2.1.8-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
 A rigorous, transparent, and self-improving evidence analysis engine designed for real decisions — not toy averaging.
@@ -86,6 +86,7 @@ record = IntelligenceRecord(
 result = record.analyze()
 print(result["status"])          # PROVISIONAL_FINDING or CONFLICTING_EVIDENCE
 print(result["confidence"])      # posterior mean
+print(result["uncertainty"])     # width of the 95% credible interval
 print(result["conclusion"])
 print(result["suggestions"])
 print(result["fingerprint"])     # content-addressable hash
