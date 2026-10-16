@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.6-pro"
+VERSION = "2.1.7-pro"
 
 
 @dataclass
@@ -290,7 +290,7 @@ def demo() -> None:
 
 
 def main() -> None:
-    """Minimal CLI for quick analysis."""
+    """CLI for quick analysis with optional weight and independence."""
     import argparse
     import sys
 
@@ -301,9 +301,9 @@ def main() -> None:
     parser.add_argument(
         "--evidence",
         action="append",
-        nargs=3,
-        metavar=("CLAIM", "SOURCE", "RELIABILITY"),
-        help="Evidence as CLAIM SOURCE RELIABILITY (repeatable). Reliability 0-1.",
+        nargs="+",
+        metavar="ARGS",
+        help="Evidence as CLAIM SOURCE RELIABILITY [WEIGHT] [INDEPENDENT] (repeatable). Reliability 0-1. WEIGHT positive float (default 1.0). INDEPENDENT true/false/yes/no/1/0 (default true).",
     )
     parser.add_argument("--prior", type=float, default=0.5, help="Prior belief 0-1 (default 0.5)")
     parser.add_argument("--demo", action="store_true", help="Run the built-in demo instead")
@@ -316,13 +316,28 @@ def main() -> None:
         parser.error("question is required when providing evidence")
 
     evidence = []
-    for claim, source, rel_str in args.evidence:
+    for parts in args.evidence:
+        if len(parts) < 3:
+            print(f"Evidence requires at least CLAIM SOURCE RELIABILITY, got {parts}", file=sys.stderr)
+            sys.exit(2)
+        claim, source, rel_str = parts[0], parts[1], parts[2]
         try:
             rel = float(rel_str)
         except ValueError:
             print(f"Invalid reliability: {rel_str}", file=sys.stderr)
             sys.exit(2)
-        evidence.append(Evidence(claim, source, rel))
+        weight = 1.0
+        independent = True
+        if len(parts) >= 4:
+            try:
+                weight = float(parts[3])
+            except ValueError:
+                print(f"Invalid weight: {parts[3]}", file=sys.stderr)
+                sys.exit(2)
+        if len(parts) >= 5:
+            ind_str = parts[4].lower()
+            independent = ind_str in ("true", "yes", "1", "y", "t")
+        evidence.append(Evidence(claim, source, rel, independent=independent, weight=weight))
 
     rec = IntelligenceRecord(question=args.question, evidence=evidence, prior_belief=args.prior)
     result = rec.analyze()
