@@ -156,5 +156,36 @@ class TestAnalyze(unittest.TestCase):
         with self.assertRaises(ValueError):
             rec.analyze()
 
+    def test_cli_evidence_json(self):
+        """CLI accepts structured evidence via --evidence-json."""
+        import json
+        import subprocess
+        import sys
+        import tempfile
+        from pathlib import Path
+
+        evidence = [
+            {"claim": "yes", "source": "A", "reliability": 0.9, "independent": True},
+            {"claim": "yes", "source": "B", "reliability": 0.85, "weight": 1.1},
+        ]
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
+            json.dump(evidence, f)
+            tmp = f.name
+        try:
+            result = subprocess.run(
+                [sys.executable, "mfr_core_pro.py", "Is it true?", "--evidence-json", tmp],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            report = json.loads(result.stdout)
+            self.assertEqual(report["status"], "PROVISIONAL_FINDING")
+            self.assertEqual(report["conclusion"], "yes")
+            self.assertGreater(report["confidence"], 0.5)
+        finally:
+            Path(tmp).unlink(missing_ok=True)
+
+
 if __name__ == "__main__":
     unittest.main()
