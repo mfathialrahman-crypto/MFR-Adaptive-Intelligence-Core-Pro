@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.8-pro] - 2026-10-16
+
+### Transparency & self-improvement
+- Report now includes an explicit `uncertainty` field (width of the approximate 95% credible interval of the top claim).
+- Top claim objects include `ci_width`.
+- Suggestions now explicitly call out wide intervals so the system recommends collecting more independent evidence when uncertainty remains high.
+- Backward compatible: existing fields and statuses unchanged.
+
 ## [2.1.7-pro] - 2026-10-16
 
 ### User experience / CLI completeness
