@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.7-pro"
+VERSION = "2.1.8-pro"
 
 
 @dataclass
@@ -306,45 +306,81 @@ def main() -> None:
         help="Evidence: CLAIM SOURCE RELIABILITY [WEIGHT] [INDEPENDENT] (repeatable). "
              "RELIABILITY 0-1, WEIGHT >0 (default 1.0), INDEPENDENT true/false (default true).",
     )
+    parser.add_argument(
+        "--evidence-json",
+        metavar="FILE",
+        help="Path to a JSON file containing a list of evidence objects "
+             "(each with claim, source, reliability, optional weight, independent). "
+             "Use '-' for stdin. Mutually exclusive with --evidence.",
+    )
     parser.add_argument("--prior", type=float, default=0.5, help="Prior belief 0-1 (default 0.5)")
     parser.add_argument("--demo", action="store_true", help="Run the built-in demo instead")
     args = parser.parse_args()
 
-    if args.demo or not args.evidence:
+    if args.demo or (not args.evidence and not args.evidence_json):
         demo()
         return
+    if args.evidence and args.evidence_json:
+        parser.error("cannot use both --evidence and --evidence-json")
     if not args.question:
         parser.error("question is required when providing evidence")
 
     evidence = []
-    for items in args.evidence:
-        if len(items) < 3:
-            print("Each --evidence needs at least CLAIM SOURCE RELIABILITY", file=sys.stderr)
-            sys.exit(2)
-        claim, source, rel_str = items[0], items[1], items[2]
-        weight = 1.0
-        independent = True
-        if len(items) >= 4:
-            try:
-                weight = float(items[3])
-            except ValueError:
-                print(f"Invalid weight: {items[3]}", file=sys.stderr)
-                sys.exit(2)
-        if len(items) >= 5:
-            ind_str = items[4].lower()
-            if ind_str in ("true", "1", "yes", "y"):
-                independent = True
-            elif ind_str in ("false", "0", "no", "n"):
-                independent = False
-            else:
-                print(f"Invalid independent flag: {items[4]} (use true/false)", file=sys.stderr)
-                sys.exit(2)
+    if args.evidence_json:
         try:
-            rel = float(rel_str)
-        except ValueError:
-            print(f"Invalid reliability: {rel_str}", file=sys.stderr)
+            if args.evidence_json == "-":
+                raw = json.load(sys.stdin)
+            else:
+                with open(args.evidence_json, "r", encoding="utf-8") as f:
+                    raw = json.load(f)
+            if not isinstance(raw, list):
+                print("evidence-json must be a JSON array of objects", file=sys.stderr)
+                sys.exit(2)
+            for item in raw:
+                if not isinstance(item, dict):
+                    print("each evidence item must be an object", file=sys.stderr)
+                    sys.exit(2)
+                claim = item.get("claim")
+                source = item.get("source")
+                rel = item.get("reliability")
+                if claim is None or source is None or rel is None:
+                    print("each evidence needs claim, source, reliability", file=sys.stderr)
+                    sys.exit(2)
+                weight = float(item.get("weight", 1.0))
+                independent = bool(item.get("independent", True))
+                evidence.append(Evidence(str(claim), str(source), float(rel), independent=independent, weight=weight))
+        except (OSError, json.JSONDecodeError, ValueError, TypeError) as exc:
+            print(f"Failed to load evidence-json: {exc}", file=sys.stderr)
             sys.exit(2)
-        evidence.append(Evidence(claim, source, rel, independent=independent, weight=weight))
+    else:
+        for items in args.evidence:
+            if len(items) < 3:
+                print("Each --evidence needs at least CLAIM SOURCE RELIABILITY", file=sys.stderr)
+                sys.exit(2)
+            claim, source, rel_str = items[0], items[1], items[2]
+            weight = 1.0
+            independent = True
+            if len(items) >= 4:
+                try:
+                    weight = float(items[3])
+                except ValueError:
+                    print(f"Invalid weight: {items[3]}", file=sys.stderr)
+                    sys.exit(2)
+            if len(items) >= 5:
+                ind_str = items[4].lower()
+                if ind_str in ("true", "1", "yes", "y"):
+                    independent = True
+                elif ind_str in ("false", "0", "no", "n"):
+                    independent = False
+                else:
+                    print(f"Invalid independent flag: {items[4]} (use true/false)", file=sys.stderr)
+                    sys.exit(2)
+            try:
+                rel = float(rel_str)
+            except ValueError:
+                print(f"Invalid reliability: {rel_str}", file=sys.stderr)
+                sys.exit(2)
+            evidence.append(Evidence(claim, source, rel, independent=independent, weight=weight))
 
     rec = IntelligenceRecord(question=args.question, evidence=evidence, prior_belief=args.prior)
     result = rec.analyze()
