@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.8-pro] - 2026-10-17
+
+### User experience / CLI completeness
+- Added `--evidence-json FILE` (or `-` for stdin) to load a JSON array of evidence objects.
+- Each object requires `claim`, `source`, `reliability`; optional `weight` and `independent`.
+- Mutually exclusive with repeated `--evidence` flags. Existing CLI unchanged.
+- Added regression test covering the new path.
+
 ## [2.1.7-pro] - 2026-10-16
 
 ### User experience / CLI completeness
