@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.7-pro"
+VERSION = "2.1.8-pro"
 
 
 @dataclass
@@ -145,6 +145,7 @@ class IntelligenceRecord:
                 "claim": claim,
                 "posterior_mean": round(mean, 4),
                 "ci_95": [round(ci_low, 4), round(ci_high, 4)],
+                "ci_width": round(ci_high - ci_low, 4),
                 "support_mass": round(support_mass, 4),
                 "evidence_count": n_obs,
                 "independent_count": n_independent,
@@ -169,6 +170,7 @@ class IntelligenceRecord:
             "status": status,
             "question": self.question,
             "confidence": round(top["posterior_mean"], 4),
+            "uncertainty": round(top["ci_width"], 4),
             "conclusion": top["claim"] if not contradiction else None,
             "top_claim": top,
             "competing_claims": results,
@@ -222,9 +224,14 @@ class IntelligenceRecord:
             suggestions.append("Sample size is small. Additional independent evidence will tighten the credible interval.")
 
         top_mean = results[0]["posterior_mean"] if results else 0
+        top_width = results[0].get("ci_width", 1.0) if results else 1.0
         if top_mean < 0.75 and not contradiction:
             suggestions.append(
                 "Current confidence is moderate. Look for primary documents or direct measurements to raise reliability."
+            )
+        if top_width > 0.4:
+            suggestions.append(
+                f"Credible interval is wide ({top_width:.2f}). Additional independent evidence will reduce uncertainty."
             )
 
         if not suggestions:
