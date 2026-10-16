@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.6-pro] - 2026-10-16
+
+### Reliability / CI
+- Fixed CLI so `python mfr_core_pro.py` (no arguments) runs the built-in demo, matching README and CI workflow expectations.
+- Made `question` positional argument optional; error only when evidence is supplied without a question.
+- CI demo step now succeeds on all Python versions in the matrix.
+
 ## [2.1.5-pro] - 2026-10-16
 
 ### Reliability
