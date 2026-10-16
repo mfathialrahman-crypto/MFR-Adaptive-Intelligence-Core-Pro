@@ -24,6 +24,9 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(result["status"], "INSUFFICIENT_EVIDENCE")
         self.assertEqual(result["confidence"], 0.0)
         self.assertIsNone(result["conclusion"])
+        self.assertIn("fingerprint", result)
+        self.assertEqual(len(result["fingerprint"]), 64)
+        self.assertEqual(result["version"], VERSION)
 
     def test_strong_agreement(self):
         rec = IntelligenceRecord(
