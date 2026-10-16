@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.7-pro] - 2026-10-16
+
+### User experience / CLI completeness
+- CLI `--evidence` now accepts optional WEIGHT and INDEPENDENT flags after reliability.
+- Format: `--evidence CLAIM SOURCE RELIABILITY [WEIGHT] [true|false]`
+- Existing 3-argument usage remains fully compatible.
+- Improved error messages for malformed evidence arguments.
+
 ## [2.1.6-pro] - 2026-10-16
 
 ### Reliability / CI
