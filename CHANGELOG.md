@@ -4,6 +4,9 @@ All notable changes to MFR Adaptive Intelligence Core Pro will be documented her
 
 ## [2.1.7-pro] - 2026-10-16
 
+### Documentation
+- README now explicitly references `AGENTS.md` as the governing Project Engineering Constitution.
+
 ### User experience / CLI completeness
 - CLI `--evidence` now accepts optional WEIGHT and INDEPENDENT flags after reliability.
 - Format: `--evidence CLAIM SOURCE RELIABILITY [WEIGHT] [true|false]`
