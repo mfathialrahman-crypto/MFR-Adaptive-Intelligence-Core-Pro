@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.7-pro] - 2026-10-16
+
+### Reliability / Consistency
+- All analysis reports (including `INSUFFICIENT_EVIDENCE`) now include a content-addressable `fingerprint`.
+- Fingerprint remains stable and excludes volatile fields (`record_id`, timestamps, version, audit_trail).
+- Added regression assertion that insufficient reports carry a valid 64-char fingerprint.
+
 ## [2.1.6-pro] - 2026-10-16
 
 ### Reliability / CI
