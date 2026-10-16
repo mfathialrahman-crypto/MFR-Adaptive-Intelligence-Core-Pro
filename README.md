@@ -129,6 +129,8 @@ Every output is a complete, replayable decision object.
 4. **The system must suggest its own next improvement.**
 5. **Provisional findings only — never absolute certainty.**
 
+The full Project Engineering Constitution that governs continuous improvement of this repository lives in [`AGENTS.md`](./AGENTS.md).
+
 ---
 
 ## Part of the FathiMind Stack
