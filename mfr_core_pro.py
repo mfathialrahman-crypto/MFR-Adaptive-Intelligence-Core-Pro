@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.4-pro"
+VERSION = "2.1.5-pro"
 
 
 @dataclass
