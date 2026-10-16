@@ -37,6 +37,9 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(result["status"], "PROVISIONAL_FINDING")
         self.assertEqual(result["conclusion"], "yes")
         self.assertGreater(result["confidence"], 0.5)
+        self.assertIn("uncertainty", result)
+        self.assertGreaterEqual(result["uncertainty"], 0.0)
+        self.assertIn("ci_width", result["top_claim"])
         self.assertIn("fingerprint", result)
         self.assertEqual(result["version"], VERSION)
 
