@@ -2,6 +2,11 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.5-pro] - 2026-10-16
+
+### Reliability
+- Extended CI matrix to Python 3.13 (in addition to 3.10–3.12). Pure stdlib; no behavior change.
+
 ## [2.1.4-pro] - 2026-10-13
 
 ### Developer & user experience
