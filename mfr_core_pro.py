@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.5-pro"
+VERSION = "2.1.6-pro"
 
 
 @dataclass
@@ -297,7 +297,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="MFR Adaptive Intelligence Core Pro – evidence analysis"
     )
-    parser.add_argument("question", help="The question to analyze")
+    parser.add_argument("question", nargs="?", default=None, help="The question to analyze (optional; omit to run demo)")
     parser.add_argument(
         "--evidence",
         action="append",
@@ -312,6 +312,8 @@ def main() -> None:
     if args.demo or not args.evidence:
         demo()
         return
+    if not args.question:
+        parser.error("question is required when providing evidence")
 
     evidence = []
     for claim, source, rel_str in args.evidence:
