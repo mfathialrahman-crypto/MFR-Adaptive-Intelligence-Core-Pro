@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.8-pro] - 2026-10-17
+
+### Reliability / UX
+- Suggestions now detect wide 95% credible intervals (width > 0.45) and recommend collecting additional independent high-reliability evidence to tighten the estimate.
+- Added regression test for the new wide-CI suggestion path.
+- Version bump aligned across code, pyproject, and README.
+
 ## [2.1.7-pro] - 2026-10-16
 
 ### Documentation

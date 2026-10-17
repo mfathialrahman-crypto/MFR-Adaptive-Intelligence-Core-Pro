@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.7-pro"
+VERSION = "2.1.8-pro"
 
 
 @dataclass
@@ -226,6 +226,15 @@ class IntelligenceRecord:
             suggestions.append(
                 "Current confidence is moderate. Look for primary documents or direct measurements to raise reliability."
             )
+
+        # Suggest tightening when credible interval is wide
+        if results:
+            ci = results[0].get("ci_95", [0.0, 1.0])
+            ci_width = ci[1] - ci[0]
+            if ci_width > 0.45:
+                suggestions.append(
+                    f"Credible interval is wide ({ci_width:.2f}). Collect additional independent high-reliability evidence to tighten the estimate."
+                )
 
         if not suggestions:
             suggestions.append("Evidence base is solid. Consider stress-testing the top claim against strong counter-evidence.")
