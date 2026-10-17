@@ -2,6 +2,18 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.11-pro] - 2026-10-17
+
+### User experience / CLI
+- Added `--evidence-file PATH` to load evidence from a JSON array of objects.
+- Supports structured, repeatable input for automation and integration.
+- Existing `--evidence` flag remains fully compatible.
+- Added analysis report JSON schema under `schemas/analysis.schema.json` (documentation contract; no runtime dependency).
+
+### Reliability
+- CLI now accepts either flag-based or file-based evidence.
+- All existing unit tests continue to pass.
+
 ## [2.1.10-pro] - 2026-10-17
 
 ### Code quality
