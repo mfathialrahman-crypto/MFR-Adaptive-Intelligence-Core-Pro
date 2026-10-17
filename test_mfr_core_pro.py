@@ -156,5 +156,19 @@ class TestAnalyze(unittest.TestCase):
         with self.assertRaises(ValueError):
             rec.analyze()
 
+    def test_evidence_notes_included(self):
+        rec = IntelligenceRecord(
+            question="q",
+            evidence=[
+                Evidence("yes", "A", 0.9, notes="primary source"),
+                Evidence("yes", "B", 0.8, notes=""),
+            ],
+        )
+        result = rec.analyze()
+        self.assertIn("evidence_notes", result)
+        self.assertEqual(len(result["evidence_notes"]), 1)
+        self.assertEqual(result["evidence_notes"][0]["notes"], "primary source")
+        self.assertEqual(result["evidence_notes"][0]["source"], "A")
+
 if __name__ == "__main__":
     unittest.main()

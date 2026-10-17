@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.9-pro] - 2026-10-17
+
+### Transparency
+- Analysis reports now include `evidence_notes` when any evidence carries non-empty notes.
+- Improves auditability without changing core scoring logic.
+- Fully backward compatible (new optional field).
+
 ## [2.1.8-pro] - 2026-10-17
 
 ### User experience / CLI completeness
