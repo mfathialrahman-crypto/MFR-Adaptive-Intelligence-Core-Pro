@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.10-pro] - 2026-10-17
+
+### Code quality
+- Extracted the conflict-detection threshold to a named constant `CONFLICT_THRESHOLD = 0.18`.
+- Documented the rationale in source. Behavior is unchanged.
+- All unit tests continue to pass.
+
 ## [2.1.9-pro] - 2026-10-17
 
 ### Code quality / typing
