@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.7-pro"
+VERSION = "2.1.8-pro"
 
 
 @dataclass
@@ -307,6 +307,12 @@ def main() -> None:
              "RELIABILITY 0-1, WEIGHT >0 (default 1.0), INDEPENDENT true/false (default true).",
     )
     parser.add_argument("--prior", type=float, default=0.5, help="Prior belief 0-1 (default 0.5)")
+    parser.add_argument(
+        "--alternatives",
+        action="append",
+        metavar="ALT",
+        help="Alternative claims to consider (repeatable). Stored for context; analysis focuses on evidence.",
+    )
     parser.add_argument("--demo", action="store_true", help="Run the built-in demo instead")
     args = parser.parse_args()
 
@@ -346,7 +352,12 @@ def main() -> None:
             sys.exit(2)
         evidence.append(Evidence(claim, source, rel, independent=independent, weight=weight))
 
-    rec = IntelligenceRecord(question=args.question, evidence=evidence, prior_belief=args.prior)
+    rec = IntelligenceRecord(
+        question=args.question,
+        evidence=evidence,
+        prior_belief=args.prior,
+        alternatives=args.alternatives or [],
+    )
     result = rec.analyze()
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
