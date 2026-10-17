@@ -24,7 +24,11 @@ import math
 import uuid
 
 
-VERSION = "2.1.9-pro"
+VERSION = "2.1.10-pro"
+
+# Minimum posterior-mean gap required to treat the top two claims as non-conflicting.
+# Below this threshold the evidence is marked CONFLICTING_EVIDENCE.
+CONFLICT_THRESHOLD = 0.18
 
 
 @dataclass
@@ -168,7 +172,7 @@ class IntelligenceRecord:
         if len(results) > 1:
             mean0 = float(results[0]["posterior_mean"])
             mean1 = float(results[1]["posterior_mean"])
-            contradiction = (mean0 - mean1) < 0.18
+            contradiction = (mean0 - mean1) < CONFLICT_THRESHOLD
 
         status = "CONFLICTING_EVIDENCE" if contradiction else "PROVISIONAL_FINDING"
         top = results[0]
