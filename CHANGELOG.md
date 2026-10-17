@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.8-pro] - 2026-10-17
+
+### User experience / CLI completeness
+- Added optional `--alternatives` flag to CLI (repeatable) to record competing hypotheses for context.
+- Alternatives are stored in the analysis record; core evidence analysis remains unchanged.
+- Fully backward compatible.
+
 ## [2.1.7-pro] - 2026-10-16
 
 ### Documentation
