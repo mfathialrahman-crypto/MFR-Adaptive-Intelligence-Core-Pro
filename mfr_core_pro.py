@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.8-pro"
+VERSION = "2.1.9-pro"
 
 
 @dataclass
@@ -163,6 +163,10 @@ class IntelligenceRecord:
         suggestions = self._generate_suggestions(results, evidence, contradiction)
 
         # 5. Build final report
+        evidence_notes = [
+            {"source": ev.source, "claim": ev.claim, "notes": ev.notes}
+            for ev in evidence if ev.notes.strip()
+        ]
         report = {
             "version": VERSION,
             "record_id": self.record_id,
@@ -173,6 +177,7 @@ class IntelligenceRecord:
             "top_claim": top,
             "competing_claims": results,
             "alternatives": self.alternatives,
+            "evidence_notes": evidence_notes,
             "suggestions": suggestions,
             "audit_trail": audit,
             "created_at": self.created_at,
