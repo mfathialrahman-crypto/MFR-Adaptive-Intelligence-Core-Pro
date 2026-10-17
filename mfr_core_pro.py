@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.10-pro"
+VERSION = "2.1.11-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -332,16 +332,51 @@ def main() -> None:
         help="Alternative claims to consider (repeatable). Stored for context; analysis focuses on evidence.",
     )
     parser.add_argument("--demo", action="store_true", help="Run the built-in demo instead")
+    parser.add_argument(
+        "--evidence-file",
+        type=str,
+        metavar="PATH",
+        help="JSON file containing a list of evidence objects "
+             "{claim, source, reliability, optional weight, optional independent}",
+    )
     args = parser.parse_args()
 
-    if args.demo or not args.evidence:
+    if args.demo or (not args.evidence and not args.evidence_file):
         demo()
         return
     if not args.question:
         parser.error("question is required when providing evidence")
 
     evidence = []
-    for items in args.evidence:
+    if args.evidence_file:
+        import json as _json
+        from pathlib import Path as _Path
+        try:
+            raw = _json.loads(_Path(args.evidence_file).read_text(encoding="utf-8"))
+        except (OSError, _json.JSONDecodeError) as exc:
+            print(f"Failed to load evidence file: {exc}", file=sys.stderr)
+            sys.exit(2)
+        if not isinstance(raw, list):
+            print("Evidence file must contain a JSON list", file=sys.stderr)
+            sys.exit(2)
+        for item in raw:
+            if not isinstance(item, dict):
+                print("Each evidence item must be an object", file=sys.stderr)
+                sys.exit(2)
+            try:
+                evidence.append(
+                    Evidence(
+                        claim=item["claim"],
+                        source=item["source"],
+                        reliability=float(item["reliability"]),
+                        independent=bool(item.get("independent", True)),
+                        weight=float(item.get("weight", 1.0)),
+                    )
+                )
+            except (KeyError, ValueError, TypeError) as exc:
+                print(f"Invalid evidence item: {exc}", file=sys.stderr)
+                sys.exit(2)
+    for items in (args.evidence or []):
         if len(items) < 3:
             print("Each --evidence needs at least CLAIM SOURCE RELIABILITY", file=sys.stderr)
             sys.exit(2)
