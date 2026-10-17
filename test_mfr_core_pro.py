@@ -2,6 +2,11 @@
 """Unit tests for MFR Adaptive Intelligence Core Pro"""
 
 import unittest
+import json
+import tempfile
+import os
+import subprocess
+import sys
 from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION
 
 
@@ -93,8 +98,6 @@ class TestAnalyze(unittest.TestCase):
         r1 = rec.analyze()
         self.assertTrue(len(r1["fingerprint"]) == 64)
 
-
-
     def test_empty_claim_rejected(self):
         with self.assertRaises(ValueError):
             Evidence("", "src", 0.8)
@@ -122,7 +125,6 @@ class TestAnalyze(unittest.TestCase):
         r2 = rec2.analyze()
         self.assertEqual(r1["fingerprint"], r2["fingerprint"])
         self.assertEqual(len(r1["fingerprint"]), 64)
-        # Different question → different fingerprint
         rec3 = IntelligenceRecord(question="Different?", evidence=ev)
         r3 = rec3.analyze()
         self.assertNotEqual(r1["fingerprint"], r3["fingerprint"])
@@ -137,9 +139,7 @@ class TestAnalyze(unittest.TestCase):
         )
         result = rec.analyze()
         self.assertEqual(result["status"], "PROVISIONAL_FINDING")
-        # After dedup only one evidence remains
         self.assertEqual(result["top_claim"]["evidence_count"], 1)
-
 
     def test_prior_belief_affects_posterior(self):
         """prior_belief should influence the posterior when evidence is limited."""
@@ -155,6 +155,29 @@ class TestAnalyze(unittest.TestCase):
         rec = IntelligenceRecord(question="q", prior_belief=1.5)
         with self.assertRaises(ValueError):
             rec.analyze()
+
+
+class TestCLI(unittest.TestCase):
+    def test_evidence_file_cli(self):
+        evidence_data = [
+            {"claim": "yes", "source": "A", "reliability": 0.9, "independent": True},
+            {"claim": "yes", "source": "B", "reliability": 0.8}
+        ]
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
+            json.dump(evidence_data, f)
+            path = f.name
+        try:
+            result = subprocess.run(
+                [sys.executable, "mfr_core_pro.py", "Is it true?", "--evidence-file", path],
+                capture_output=True, text=True, check=True, cwd=os.path.dirname(__file__) or "."
+            )
+            data = json.loads(result.stdout)
+            self.assertEqual(data["status"], "PROVISIONAL_FINDING")
+            self.assertEqual(data["conclusion"], "yes")
+            self.assertIn("fingerprint", data)
+        finally:
+            os.unlink(path)
+
 
 if __name__ == "__main__":
     unittest.main()
