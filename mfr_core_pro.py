@@ -18,13 +18,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from hashlib import sha256
-from typing import Any, Optional
+from typing import Any, Optional, TypedDict
 import json
 import math
 import uuid
 
 
-VERSION = "2.1.8-pro"
+VERSION = "2.1.9-pro"
 
 
 @dataclass
@@ -36,7 +36,7 @@ class Evidence:
     weight: float = 1.0  # extra multiplier (e.g. sample size / recency)
     notes: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not isinstance(self.claim, str) or not self.claim.strip():
             raise ValueError("claim must be a non-empty string")
         if not isinstance(self.source, str) or not self.source.strip():
@@ -45,6 +45,16 @@ class Evidence:
             raise ValueError(f"reliability must be in [0,1], got {self.reliability}")
         if not isinstance(self.weight, (int, float)) or self.weight <= 0:
             raise ValueError("weight must be a positive number")
+
+
+class ClaimResult(TypedDict):
+    claim: str
+    posterior_mean: float
+    ci_95: list[float]
+    support_mass: float
+    evidence_count: int
+    independent_count: int
+    effective_score: float
 
 
 @dataclass
@@ -121,7 +131,7 @@ class IntelligenceRecord:
             claims.setdefault(ev.claim, []).append((effective, ev.independent))
 
         # 3. Bayesian-style scoring (Beta prior + soft observations)
-        results = []
+        results: list[ClaimResult] = []
         for claim, scores in claims.items():
             support_mass = sum(s for s, _ in scores)
             n_obs = len(scores)
@@ -154,7 +164,11 @@ class IntelligenceRecord:
         # Rank by effective score then by posterior mean
         results.sort(key=lambda x: (x["effective_score"], x["posterior_mean"]), reverse=True)
 
-        contradiction = len(results) > 1 and results[0]["posterior_mean"] - results[1]["posterior_mean"] < 0.18
+        contradiction = False
+        if len(results) > 1:
+            mean0 = float(results[0]["posterior_mean"])
+            mean1 = float(results[1]["posterior_mean"])
+            contradiction = (mean0 - mean1) < 0.18
 
         status = "CONFLICTING_EVIDENCE" if contradiction else "PROVISIONAL_FINDING"
         top = results[0]
@@ -182,7 +196,7 @@ class IntelligenceRecord:
         report["fingerprint"] = fingerprint(report)
         return report
 
-    def _insufficient(self, reason: str, audit: list) -> dict[str, Any]:
+    def _insufficient(self, reason: str, audit: list[dict[str, Any]]) -> dict[str, Any]:
         audit.append({"step": "insufficient", "reason": reason})
         return {
             "version": VERSION,
@@ -201,7 +215,7 @@ class IntelligenceRecord:
         }
 
     def _generate_suggestions(
-        self, results: list[dict], evidence: list[Evidence], contradiction: bool
+        self, results: list[ClaimResult], evidence: list[Evidence], contradiction: bool
     ) -> list[str]:
         suggestions = []
         if contradiction:
@@ -233,7 +247,7 @@ class IntelligenceRecord:
         return suggestions
 
 
-def fingerprint(record: dict) -> str:
+def fingerprint(record: dict[str, Any]) -> str:
     """
     Content-addressable fingerprint.
     Stable for identical decision content (question, evidence, alternatives, prior, conclusion, confidence, status).

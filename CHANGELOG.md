@@ -2,6 +2,15 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.9-pro] - 2026-10-17
+
+### Code quality / typing
+- Strengthened static typing throughout the core module.
+- Introduced `ClaimResult` TypedDict for analysis claim records.
+- Added explicit return type and parameter types to satisfy strict mypy.
+- All unit tests continue to pass; behavior is unchanged.
+- Ready for optional type-checking in CI.
+
 ## [2.1.8-pro] - 2026-10-17
 
 ### User experience / CLI completeness
