@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/schemas/analysis.schema.json",
+  "title": "MFR Adaptive Intelligence Analysis Report",
+  "description": "Output contract for IntelligenceRecord.analyze(). Additive fields allowed. Public transparent layer of FathiMind.",
+  "type": "object",
+  "required": ["version", "status", "question", "confidence", "suggestions", "audit_trail", "created_at", "analyzed_at", "fingerprint"],
+  "properties": {
+    "version": { "type": "string" },
+    "record_id": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE", "INSUFFICIENT_EVIDENCE"]
+    },
+    "question": { "type": "string" },
+    "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "conclusion": { "type": ["string", "null"] },
+    "top_claim": { "type": "object", "additionalProperties": true },
+    "competing_claims": { "type": "array" },
+    "alternatives": { "type": "array", "items": { "type": "string" } },
+    "suggestions": { "type": "array", "items": { "type": "string" } },
+    "audit_trail": { "type": "array" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "analyzed_at": { "type": "string", "format": "date-time" },
+    "fingerprint": { "type": "string", "minLength": 64, "maxLength": 64 },
+    "missing": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}
