@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.12-pro"
+VERSION = "2.1.13-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -59,6 +59,8 @@ class ClaimResult(TypedDict):
     evidence_count: int
     independent_count: int
     effective_score: float
+    alpha: float
+    beta: float
 
 
 @dataclass
@@ -163,6 +165,8 @@ class IntelligenceRecord:
                 "evidence_count": n_obs,
                 "independent_count": n_independent,
                 "effective_score": round(support_mass * (1 + 0.15 * n_independent), 4),
+                "alpha": round(alpha, 4),
+                "beta": round(beta, 4),
             })
 
         # Rank by effective score then by posterior mean
@@ -244,6 +248,12 @@ class IntelligenceRecord:
             suggestions.append(
                 "Current confidence is moderate. Look for primary documents or direct measurements to raise reliability."
             )
+        if results:
+            ci_width = results[0]["ci_95"][1] - results[0]["ci_95"][0]
+            if ci_width > 0.5:
+                suggestions.append(
+                    f"Credible interval is wide ({ci_width:.2f}). Additional independent high-reliability evidence will narrow uncertainty."
+                )
 
         if not suggestions:
             suggestions.append("Evidence base is solid. Consider stress-testing the top claim against strong counter-evidence.")

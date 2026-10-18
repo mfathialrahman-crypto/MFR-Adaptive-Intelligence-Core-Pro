@@ -8,7 +8,7 @@
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.12-pro**  
+Version **2.1.13-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
 A rigorous, transparent, and self-improving evidence analysis engine designed for real decisions — not toy averaging.

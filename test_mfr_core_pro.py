@@ -157,6 +157,23 @@ class TestAnalyze(unittest.TestCase):
             rec.analyze()
 
 
+
+    def test_claim_result_includes_alpha_beta(self):
+        """Analysis must expose posterior parameters for full auditability."""
+        rec = IntelligenceRecord(
+            question="audit",
+            evidence=[Evidence("yes", "A", 0.9, independent=True)],
+        )
+        result = rec.analyze()
+        top = result["top_claim"]
+        self.assertIn("alpha", top)
+        self.assertIn("beta", top)
+        self.assertGreater(top["alpha"], 0)
+        self.assertGreater(top["beta"], 0)
+        # Mean must match alpha / (alpha + beta) within rounding
+        computed = top["alpha"] / (top["alpha"] + top["beta"])
+        self.assertAlmostEqual(computed, top["posterior_mean"], places=3)
+
 class TestDecisionMapping(unittest.TestCase):
     def test_to_fathimind_decision_strong(self):
         rec = IntelligenceRecord(

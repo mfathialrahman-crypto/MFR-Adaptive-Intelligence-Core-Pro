@@ -2,6 +2,15 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.13-pro] - 2026-10-18
+
+### Transparency / Auditability
+- Claim results now include posterior `alpha` and `beta` parameters.
+- Enables exact reconstruction of the Beta posterior and stronger audit trails.
+- Suggestions now flag wide credible intervals (>0.5) and recommend more evidence.
+- Fully backward compatible; existing fields and behavior preserved.
+- New unit test verifies alpha/beta presence and consistency with posterior mean.
+
 ## [2.1.12-pro] - 2026-10-18
 
 ### Interoperability / Competitive
