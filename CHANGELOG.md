@@ -2,6 +2,12 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.12-pro] - 2026-10-18
+
+### User experience / CLI
+- Added `--version` flag to print the current version and exit.
+- Fully backward compatible. Existing tests pass.
+
 ## [2.1.11-pro] - 2026-10-17
 
 ### User experience / CLI
