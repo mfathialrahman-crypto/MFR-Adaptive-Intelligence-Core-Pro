@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.14-pro] - 2026-10-19
+
+### Fixed
+- Restored complete `mfr_core_pro.py` implementation after accidental truncation to placeholder.
+- Verified: 20/20 unit tests pass; strict mypy clean; CLI `--decision` and demo work.
+- Aligned product VERSION constant with packaging version intent (2.1.14).
+
 ## [2.1.13-pro] - 2026-10-18
 
 ### Interoperability / CLI
