@@ -7,7 +7,7 @@ import tempfile
 import os
 import subprocess
 import sys
-from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION
+from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision
 
 
 class TestEvidence(unittest.TestCase):
@@ -155,6 +155,49 @@ class TestAnalyze(unittest.TestCase):
         rec = IntelligenceRecord(question="q", prior_belief=1.5)
         with self.assertRaises(ValueError):
             rec.analyze()
+
+
+class TestDecisionMapping(unittest.TestCase):
+    def test_to_fathimind_decision_strong(self):
+        rec = IntelligenceRecord(
+            question="Is it true?",
+            evidence=[
+                Evidence("yes", "A", 0.95, independent=True),
+                Evidence("yes", "B", 0.90, independent=True),
+            ],
+        )
+        result = rec.analyze()
+        decision = to_fathimind_decision(result)
+        self.assertIn("timestamp", decision)
+        self.assertIn(decision["status"], ("stable", "warning"))
+        self.assertGreaterEqual(decision["confidence"], 0.3)
+        self.assertLessEqual(decision["confidence"], 0.98)
+        self.assertIsInstance(decision["evidence"], list)
+        self.assertIsInstance(decision["anomalies"], list)
+        self.assertIn("input", decision)
+        self.assertEqual(decision["input"]["question"], "Is it true?")
+        self.assertEqual(decision["_original_status"], result["status"])
+
+    def test_to_fathimind_decision_insufficient(self):
+        rec = IntelligenceRecord(question="unknown")
+        result = rec.analyze()
+        decision = to_fathimind_decision(result)
+        self.assertEqual(decision["status"], "critical")
+        self.assertIn("insufficient evidence", decision["anomalies"])
+        self.assertGreaterEqual(decision["confidence"], 0.3)
+
+    def test_to_fathimind_decision_conflict(self):
+        rec = IntelligenceRecord(
+            question="Safe?",
+            evidence=[
+                Evidence("safe", "X", 0.9, independent=True),
+                Evidence("unsafe", "Y", 0.88, independent=True),
+            ],
+        )
+        result = rec.analyze()
+        decision = to_fathimind_decision(result)
+        self.assertEqual(decision["status"], "warning")
+        self.assertIn("conflicting evidence detected", decision["anomalies"])
 
 
 class TestCLI(unittest.TestCase):

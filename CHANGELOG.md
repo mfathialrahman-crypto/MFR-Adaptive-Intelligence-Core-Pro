@@ -2,6 +2,16 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.12-pro] - 2026-10-18
+
+### Interoperability / Competitive
+- Added `to_fathimind_decision(report)` that maps an analysis report to a FathiMind Decision schema-compatible object (RFC-0001).
+- Status mapping: high-confidence provisional → stable; lower or conflicting → warning; insufficient → critical.
+- Confidence is clamped to the shared contract bounds [0.3, 0.98].
+- Evidence and anomalies are populated for replayability. Additive fields allowed.
+- New unit tests cover strong, insufficient, and conflict cases.
+- Fully backward compatible; existing analyze() output is unchanged.
+
 ## [2.1.11-pro] - 2026-10-17
 
 ### User experience / CLI

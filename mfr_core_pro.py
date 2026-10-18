@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.11-pro"
+VERSION = "2.1.12-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -265,6 +265,74 @@ def fingerprint(record: dict[str, Any]) -> str:
     # Canonicalize evidence-like lists if present for stability
     payload = json.dumps(clean, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
     return sha256(payload).hexdigest()
+
+
+def to_fathimind_decision(report: dict[str, Any]) -> dict[str, Any]:
+    """Map an analysis report to a FathiMind Decision schema-compatible object (RFC-0001).
+
+    Status mapping (aligned with shared contract):
+    - PROVISIONAL_FINDING with confidence >= 0.75 → stable
+    - PROVISIONAL_FINDING with confidence < 0.75 → warning
+    - CONFLICTING_EVIDENCE → warning
+    - INSUFFICIENT_EVIDENCE → critical
+
+    Confidence is clamped to the contract bounds [0.3, 0.98].
+    Additive fields are allowed; this produces a minimal valid decision.
+    """
+    if not isinstance(report, dict):
+        raise TypeError("report must be a dict")
+
+    status_raw = report.get("status", "INSUFFICIENT_EVIDENCE")
+    conf = float(report.get("confidence", 0.0))
+    # Clamp to schema bounds
+    conf_clamped = max(0.3, min(0.98, conf))
+
+    if status_raw == "PROVISIONAL_FINDING":
+        decision_status = "stable" if conf >= 0.75 else "warning"
+    elif status_raw == "CONFLICTING_EVIDENCE":
+        decision_status = "warning"
+    else:
+        decision_status = "critical"
+
+    # Build evidence list as strings for simplicity and schema compatibility
+    evidence_items: list[str] = []
+    top = report.get("top_claim") or {}
+    if top:
+        evidence_items.append(
+            f"top_claim={top.get('claim')} posterior={top.get('posterior_mean')} "
+            f"ci={top.get('ci_95')} n={top.get('evidence_count')}"
+        )
+    for s in report.get("suggestions", [])[:5]:
+        evidence_items.append(f"suggestion: {s}")
+    if not evidence_items:
+        evidence_items.append("no supporting evidence")
+
+    anomalies = []
+    if status_raw == "CONFLICTING_EVIDENCE":
+        anomalies.append("conflicting evidence detected")
+    if status_raw == "INSUFFICIENT_EVIDENCE":
+        anomalies.append("insufficient evidence")
+    if conf < 0.6:
+        anomalies.append("low confidence")
+
+    decision = {
+        "timestamp": report.get("analyzed_at") or datetime.now(timezone.utc).isoformat(),
+        "status": decision_status,
+        "confidence": round(conf_clamped, 4),
+        "input": {
+            "question": report.get("question", ""),
+            "record_id": report.get("record_id"),
+            "version": report.get("version"),
+            "n_competing": len(report.get("competing_claims") or []),
+        },
+        "evidence": evidence_items,
+        "anomalies": anomalies,
+        "signature": report.get("fingerprint"),
+        # Additive: full original report reference for replay
+        "_source": "mfr_core_pro",
+        "_original_status": status_raw,
+    }
+    return decision
 
 
 def demo() -> None:
