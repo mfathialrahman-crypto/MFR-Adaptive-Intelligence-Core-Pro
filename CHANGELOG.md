@@ -1,3 +1,10 @@
+## [2.1.12-pro] - 2026-10-18
+
+### User experience / CLI
+- Added `--summary` flag for concise human-readable output (status, confidence, conclusion, suggestions, CI, short fingerprint).
+- Full JSON remains the default for automation and integration.
+- All existing unit tests continue to pass.
+
 # Changelog
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
