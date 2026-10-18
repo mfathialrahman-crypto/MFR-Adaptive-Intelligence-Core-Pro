@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.11-pro"
+VERSION = "2.1.12-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -71,6 +71,10 @@ class IntelligenceRecord:
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
     record_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.question, str) or not self.question.strip():
+            raise ValueError("question must be a non-empty string")
 
     def add_evidence(self, *items: Evidence) -> None:
         self.evidence.extend(items)

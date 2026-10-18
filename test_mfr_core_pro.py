@@ -98,6 +98,13 @@ class TestAnalyze(unittest.TestCase):
         r1 = rec.analyze()
         self.assertTrue(len(r1["fingerprint"]) == 64)
 
+    
+    def test_empty_question_rejected(self):
+        with self.assertRaises(ValueError):
+            IntelligenceRecord(question="", evidence=[Evidence("claim", "src", 0.9)])
+        with self.assertRaises(ValueError):
+            IntelligenceRecord(question="   ", evidence=[Evidence("claim", "src", 0.9)])
+
     def test_empty_claim_rejected(self):
         with self.assertRaises(ValueError):
             Evidence("", "src", 0.8)

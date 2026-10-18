@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.12-pro] - 2026-10-18
+
+### Reliability
+- Added validation rejecting empty or whitespace-only questions on IntelligenceRecord construction.
+- Prevents meaningless analysis records at the boundary.
+- Added regression test `test_empty_question_rejected`.
+- All existing tests continue to pass.
+
 ## [2.1.11-pro] - 2026-10-17
 
 ### User experience / CLI
