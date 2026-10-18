@@ -179,5 +179,15 @@ class TestCLI(unittest.TestCase):
             os.unlink(path)
 
 
+
+    def test_version_flag(self):
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "--version"],
+            capture_output=True, text=True, check=True, cwd=os.path.dirname(__file__) or "."
+        )
+        self.assertIn("2.1.12-pro", result.stdout)
+        self.assertEqual(result.returncode, 0)
+
+
 if __name__ == "__main__":
     unittest.main()
