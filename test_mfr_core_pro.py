@@ -151,6 +151,17 @@ class TestAnalyze(unittest.TestCase):
         self.assertGreater(r_high["confidence"], r_neutral["confidence"])
         self.assertEqual(r_neutral["status"], "PROVISIONAL_FINDING")
 
+    def test_wide_ci_suggestion(self):
+        """Wide credible interval should trigger a suggestion for more evidence."""
+        rec = IntelligenceRecord(
+            question="uncertain",
+            evidence=[Evidence("yes", "A", 0.7, independent=True)],
+        )
+        result = rec.analyze()
+        self.assertEqual(result["status"], "PROVISIONAL_FINDING")
+        suggestions = result["suggestions"]
+        self.assertTrue(any("Credible interval is wide" in s for s in suggestions))
+
     def test_invalid_prior_rejected(self):
         rec = IntelligenceRecord(question="q", prior_belief=1.5)
         with self.assertRaises(ValueError):
