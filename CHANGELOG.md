@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.12-pro] - 2026-10-18
+
+### Reliability / UX
+- Suggestions now include a note when the top claim's 95% credible interval is wide (>0.4), recommending additional independent evidence to reduce uncertainty.
+- Behavior of core analysis, status, and fingerprints unchanged.
+- Added regression test for the wide-CI suggestion path.
+- Version bumped to 2.1.12-pro.
+
 ## [2.1.11-pro] - 2026-10-17
 
 ### User experience / CLI
