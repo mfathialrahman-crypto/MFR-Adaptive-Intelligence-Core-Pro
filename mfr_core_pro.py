@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.11-pro"
+VERSION = "2.1.12-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -315,6 +315,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="MFR Adaptive Intelligence Core Pro – evidence analysis"
     )
+    parser.add_argument("--version", action="version", version=f"MFR Adaptive Intelligence Core Pro {VERSION}")
     parser.add_argument("question", nargs="?", default=None, help="The question to analyze (optional; omit to run demo)")
     parser.add_argument(
         "--evidence",
