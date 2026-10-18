@@ -3,12 +3,12 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions)
-[![Version](https://img.shields.io/badge/version-2.1.11--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.12--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.11-pro**  
+Version **2.1.12-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
 A rigorous, transparent, and self-improving evidence analysis engine designed for real decisions — not toy averaging.
@@ -57,7 +57,8 @@ python mfr_core_pro.py "Is the system secure?" \
   --evidence "secure" "audit-firm" 0.91 \
   --evidence "vulnerable" "researcher" 0.87 1.2 false \
   --alternatives "partially secure" \
-  --prior 0.5
+  --prior 0.5 \
+  --summary
 
 # Or load from JSON file:
 python mfr_core_pro.py "Is the system secure?" --evidence-file evidence.json
@@ -65,6 +66,8 @@ python mfr_core_pro.py "Is the system secure?" --evidence-file evidence.json
 
 The fourth argument (optional) is weight (>0, default 1.0).  
 The fifth argument (optional) is independent flag (`true`/`false`/`yes`/`no`, default true).
+
+Add `--summary` for a concise human-readable report instead of full JSON.
 
 Or run the demo:
 
