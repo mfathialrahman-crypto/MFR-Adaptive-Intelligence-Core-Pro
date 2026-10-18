@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.11-pro"
+VERSION = "2.1.12-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -244,6 +244,15 @@ class IntelligenceRecord:
             suggestions.append(
                 "Current confidence is moderate. Look for primary documents or direct measurements to raise reliability."
             )
+
+        # Uncertainty from credible interval width
+        if results:
+            ci = results[0]["ci_95"]
+            width = ci[1] - ci[0]
+            if width > 0.4:
+                suggestions.append(
+                    f"Credible interval is wide ({width:.2f}). Additional independent evidence will reduce uncertainty."
+                )
 
         if not suggestions:
             suggestions.append("Evidence base is solid. Consider stress-testing the top claim against strong counter-evidence.")
