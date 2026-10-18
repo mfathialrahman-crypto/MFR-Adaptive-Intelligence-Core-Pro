@@ -224,3 +224,23 @@ class TestCLI(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestDecisionCLI(unittest.TestCase):
+    def test_decision_flag_emits_contract(self):
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "Is it true?",
+             "--evidence", "yes", "A", "0.95",
+             "--evidence", "yes", "B", "0.90",
+             "--decision"],
+            capture_output=True, text=True, check=True,
+            cwd=os.path.dirname(__file__) or "."
+        )
+        data = json.loads(result.stdout)
+        self.assertIn("status", data)
+        self.assertIn(data["status"], ("stable", "warning", "critical"))
+        self.assertIn("confidence", data)
+        self.assertGreaterEqual(data["confidence"], 0.3)
+        self.assertLessEqual(data["confidence"], 0.98)
+        self.assertIn("input", data)
+        self.assertEqual(data["input"]["question"], "Is it true?")
