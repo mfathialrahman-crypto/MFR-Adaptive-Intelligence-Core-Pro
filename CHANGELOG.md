@@ -2,7 +2,15 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.13-pro] - 2026-10-18
+
+### Interoperability / CLI
+- Added optional `--decision` flag that emits a FathiMind Decision contract (RFC-0001) instead of the raw analysis report.
+- Non-breaking; default output remains the full analysis object.
+- Restored full core implementation that was accidentally overwritten by a placeholder in the previous commit.
+- All unit tests (19) and strict mypy continue to pass.
 ## [2.1.12-pro] - 2026-10-18
+
 
 ### Interoperability / Competitive
 - Added `to_fathimind_decision(report)` that maps an analysis report to a FathiMind Decision schema-compatible object (RFC-0001).
