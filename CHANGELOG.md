@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.14-pro] - 2026-10-19
+
+### Critical fix
+- Restored full production implementation of `mfr_core_pro.py` that had been overwritten by a placeholder string.
+- All 20 unit tests pass (Evidence validation, Bayesian updates, independence penalty, weight capping, conflict detection, content-addressable fingerprints, CLI, and FathiMind Decision mapping).
+- Version aligned across `pyproject.toml`, module `VERSION`, and documentation.
+- Zero-dependency stdlib only; behavior matches documented contracts and regression tests.
+
 ## [2.1.13-pro] - 2026-10-18
 
 ### Interoperability / CLI
@@ -81,7 +89,7 @@ All notable changes to MFR Adaptive Intelligence Core Pro will be documented her
 ## [2.1.4-pro] - 2026-10-13
 
 ### Developer & user experience
-- Added minimal CLI (`python mfr_core_pro.py "question" --evidence ...`) for quick analysis without writing code.
+- Added minimal CLI (`python mfr_core_pro.py \"question\" --evidence ...`) for quick analysis without writing code.
 - `--demo` flag and `--prior` support.
 - Existing demo and library API unchanged.
 
