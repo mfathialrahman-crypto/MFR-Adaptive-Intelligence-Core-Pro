@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.14-pro"
+VERSION = "2.1.15-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -333,6 +333,49 @@ def to_fathimind_decision(report: dict[str, Any]) -> dict[str, Any]:
         "_original_status": status_raw,
     }
     return decision
+
+
+def validate_fathimind_decision(decision: dict[str, Any]) -> list[str]:
+    """Pure-stdlib structural check against the minimal FathiMind Decision contract (RFC-0001).
+
+    Returns a list of human-readable violation messages (empty = valid).
+    Does not raise; callers decide how to handle violations.
+    Checks only required fields and basic type/bound constraints.
+    Additive fields are ignored.
+    """
+    violations: list[str] = []
+    if not isinstance(decision, dict):
+        return ["decision must be a dict"]
+
+    required = ["timestamp", "status", "confidence", "input", "evidence", "anomalies"]
+    for key in required:
+        if key not in decision:
+            violations.append(f"missing required field: {key}")
+
+    if "status" in decision and decision["status"] not in ("stable", "warning", "critical"):
+        violations.append(f"status must be one of stable/warning/critical, got {decision['status']!r}")
+
+    if "confidence" in decision:
+        conf = decision["confidence"]
+        if not isinstance(conf, (int, float)):
+            violations.append("confidence must be a number")
+        elif not (0.3 <= float(conf) <= 0.98):
+            violations.append(f"confidence {conf} outside contract bounds [0.3, 0.98]")
+
+    if "input" in decision and not isinstance(decision["input"], dict):
+        violations.append("input must be an object")
+
+    if "evidence" in decision and not isinstance(decision["evidence"], list):
+        violations.append("evidence must be an array")
+
+    if "anomalies" in decision and not isinstance(decision["anomalies"], list):
+        violations.append("anomalies must be an array")
+
+    ts = decision.get("timestamp")
+    if ts is not None and not isinstance(ts, str):
+        violations.append("timestamp must be a string")
+
+    return violations
 
 
 def demo() -> None:

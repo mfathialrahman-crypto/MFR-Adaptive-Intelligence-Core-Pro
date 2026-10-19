@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-19
+
+### Reliability / Interoperability
+- Added pure-stdlib `validate_fathimind_decision(decision)` that returns a list of contract violations against the minimal FathiMind Decision schema (RFC-0001). Empty list means structurally valid.
+- Checks required fields, status enum, confidence bounds [0.3, 0.98], and basic types. Additive fields ignored. Does not raise.
+- Unit tests cover valid decisions, missing fields, bad status, and out-of-bounds confidence.
+- Fully backward compatible. Existing analyze() and to_fathimind_decision() unchanged.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed

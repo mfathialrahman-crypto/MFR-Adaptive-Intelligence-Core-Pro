@@ -7,7 +7,7 @@ import tempfile
 import os
 import subprocess
 import sys
-from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision
+from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision, validate_fathimind_decision
 
 
 class TestEvidence(unittest.TestCase):
@@ -220,6 +220,44 @@ class TestCLI(unittest.TestCase):
             self.assertIn("fingerprint", data)
         finally:
             os.unlink(path)
+
+
+class TestDecisionValidator(unittest.TestCase):
+    def test_valid_decision_passes(self):
+        rec = IntelligenceRecord("q?", evidence=[Evidence("yes", "s", 0.9)])
+        report = rec.analyze()
+        decision = to_fathimind_decision(report)
+        self.assertEqual(validate_fathimind_decision(decision), [])
+
+    def test_missing_field_reported(self):
+        bad = {"status": "stable", "confidence": 0.8, "input": {}, "evidence": [], "anomalies": []}
+        # missing timestamp
+        violations = validate_fathimind_decision(bad)
+        self.assertTrue(any("timestamp" in v for v in violations))
+
+    def test_bad_status_reported(self):
+        bad = {
+            "timestamp": "2026-01-01T00:00:00Z",
+            "status": "unknown",
+            "confidence": 0.5,
+            "input": {},
+            "evidence": [],
+            "anomalies": [],
+        }
+        violations = validate_fathimind_decision(bad)
+        self.assertTrue(any("status" in v for v in violations))
+
+    def test_out_of_bounds_confidence_reported(self):
+        bad = {
+            "timestamp": "2026-01-01T00:00:00Z",
+            "status": "stable",
+            "confidence": 0.1,
+            "input": {},
+            "evidence": [],
+            "anomalies": [],
+        }
+        violations = validate_fathimind_decision(bad)
+        self.assertTrue(any("confidence" in v for v in violations))
 
 
 if __name__ == "__main__":
