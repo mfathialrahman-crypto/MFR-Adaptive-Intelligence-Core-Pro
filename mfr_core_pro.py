@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.14-pro"
+VERSION = "2.1.15-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -125,6 +125,7 @@ class IntelligenceRecord:
 
         # 2. Group by claim and compute effective support (capped to prevent invalid posteriors)
         claims: dict[str, list[tuple[float, bool]]] = {}  # claim -> list of (capped_effective, independent)
+        evidence_details: list[dict[str, Any]] = []
         for ev in evidence:
             # Independence penalty: non-independent evidence contributes less
             ind_factor = 1.0 if ev.independent else 0.55
@@ -133,6 +134,16 @@ class IntelligenceRecord:
             raw_effective = ev.reliability * min(ev.weight, 3.0) * ind_factor
             effective = min(1.0, raw_effective)
             claims.setdefault(ev.claim, []).append((effective, ev.independent))
+            evidence_details.append({
+                "source": ev.source,
+                "claim": ev.claim,
+                "reliability": ev.reliability,
+                "weight": ev.weight,
+                "independent": ev.independent,
+                "ind_factor": ind_factor,
+                "effective": round(effective, 4),
+            })
+        audit.append({"step": "evidence_effective", "details": evidence_details})
 
         # 3. Bayesian-style scoring (Beta prior + soft observations)
         results: list[ClaimResult] = []
