@@ -156,6 +156,12 @@ class TestAnalyze(unittest.TestCase):
         with self.assertRaises(ValueError):
             rec.analyze()
 
+    def test_empty_question_rejected(self):
+        with self.assertRaises(ValueError):
+            IntelligenceRecord(question="")
+        with self.assertRaises(ValueError):
+            IntelligenceRecord(question="   ")
+
 
 class TestDecisionMapping(unittest.TestCase):
     def test_to_fathimind_decision_strong(self):
