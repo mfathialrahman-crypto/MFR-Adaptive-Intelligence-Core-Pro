@@ -199,6 +199,22 @@ class TestDecisionMapping(unittest.TestCase):
         self.assertEqual(decision["status"], "warning")
         self.assertIn("conflicting evidence detected", decision["anomalies"])
 
+    def test_audit_includes_evidence_effective(self) -> None:
+        """Audit trail must record per-evidence effective contributions for explainability."""
+        rec = IntelligenceRecord(
+            question="test audit",
+            evidence=[
+                Evidence("yes", "src1", 0.9, independent=True, weight=1.5),
+                Evidence("yes", "src2", 0.6, independent=False),
+            ],
+        )
+        result = rec.analyze()
+        steps = [a["step"] for a in result["audit_trail"]]
+        self.assertIn("evidence_effective", steps)
+        details = next(a["details"] for a in result["audit_trail"] if a["step"] == "evidence_effective")
+        self.assertEqual(len(details), 2)
+        self.assertTrue(all("effective" in d and "independent" in d for d in details))
+
 
 class TestCLI(unittest.TestCase):
     def test_evidence_file_cli(self):
