@@ -2,6 +2,13 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-20
+
+### Improved
+- Evidence claim and source strings are now automatically stripped of leading/trailing whitespace for consistent grouping and fingerprinting.
+- Added 1MB size limit when loading evidence from JSON file via CLI to prevent resource exhaustion.
+- Added regression test for whitespace stripping.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed

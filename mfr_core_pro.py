@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.14-pro"
+VERSION = "2.1.15-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -43,8 +43,10 @@ class Evidence:
     def __post_init__(self) -> None:
         if not isinstance(self.claim, str) or not self.claim.strip():
             raise ValueError("claim must be a non-empty string")
+        self.claim = self.claim.strip()
         if not isinstance(self.source, str) or not self.source.strip():
             raise ValueError("source must be a non-empty string")
+        self.source = self.source.strip()
         if not 0.0 <= self.reliability <= 1.0:
             raise ValueError(f"reliability must be in [0,1], got {self.reliability}")
         if not isinstance(self.weight, (int, float)) or self.weight <= 0:
@@ -424,8 +426,13 @@ def main() -> None:
     if args.evidence_file:
         import json as _json
         from pathlib import Path as _Path
+        path = _Path(args.evidence_file)
         try:
-            raw = _json.loads(_Path(args.evidence_file).read_text(encoding="utf-8"))
+            # Security: limit evidence file size to 1MB to prevent resource exhaustion
+            if path.stat().st_size > 1_048_576:
+                print("Evidence file exceeds 1MB size limit", file=sys.stderr)
+                sys.exit(2)
+            raw = _json.loads(path.read_text(encoding="utf-8"))
         except (OSError, _json.JSONDecodeError) as exc:
             print(f"Failed to load evidence file: {exc}", file=sys.stderr)
             sys.exit(2)

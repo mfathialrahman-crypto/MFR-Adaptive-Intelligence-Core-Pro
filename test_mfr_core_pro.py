@@ -21,6 +21,11 @@ class TestEvidence(unittest.TestCase):
         with self.assertRaises(ValueError):
             Evidence("claim", "src", -0.1)
 
+    def test_whitespace_stripped(self):
+        e = Evidence("  claim with space  ", "  source  ", 0.9)
+        self.assertEqual(e.claim, "claim with space")
+        self.assertEqual(e.source, "source")
+
 
 class TestAnalyze(unittest.TestCase):
     def test_insufficient(self):
