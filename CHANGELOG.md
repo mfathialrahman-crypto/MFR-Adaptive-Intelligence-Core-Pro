@@ -2,6 +2,15 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-19
+
+### Reliability / Contract correctness
+- `_insufficient()` now returns a schema-complete report: includes `question`, `fingerprint`, `top_claim`, `competing_claims`, and `alternatives`.
+- Aligns the INSUFFICIENT_EVIDENCE path with `schemas/analysis.schema.json` required fields.
+- Decision mapper (`to_fathimind_decision`) now receives a non-empty question and a real content-addressable signature for insufficient cases.
+- Strengthened unit tests for both the analysis report and the decision contract on the insufficient path.
+- All 20 unit tests pass; strict mypy clean.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed
