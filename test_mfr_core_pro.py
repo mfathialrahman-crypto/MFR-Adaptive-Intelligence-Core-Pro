@@ -29,6 +29,11 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(result["status"], "INSUFFICIENT_EVIDENCE")
         self.assertEqual(result["confidence"], 0.0)
         self.assertIsNone(result["conclusion"])
+        self.assertEqual(result["question"], "test")
+        self.assertIn("fingerprint", result)
+        self.assertEqual(len(result["fingerprint"]), 64)
+        self.assertEqual(result["competing_claims"], [])
+        self.assertIsNone(result["top_claim"])
 
     def test_strong_agreement(self):
         rec = IntelligenceRecord(
@@ -185,6 +190,9 @@ class TestDecisionMapping(unittest.TestCase):
         self.assertEqual(decision["status"], "critical")
         self.assertIn("insufficient evidence", decision["anomalies"])
         self.assertGreaterEqual(decision["confidence"], 0.3)
+        self.assertEqual(decision["input"]["question"], "unknown")
+        self.assertIsNotNone(decision["signature"])
+        self.assertEqual(len(decision["signature"]), 64)
 
     def test_to_fathimind_decision_conflict(self):
         rec = IntelligenceRecord(
@@ -222,10 +230,6 @@ class TestCLI(unittest.TestCase):
             os.unlink(path)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestDecisionCLI(unittest.TestCase):
     def test_decision_flag_emits_contract(self):
         result = subprocess.run(
@@ -244,3 +248,7 @@ class TestDecisionCLI(unittest.TestCase):
         self.assertLessEqual(data["confidence"], 0.98)
         self.assertIn("input", data)
         self.assertEqual(data["input"]["question"], "Is it true?")
+
+
+if __name__ == "__main__":
+    unittest.main()
