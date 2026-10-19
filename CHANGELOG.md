@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-19
+
+### Reliability / Explainability
+- Enhanced audit trail with per-evidence effective contribution details (source, claim, reliability, weight, independence factor, effective score).
+- Improves replayability and transparency of the Bayesian update without changing any analysis results.
+- Added regression test covering the new audit step.
+- All 21 unit tests pass.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed
