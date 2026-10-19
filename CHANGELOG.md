@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-19
+
+### Reliability
+- Reject empty or whitespace-only questions at IntelligenceRecord construction time.
+- Prevents silent INSUFFICIENT_EVIDENCE paths that hide caller errors.
+- Added regression tests; all prior behavior for valid inputs preserved.
+- Verified: 21/21 unit tests pass; strict mypy clean.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed
