@@ -3,12 +3,12 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions)
-[![Version](https://img.shields.io/badge/version-2.1.14--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.15--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.14-pro**  
+Version **2.1.15-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
 A rigorous, transparent, and self-improving evidence analysis engine designed for real decisions — not toy averaging.
@@ -160,15 +160,6 @@ The full Project Engineering Constitution that governs continuous improvement of
 python -m unittest test_mfr_core_pro.py -v
 ```
 
-All critical paths are covered. The core is intentionally dependency-free (stdlib only) so it can be dropped into any environment.
+21 unit tests cover evidence validation, Bayesian updates, independence, conflict, fingerprint stability, CLI, and Decision contract mapping.
 
----
-
-## License
-
-MIT License — free to use, modify, and distribute with attribution.
-
----
-
-Built and continuously evolved by **Mohamed Fathi Alrahman**  
-[FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) — human-centric cognitive engineering.
+Strict mypy clean on the core module.
