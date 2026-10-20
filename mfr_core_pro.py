@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.14-pro"
+from version import VERSION
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
