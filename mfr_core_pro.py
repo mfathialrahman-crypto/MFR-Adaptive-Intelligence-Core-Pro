@@ -18,13 +18,17 @@ from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from hashlib import sha256
-from typing import Any, Optional
+from typing import Any, Optional, TypedDict
 import json
 import math
 import uuid
 
 
 from version import VERSION
+
+# Posterior mean difference below this threshold indicates insufficient separation
+# between top claims and is treated as conflicting evidence (see analyze()).
+CONFLICT_THRESHOLD = 0.18
 
 
 @dataclass
@@ -36,7 +40,7 @@ class Evidence:
     weight: float = 1.0  # extra multiplier (e.g. sample size / recency)
     notes: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not isinstance(self.claim, str) or not self.claim.strip():
             raise ValueError("claim must be a non-empty string")
         if not isinstance(self.source, str) or not self.source.strip():
@@ -45,6 +49,16 @@ class Evidence:
             raise ValueError(f"reliability must be in [0,1], got {self.reliability}")
         if not isinstance(self.weight, (int, float)) or self.weight <= 0:
             raise ValueError("weight must be a positive number")
+
+
+class ClaimResult(TypedDict):
+    claim: str
+    posterior_mean: float
+    ci_95: list[float]
+    support_mass: float
+    evidence_count: int
+    independent_count: int
+    effective_score: float
 
 
 @dataclass
@@ -121,7 +135,7 @@ class IntelligenceRecord:
             claims.setdefault(ev.claim, []).append((effective, ev.independent))
 
         # 3. Bayesian-style scoring (Beta prior + soft observations)
-        results = []
+        results: list[ClaimResult] = []
         for claim, scores in claims.items():
             support_mass = sum(s for s, _ in scores)
             n_obs = len(scores)
@@ -154,7 +168,11 @@ class IntelligenceRecord:
         # Rank by effective score then by posterior mean
         results.sort(key=lambda x: (x["effective_score"], x["posterior_mean"]), reverse=True)
 
-        contradiction = len(results) > 1 and results[0]["posterior_mean"] - results[1]["posterior_mean"] < 0.18
+        contradiction = False
+        if len(results) > 1:
+            mean0 = float(results[0]["posterior_mean"])
+            mean1 = float(results[1]["posterior_mean"])
+            contradiction = (mean0 - mean1) < CONFLICT_THRESHOLD
 
         status = "CONFLICTING_EVIDENCE" if contradiction else "PROVISIONAL_FINDING"
         top = results[0]
@@ -182,7 +200,7 @@ class IntelligenceRecord:
         report["fingerprint"] = fingerprint(report)
         return report
 
-    def _insufficient(self, reason: str, audit: list) -> dict[str, Any]:
+    def _insufficient(self, reason: str, audit: list[dict[str, Any]]) -> dict[str, Any]:
         audit.append({"step": "insufficient", "reason": reason})
         return {
             "version": VERSION,
@@ -201,7 +219,7 @@ class IntelligenceRecord:
         }
 
     def _generate_suggestions(
-        self, results: list[dict], evidence: list[Evidence], contradiction: bool
+        self, results: list[ClaimResult], evidence: list[Evidence], contradiction: bool
     ) -> list[str]:
         suggestions = []
         if contradiction:
@@ -233,7 +251,7 @@ class IntelligenceRecord:
         return suggestions
 
 
-def fingerprint(record: dict) -> str:
+def fingerprint(record: dict[str, Any]) -> str:
     """
     Content-addressable fingerprint.
     Stable for identical decision content (question, evidence, alternatives, prior, conclusion, confidence, status).
@@ -247,6 +265,74 @@ def fingerprint(record: dict) -> str:
     # Canonicalize evidence-like lists if present for stability
     payload = json.dumps(clean, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
     return sha256(payload).hexdigest()
+
+
+def to_fathimind_decision(report: dict[str, Any]) -> dict[str, Any]:
+    """Map an analysis report to a FathiMind Decision schema-compatible object (RFC-0001).
+
+    Status mapping (aligned with shared contract):
+    - PROVISIONAL_FINDING with confidence >= 0.75 → stable
+    - PROVISIONAL_FINDING with confidence < 0.75 → warning
+    - CONFLICTING_EVIDENCE → warning
+    - INSUFFICIENT_EVIDENCE → critical
+
+    Confidence is clamped to the contract bounds [0.3, 0.98].
+    Additive fields are allowed; this produces a minimal valid decision.
+    """
+    if not isinstance(report, dict):
+        raise TypeError("report must be a dict")
+
+    status_raw = report.get("status", "INSUFFICIENT_EVIDENCE")
+    conf = float(report.get("confidence", 0.0))
+    # Clamp to schema bounds
+    conf_clamped = max(0.3, min(0.98, conf))
+
+    if status_raw == "PROVISIONAL_FINDING":
+        decision_status = "stable" if conf >= 0.75 else "warning"
+    elif status_raw == "CONFLICTING_EVIDENCE":
+        decision_status = "warning"
+    else:
+        decision_status = "critical"
+
+    # Build evidence list as strings for simplicity and schema compatibility
+    evidence_items: list[str] = []
+    top = report.get("top_claim") or {}
+    if top:
+        evidence_items.append(
+            f"top_claim={top.get('claim')} posterior={top.get('posterior_mean')} "
+            f"ci={top.get('ci_95')} n={top.get('evidence_count')}"
+        )
+    for s in report.get("suggestions", [])[:5]:
+        evidence_items.append(f"suggestion: {s}")
+    if not evidence_items:
+        evidence_items.append("no supporting evidence")
+
+    anomalies = []
+    if status_raw == "CONFLICTING_EVIDENCE":
+        anomalies.append("conflicting evidence detected")
+    if status_raw == "INSUFFICIENT_EVIDENCE":
+        anomalies.append("insufficient evidence")
+    if conf < 0.6:
+        anomalies.append("low confidence")
+
+    decision = {
+        "timestamp": report.get("analyzed_at") or datetime.now(timezone.utc).isoformat(),
+        "status": decision_status,
+        "confidence": round(conf_clamped, 4),
+        "input": {
+            "question": report.get("question", ""),
+            "record_id": report.get("record_id"),
+            "version": report.get("version"),
+            "n_competing": len(report.get("competing_claims") or []),
+        },
+        "evidence": evidence_items,
+        "anomalies": anomalies,
+        "signature": report.get("fingerprint"),
+        # Additive: full original report reference for replay
+        "_source": "mfr_core_pro",
+        "_original_status": status_raw,
+    }
+    return decision
 
 
 def demo() -> None:
@@ -307,17 +393,63 @@ def main() -> None:
              "RELIABILITY 0-1, WEIGHT >0 (default 1.0), INDEPENDENT true/false (default true).",
     )
     parser.add_argument("--prior", type=float, default=0.5, help="Prior belief 0-1 (default 0.5)")
+    parser.add_argument(
+        "--alternatives",
+        action="append",
+        metavar="ALT",
+        help="Alternative claims to consider (repeatable). Stored for context; analysis focuses on evidence.",
+    )
     parser.add_argument("--demo", action="store_true", help="Run the built-in demo instead")
+    parser.add_argument(
+        "--decision",
+        action="store_true",
+        help="Emit FathiMind Decision contract (RFC-0001) instead of raw analysis report",
+    )
+    parser.add_argument(
+        "--evidence-file",
+        type=str,
+        metavar="PATH",
+        help="JSON file containing a list of evidence objects "
+             "{claim, source, reliability, optional weight, optional independent}",
+    )
     args = parser.parse_args()
 
-    if args.demo or not args.evidence:
+    if args.demo or (not args.evidence and not args.evidence_file):
         demo()
         return
     if not args.question:
         parser.error("question is required when providing evidence")
 
     evidence = []
-    for items in args.evidence:
+    if args.evidence_file:
+        import json as _json
+        from pathlib import Path as _Path
+        try:
+            raw = _json.loads(_Path(args.evidence_file).read_text(encoding="utf-8"))
+        except (OSError, _json.JSONDecodeError) as exc:
+            print(f"Failed to load evidence file: {exc}", file=sys.stderr)
+            sys.exit(2)
+        if not isinstance(raw, list):
+            print("Evidence file must contain a JSON list", file=sys.stderr)
+            sys.exit(2)
+        for item in raw:
+            if not isinstance(item, dict):
+                print("Each evidence item must be an object", file=sys.stderr)
+                sys.exit(2)
+            try:
+                evidence.append(
+                    Evidence(
+                        claim=item["claim"],
+                        source=item["source"],
+                        reliability=float(item["reliability"]),
+                        independent=bool(item.get("independent", True)),
+                        weight=float(item.get("weight", 1.0)),
+                    )
+                )
+            except (KeyError, ValueError, TypeError) as exc:
+                print(f"Invalid evidence item: {exc}", file=sys.stderr)
+                sys.exit(2)
+    for items in (args.evidence or []):
         if len(items) < 3:
             print("Each --evidence needs at least CLAIM SOURCE RELIABILITY", file=sys.stderr)
             sys.exit(2)
@@ -337,17 +469,29 @@ def main() -> None:
             elif ind_str in ("false", "0", "no", "n"):
                 independent = False
             else:
-                print(f"Invalid independent flag: {items[4]} (use true/false)", file=sys.stderr)
+                print(f"Invalid independent flag: {items[4]}", file=sys.stderr)
                 sys.exit(2)
         try:
-            rel = float(rel_str)
+            reliability = float(rel_str)
         except ValueError:
             print(f"Invalid reliability: {rel_str}", file=sys.stderr)
             sys.exit(2)
-        evidence.append(Evidence(claim, source, rel, independent=independent, weight=weight))
+        evidence.append(Evidence(claim, source, reliability, independent, weight))
 
-    rec = IntelligenceRecord(question=args.question, evidence=evidence, prior_belief=args.prior)
-    result = rec.analyze()
+    if not evidence:
+        print("No evidence provided", file=sys.stderr)
+        sys.exit(2)
+
+    record = IntelligenceRecord(
+        question=args.question,
+        evidence=evidence,
+        alternatives=args.alternatives or [],
+        prior_belief=args.prior,
+    )
+    result = record.analyze()
+    if args.decision:
+        from mfr_core_pro import to_fathimind_decision
+        result = to_fathimind_decision(result)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
