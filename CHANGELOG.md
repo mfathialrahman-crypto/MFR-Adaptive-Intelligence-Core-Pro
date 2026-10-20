@@ -2,6 +2,24 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-21
+
+### Reliability
+- IntelligenceRecord now rejects empty or whitespace-only questions at construction time.
+- prior_belief validation moved to __post_init__ for earlier failure (still checked in analyze for safety).
+
+### User experience / CLI
+- Added `--compact` flag for single-line JSON output (useful for piping and automation).
+- Evidence JSON file loader now accepts an optional `notes` field.
+
+### Tests
+- New tests cover empty-question rejection and compact CLI output.
+- Fixed test module structure so all test classes are discovered when the file is executed directly.
+
+### Verification
+- All unit tests pass (26+).
+- Strict mypy remains clean.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed
