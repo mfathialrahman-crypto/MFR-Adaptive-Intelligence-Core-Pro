@@ -244,3 +244,40 @@ class TestDecisionCLI(unittest.TestCase):
         self.assertLessEqual(data["confidence"], 0.98)
         self.assertIn("input", data)
         self.assertEqual(data["input"]["question"], "Is it true?")
+
+
+class TestCLIErrors(unittest.TestCase):
+    def test_invalid_reliability_cli(self):
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "Q?",
+             "--evidence", "claim", "src", "1.5"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(__file__) or "."
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("reliability", result.stderr.lower())
+
+    def test_missing_question_with_evidence(self):
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py",
+             "--evidence", "claim", "src", "0.9"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(__file__) or "."
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("question is required", result.stderr)
+
+    def test_bad_evidence_file_json(self):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            f.write("not json")
+            path = f.name
+        try:
+            result = subprocess.run(
+                [sys.executable, "mfr_core_pro.py", "Q?", "--evidence-file", path],
+                capture_output=True, text=True,
+                cwd=os.path.dirname(__file__) or "."
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Failed to load", result.stderr)
+        finally:
+            os.unlink(path)
