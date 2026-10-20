@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.14-pro"
+VERSION = "2.1.15-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -379,6 +379,7 @@ def main() -> None:
     """Minimal CLI for quick analysis."""
     import argparse
     import sys
+    from pathlib import Path
 
     parser = argparse.ArgumentParser(
         description="MFR Adaptive Intelligence Core Pro – evidence analysis"
@@ -411,6 +412,13 @@ def main() -> None:
         metavar="PATH",
         help="JSON file containing a list of evidence objects "
              "{claim, source, reliability, optional weight, optional independent}",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        metavar="FILE",
+        help="Write the JSON report (or decision) to this file instead of stdout. "
+             "Creates or overwrites the file. Useful for automation and pipelines.",
     )
     args = parser.parse_args()
 
@@ -486,10 +494,19 @@ def main() -> None:
     )
     result = rec.analyze()
     if args.decision:
-        decision = to_fathimind_decision(result)
-        print(json.dumps(decision, ensure_ascii=False, indent=2))
+        output_obj = to_fathimind_decision(result)
     else:
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        output_obj = result
+    payload = json.dumps(output_obj, ensure_ascii=False, indent=2)
+    if args.output:
+        try:
+            Path(args.output).write_text(payload + "\n", encoding="utf-8")
+            print(f"Wrote report to {args.output}", file=sys.stderr)
+        except OSError as exc:
+            print(f"Failed to write output file: {exc}", file=sys.stderr)
+            sys.exit(2)
+    else:
+        print(payload)
 
 
 if __name__ == "__main__":

@@ -281,3 +281,25 @@ class TestCLIErrors(unittest.TestCase):
             self.assertIn("Failed to load", result.stderr)
         finally:
             os.unlink(path)
+
+
+class TestOutputFlag(unittest.TestCase):
+    def test_output_flag_writes_file(self) -> None:
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td) / "report.json"
+            # Run via subprocess to test CLI
+            import subprocess, sys
+            cmd = [
+                sys.executable, "mfr_core_pro.py",
+                "Is it ready?",
+                "--evidence", "yes", "src", "0.9",
+                "--output", str(out),
+            ]
+            proc = subprocess.run(cmd, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertTrue(out.exists())
+            data = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(data["status"], "PROVISIONAL_FINDING")
+            self.assertIn("Wrote report to", proc.stderr)

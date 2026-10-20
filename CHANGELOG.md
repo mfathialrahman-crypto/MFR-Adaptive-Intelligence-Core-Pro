@@ -2,6 +2,15 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-20
+
+### User experience / CLI
+- Added optional `--output FILE` flag to write the analysis report (or Decision contract when `--decision` is set) to a file instead of stdout.
+- Prints a short confirmation to stderr. Fully backward compatible; default remains stdout.
+- Useful for scripting, pipelines, and automation.
+- New unit test covers the flag.
+- All existing tests continue to pass.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed
