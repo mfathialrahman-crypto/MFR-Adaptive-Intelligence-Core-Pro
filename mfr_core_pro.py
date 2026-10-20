@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.14-pro"
+VERSION = "2.1.15-pro"
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -71,6 +71,13 @@ class IntelligenceRecord:
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
     record_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.question, str) or not self.question.strip():
+            raise ValueError("question must be a non-empty string")
+        if not 0.0 <= self.prior_belief <= 1.0:
+            raise ValueError(f"prior_belief must be in [0,1], got {self.prior_belief}")
+        # Evidence items are validated by their own __post_init__
 
     def add_evidence(self, *items: Evidence) -> None:
         self.evidence.extend(items)
@@ -412,6 +419,11 @@ def main() -> None:
         help="JSON file containing a list of evidence objects "
              "{claim, source, reliability, optional weight, optional independent}",
     )
+    parser.add_argument(
+        "--compact",
+        action="store_true",
+        help="Emit compact JSON (no indentation) for machine consumption",
+    )
     args = parser.parse_args()
 
     if args.demo or (not args.evidence and not args.evidence_file):
@@ -444,6 +456,7 @@ def main() -> None:
                         reliability=float(item["reliability"]),
                         independent=bool(item.get("independent", True)),
                         weight=float(item.get("weight", 1.0)),
+                        notes=str(item.get("notes", "")),
                     )
                 )
             except (KeyError, ValueError, TypeError) as exc:
@@ -485,11 +498,12 @@ def main() -> None:
         alternatives=args.alternatives or [],
     )
     result = rec.analyze()
+    indent = None if args.compact else 2
     if args.decision:
         decision = to_fathimind_decision(result)
-        print(json.dumps(decision, ensure_ascii=False, indent=2))
+        print(json.dumps(decision, ensure_ascii=False, indent=indent))
     else:
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        print(json.dumps(result, ensure_ascii=False, indent=indent))
 
 
 if __name__ == "__main__":
