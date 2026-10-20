@@ -24,7 +24,7 @@ import math
 import uuid
 
 
-VERSION = "2.1.14-pro"
+from version import VERSION
 
 # Posterior mean difference below this threshold indicates insufficient separation
 # between top claims and is treated as conflicting evidence (see analyze()).
@@ -469,14 +469,21 @@ def main() -> None:
             elif ind_str in ("false", "0", "no", "n"):
                 independent = False
             else:
-                print(f"Invalid independent flag: {items[4]} (use true/false)", file=sys.stderr)
+                print(f"Invalid independent flag: {items[4]}", file=sys.stderr)
                 sys.exit(2)
         try:
-            rel = float(rel_str)
-        except ValueError:
-            print(f"Invalid reliability: {rel_str}", file=sys.stderr)
+            evidence.append(
+                Evidence(
+                    claim=claim,
+                    source=source,
+                    reliability=float(rel_str),
+                    independent=independent,
+                    weight=weight,
+                )
+            )
+        except ValueError as exc:
+            print(f"Invalid evidence: {exc}", file=sys.stderr)
             sys.exit(2)
-        evidence.append(Evidence(claim, source, rel, independent=independent, weight=weight))
 
     rec = IntelligenceRecord(
         question=args.question,
@@ -486,8 +493,7 @@ def main() -> None:
     )
     result = rec.analyze()
     if args.decision:
-        decision = to_fathimind_decision(result)
-        print(json.dumps(decision, ensure_ascii=False, indent=2))
+        print(json.dumps(to_fathimind_decision(result), ensure_ascii=False, indent=2))
     else:
         print(json.dumps(result, ensure_ascii=False, indent=2))
 

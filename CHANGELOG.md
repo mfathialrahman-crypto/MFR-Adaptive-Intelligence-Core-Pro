@@ -2,6 +2,14 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-20
+
+### Maintainability
+- Introduced `version.py` as the single source of truth for the product VERSION string.
+- `mfr_core_pro.py` now imports VERSION from version.py.
+- pyproject.toml remains the packaging version source; both are kept aligned.
+- All unit tests continue to pass.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed
