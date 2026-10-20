@@ -152,9 +152,8 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(r_neutral["status"], "PROVISIONAL_FINDING")
 
     def test_invalid_prior_rejected(self):
-        rec = IntelligenceRecord(question="q", prior_belief=1.5)
         with self.assertRaises(ValueError):
-            rec.analyze()
+            IntelligenceRecord(question="q", prior_belief=1.5)
 
 
 class TestDecisionMapping(unittest.TestCase):
@@ -222,10 +221,6 @@ class TestCLI(unittest.TestCase):
             os.unlink(path)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestDecisionCLI(unittest.TestCase):
     def test_decision_flag_emits_contract(self):
         result = subprocess.run(
@@ -281,3 +276,34 @@ class TestCLIErrors(unittest.TestCase):
             self.assertIn("Failed to load", result.stderr)
         finally:
             os.unlink(path)
+
+
+class TestQuestionValidation(unittest.TestCase):
+    def test_empty_question_rejected(self):
+        with self.assertRaises(ValueError):
+            IntelligenceRecord(question="")
+        with self.assertRaises(ValueError):
+            IntelligenceRecord(question="   ")
+
+    def test_invalid_prior_rejected_at_init(self):
+        with self.assertRaises(ValueError):
+            IntelligenceRecord(question="valid", prior_belief=1.5)
+
+
+class TestCompactCLI(unittest.TestCase):
+    def test_compact_flag(self):
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "Is it true?",
+             "--evidence", "yes", "A", "0.9",
+             "--compact"],
+            capture_output=True, text=True, check=True,
+            cwd=os.path.dirname(__file__) or "."
+        )
+        # Compact should be single-line or no extra indent whitespace at start of lines
+        self.assertNotIn("\n  ", result.stdout)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["status"], "PROVISIONAL_FINDING")
+
+
+if __name__ == "__main__":
+    unittest.main()
