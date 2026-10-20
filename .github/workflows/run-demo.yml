@@ -33,6 +33,11 @@ jobs:
           echo "=== Running Unit Tests (Python ${{ matrix.python-version }}) ==="
           python -m unittest test_mfr_core_pro.py -v
 
+      - name: Coverage report (pytest)
+        run: |
+          pip install pytest pytest-cov
+          python -m pytest test_mfr_core_pro.py --cov=mfr_core_pro --cov-report=term-missing
+
       - name: Run Adaptive Intelligence Demo
         run: |
           echo "============================================================"

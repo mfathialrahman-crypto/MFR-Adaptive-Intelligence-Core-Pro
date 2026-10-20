@@ -7,7 +7,7 @@ import tempfile
 import os
 import subprocess
 import sys
-from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision
+from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision, demo
 
 
 class TestEvidence(unittest.TestCase):
@@ -281,3 +281,18 @@ class TestCLIErrors(unittest.TestCase):
             self.assertIn("Failed to load", result.stderr)
         finally:
             os.unlink(path)
+
+
+class TestDemo(unittest.TestCase):
+    def test_demo_runs_without_error(self):
+        # Capture stdout to avoid clutter; just ensure no exception
+        from io import StringIO
+        import contextlib
+        buf = StringIO()
+        with contextlib.redirect_stdout(buf):
+            demo()
+        output = buf.getvalue()
+        self.assertIn("MFR Adaptive Intelligence Core Pro \u2013 Demo", output)
+        self.assertIn("Strong agreement", output)
+        self.assertIn("Conflicting evidence", output)
+        self.assertIn("Insufficient", output)
