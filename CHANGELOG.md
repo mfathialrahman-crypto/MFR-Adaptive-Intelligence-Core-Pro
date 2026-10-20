@@ -9,6 +9,11 @@ All notable changes to MFR Adaptive Intelligence Core Pro will be documented her
 - Verified: 20/20 unit tests pass; strict mypy clean; CLI `--decision` and demo work.
 - Aligned product VERSION constant with packaging version intent (2.1.14).
 
+### Improved
+- Introduced `version.py` as the single source of truth for the engine version (`VERSION` / `__version__`).
+- `mfr_core_pro.py` now imports `VERSION` from `version.py` instead of hard-coding it.
+- Aligns with FathiMind engineering hygiene: one place to update version across runtime, docs, and packaging intent.
+
 ## [2.1.13-pro] - 2026-10-18
 
 ### Interoperability / CLI
