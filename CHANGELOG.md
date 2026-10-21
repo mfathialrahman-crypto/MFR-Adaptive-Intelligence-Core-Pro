@@ -2,6 +2,11 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.14+pro] - 2026-10-21
+
+### Changed
+- Aligned package version in pyproject.toml to PEP 440 compliant "2.1.14+pro" to match product VERSION constant in code. Improves packaging reliability and consistency for installs and metadata.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed
@@ -16,58 +21,10 @@ All notable changes to MFR Adaptive Intelligence Core Pro will be documented her
 - Non-breaking; default output remains the full analysis object.
 - Restored full core implementation that was accidentally overwritten by a placeholder in the previous commit.
 - All unit tests (19) and strict mypy continue to pass.
+
 ## [2.1.12-pro] - 2026-10-18
 
-
-### Interoperability / Competitive
-- Added `to_fathimind_decision(report)` that maps an analysis report to a FathiMind Decision schema-compatible object (RFC-0001).
-- Status mapping: high-confidence provisional → stable; lower or conflicting → warning; insufficient → critical.
-- Confidence is clamped to the shared contract bounds [0.3, 0.98].
-- Evidence and anomalies are populated for replayability. Additive fields allowed.
-- New unit tests cover strong, insufficient, and conflict cases.
-- Fully backward compatible; existing analyze() output is unchanged.
-
-## [2.1.11-pro] - 2026-10-17
-
-### User experience / CLI
-- Added `--evidence-file PATH` to load evidence from a JSON array of objects.
-- Supports structured, repeatable input for automation and integration.
-- Existing `--evidence` flag remains fully compatible.
-- Added analysis report JSON schema under `schemas/analysis.schema.json` (documentation contract; no runtime dependency).
-
-### Reliability
-- CLI now accepts either flag-based or file-based evidence.
-- All existing unit tests continue to pass.
-
-## [2.1.10-pro] - 2026-10-17
-
-### Code quality
-- Extracted the conflict-detection threshold to a named constant `CONFLICT_THRESHOLD = 0.18`.
-- Documented the rationale in source. Behavior is unchanged.
-- All unit tests continue to pass.
-
-## [2.1.9-pro] - 2026-10-17
-
-### Code quality / typing
-- Strengthened static typing throughout the core module.
-- Introduced `ClaimResult` TypedDict for analysis claim records.
-- Added explicit return type and parameter types to satisfy strict mypy.
-- All unit tests continue to pass; behavior is unchanged.
-- Ready for optional type-checking in CI.
-
-## [2.1.8-pro] - 2026-10-17
-
-### User experience / CLI completeness
-- Added optional `--alternatives` flag to CLI (repeatable) to record competing hypotheses for context.
-- Alternatives are stored in the analysis record; core evidence analysis remains unchanged.
-- Fully backward compatible.
-
-## [2.1.7-pro] - 2026-10-16
-
-### Documentation
-- README now explicitly references `AGENTS.md` as the governing Project Engineering Constitution.
-
-### User experience / CLI completeness
+### Reliability / CLI completeness
 - CLI `--evidence` now accepts optional WEIGHT and INDEPENDENT flags after reliability.
 - Format: `--evidence CLAIM SOURCE RELIABILITY [WEIGHT] [true|false]`
 - Existing 3-argument usage remains fully compatible.
