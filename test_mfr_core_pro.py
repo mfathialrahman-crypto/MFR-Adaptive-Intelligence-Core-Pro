@@ -281,3 +281,49 @@ class TestCLIErrors(unittest.TestCase):
             self.assertIn("Failed to load", result.stderr)
         finally:
             os.unlink(path)
+
+
+class TestSuggestionsAndEdgeCases(unittest.TestCase):
+    def test_suggestions_on_small_sample(self):
+        rec = IntelligenceRecord(
+            question="Small?",
+            evidence=[Evidence("yes", "A", 0.8, independent=True)],
+        )
+        result = rec.analyze()
+        self.assertIn("Sample size is small", " ".join(result["suggestions"]))
+
+    def test_suggestions_on_conflict(self):
+        rec = IntelligenceRecord(
+            question="Conflict?",
+            evidence=[
+                Evidence("yes", "A", 0.85, independent=True),
+                Evidence("no", "B", 0.84, independent=True),
+            ],
+        )
+        result = rec.analyze()
+        self.assertEqual(result["status"], "CONFLICTING_EVIDENCE")
+        self.assertTrue(any("conflicting" in s.lower() for s in result["suggestions"]))
+
+    def test_suggestions_on_non_independent(self):
+        rec = IntelligenceRecord(
+            question="Indep?",
+            evidence=[
+                Evidence("yes", "A", 0.9, independent=False),
+                Evidence("yes", "B", 0.85, independent=True),
+            ],
+        )
+        result = rec.analyze()
+        self.assertTrue(any("non-independent" in s.lower() for s in result["suggestions"]))
+
+    def test_demo_runs_without_error(self):
+        # Direct call to cover demo path
+        from mfr_core_pro import demo
+        # Capture stdout to avoid noise
+        import io
+        from contextlib import redirect_stdout
+        f = io.StringIO()
+        with redirect_stdout(f):
+            demo()
+        output = f.getvalue()
+        self.assertIn("PROVISIONAL_FINDING", output)
+        self.assertIn("fingerprint", output)
