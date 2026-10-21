@@ -2,6 +2,12 @@
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
 
+## [2.1.15-pro] - 2026-10-21
+
+### Added
+- Regression test confirming that the approximate 95% credible interval tightens as additional independent supporting evidence is added.
+- No functional changes to analysis logic; verification of expected Bayesian-style behavior.
+
 ## [2.1.14-pro] - 2026-10-19
 
 ### Fixed

@@ -90,7 +90,24 @@ class TestAnalyze(unittest.TestCase):
         self.assertGreaterEqual(top["ci_95"][0], 0.0)
         self.assertLessEqual(top["ci_95"][1], 1.0)
 
-    def test_fingerprint_stable(self):
+    def test_ci_tightens_with_more_independent_evidence(self):
+        """Credible interval width should decrease as independent supporting evidence is added."""
+        rec = IntelligenceRecord(
+            question="CI width test",
+            evidence=[Evidence("yes", "A", 0.9, independent=True)],
+        )
+        r1 = rec.analyze()
+        width1 = r1["top_claim"]["ci_95"][1] - r1["top_claim"]["ci_95"][0]
+        rec.add_evidence(
+            Evidence("yes", "B", 0.9, independent=True),
+            Evidence("yes", "C", 0.9, independent=True),
+        )
+        r2 = rec.analyze()
+        width2 = r2["top_claim"]["ci_95"][1] - r2["top_claim"]["ci_95"][0]
+        self.assertLess(width2, width1)
+        self.assertGreaterEqual(r2["top_claim"]["ci_95"][0], 0.0)
+        self.assertLessEqual(r2["top_claim"]["ci_95"][1], 1.0)
+
         rec = IntelligenceRecord(
             question="q",
             evidence=[Evidence("c", "s", 0.8)],
