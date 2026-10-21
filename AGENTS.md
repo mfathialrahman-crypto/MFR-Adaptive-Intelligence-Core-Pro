@@ -343,3 +343,6 @@ Standing priority:
 stability → security → functional correctness → performance → quality → user experience → innovation.
 
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
+
+---
+*Last reviewed and confirmed in repository: 2026-10-21. Matches attached constitution plus long-horizon cycle.*
