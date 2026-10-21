@@ -7,7 +7,7 @@ import tempfile
 import os
 import subprocess
 import sys
-from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision
+from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision, validate_report
 
 
 class TestEvidence(unittest.TestCase):
@@ -29,6 +29,9 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(result["status"], "INSUFFICIENT_EVIDENCE")
         self.assertEqual(result["confidence"], 0.0)
         self.assertIsNone(result["conclusion"])
+        self.assertIn("fingerprint", result)
+        self.assertEqual(len(result["fingerprint"]), 64)
+        self.assertEqual(validate_report(result), [])
 
     def test_strong_agreement(self):
         rec = IntelligenceRecord(
@@ -327,3 +330,25 @@ class TestSuggestionsAndEdgeCases(unittest.TestCase):
         output = f.getvalue()
         self.assertIn("PROVISIONAL_FINDING", output)
         self.assertIn("fingerprint", output)
+
+
+class TestValidateReport(unittest.TestCase):
+    def test_valid_provisional(self):
+        rec = IntelligenceRecord(
+            question="q",
+            evidence=[Evidence("yes", "A", 0.9)],
+        )
+        result = rec.analyze()
+        self.assertEqual(validate_report(result), [])
+
+    def test_valid_insufficient_now_has_fingerprint(self):
+        result = IntelligenceRecord(question="empty").analyze()
+        self.assertEqual(result["status"], "INSUFFICIENT_EVIDENCE")
+        self.assertEqual(validate_report(result), [])
+
+    def test_detects_missing_fingerprint(self):
+        bad = {"version": "x", "status": "PROVISIONAL_FINDING", "question": "q",
+               "confidence": 0.5, "suggestions": [], "audit_trail": [],
+               "created_at": "t", "analyzed_at": "t"}
+        violations = validate_report(bad)
+        self.assertTrue(any("fingerprint" in v for v in violations))
