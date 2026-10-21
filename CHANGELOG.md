@@ -1,3 +1,15 @@
+## [2.1.15-pro] - 2026-10-21
+
+### Improved
+- Added regression tests for suggestion generation on small samples, conflicting evidence, and non-independent sources.
+- Added direct unit test for the built-in demo() path.
+- Raised measured logical coverage of core analysis paths.
+- Version aligned across code, packaging, and docs.
+
+### Verified
+- All 27 unit tests pass.
+- Existing CLI, decision mapping, and fingerprint behavior preserved.
+
 # Changelog
 
 All notable changes to MFR Adaptive Intelligence Core Pro will be documented here.
