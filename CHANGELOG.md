@@ -1,3 +1,14 @@
+## [2.1.17-pro] - 2026-10-22
+
+### Improved
+- Reject empty or whitespace-only questions at IntelligenceRecord construction (ValueError).
+- Strengthens input validation for reliability and prevents silent low-quality analyses.
+- Version aligned across version.py, pyproject.toml, and README.
+
+### Verified
+- All unit tests pass including new empty-question regression.
+- Existing analysis, CLI, fingerprint, and decision mapping behavior preserved.
+
 ## [2.1.16-pro] - 2026-10-22
 
 ### Fixed (Critical)
