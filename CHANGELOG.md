@@ -1,3 +1,13 @@
+## [2.1.18-pro] - 2026-10-22
+
+### Improved
+- Suggestions now flag wide 95% credible intervals (width > 0.35) as a reliability signal for remaining uncertainty.
+- Version aligned across version.py, pyproject.toml, README, and changelog.
+
+### Verified
+- All existing unit tests continue to pass.
+- New suggestion path covered by existing suggestion tests plus manual verification.
+
 ## [2.1.17-pro] - 2026-10-22
 
 ### Improved
