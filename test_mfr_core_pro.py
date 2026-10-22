@@ -326,6 +326,15 @@ class TestSuggestionsAndEdgeCases(unittest.TestCase):
         result = rec.analyze()
         self.assertTrue(any("non-independent" in s.lower() for s in result["suggestions"]))
 
+    def test_suggestions_on_wide_ci(self):
+        """Wide credible interval should trigger an uncertainty suggestion."""
+        rec = IntelligenceRecord(
+            question="Uncertain?",
+            evidence=[Evidence("maybe", "solo", 0.55, independent=True)],
+        )
+        result = rec.analyze()
+        self.assertTrue(any("credible interval is wide" in s.lower() for s in result["suggestions"]))
+
     def test_demo_runs_without_error(self):
         # Direct call to cover demo path
         from mfr_core_pro import demo
