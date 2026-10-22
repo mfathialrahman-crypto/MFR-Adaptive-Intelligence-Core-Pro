@@ -1,3 +1,18 @@
+#!/usr/bin/env python3
+"""
+MFR Adaptive Intelligence Core Pro
+Evidence → Bayesian Reasoning → Verification → Self-Improvement
+
+Superior implementation over the original:
+- Bayesian-style belief updating with Beta prior
+- Proper independence penalty
+- Full audit trail
+- Conflict resolution with explanatory hypotheses
+- Confidence intervals (approximate)
+- Actionable improvement suggestions
+- Deterministic fingerprinting + versioning
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
