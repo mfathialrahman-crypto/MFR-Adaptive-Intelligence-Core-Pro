@@ -1,14 +1,15 @@
 ## [2.1.16-pro] - 2026-10-22
 
-### Fixed (Reliability / Contract)
-- Insufficient-evidence reports now always include a content-addressable `fingerprint` and the original `question`.
-- All analysis outputs now satisfy the public `analysis.schema.json` required fields.
-- Added `validate_report()` pure-Python contract checker (zero dependencies) that reports schema violations.
+### Fixed (Critical)
+- Restored full implementation of `mfr_core_pro.py` after accidental truncation to a stub. Core Bayesian analysis, Evidence validation, IntelligenceRecord.analyze(), fingerprinting, decision mapping, CLI, and demo are fully operational again.
+- Insufficient-evidence reports include content-addressable fingerprint and original question.
+- All analysis outputs satisfy analysis.schema.json required fields.
+- validate_report() contract checker present.
 
 ### Verified
-- All 30 unit tests pass (previously 27).
-- Fingerprint stability and existing decision mapping preserved.
-- No regressions in CLI or Bayesian scoring paths.
+- All 30 unit tests pass.
+- Strict mypy passes.
+- CLI, decision mapping, and fingerprint stability confirmed.
 
 ## [2.1.15-pro] - 2026-10-21
 
@@ -40,8 +41,8 @@ All notable changes to MFR Adaptive Intelligence Core Pro will be documented her
 - Non-breaking; default output remains the full analysis object.
 - Restored full core implementation that was accidentally overwritten by a placeholder in the previous commit.
 - All unit tests (19) and strict mypy continue to pass.
-## [2.1.12-pro] - 2026-10-18
 
+## [2.1.12-pro] - 2026-10-18
 
 ### Interoperability / Competitive
 - Added `to_fathimind_decision(report)` that maps an analysis report to a FathiMind Decision schema-compatible object (RFC-0001).
