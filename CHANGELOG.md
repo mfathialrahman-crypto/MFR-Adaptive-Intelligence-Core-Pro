@@ -1,3 +1,13 @@
+## [2.1.18-pro] - 2026-10-22
+
+### Fixed
+- Aligned public documentation (README badge and version text) with single source of truth `version.py` (2.1.18-pro) and packaging version (2.1.18).
+- Prevents user-facing version drift on the competitive public surface.
+
+### Verified
+- All 31 unit tests continue to pass after documentation-only change.
+- No functional code modified.
+
 ## [2.1.17-pro] - 2026-10-22
 
 ### Improved
