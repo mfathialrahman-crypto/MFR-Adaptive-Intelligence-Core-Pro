@@ -226,6 +226,14 @@ def _generate_suggestions(
         )
     if top and top.get("evidence_count", 0) == 1:
         suggestions.append("Top claim rests on a single source. Seek additional confirmation.")
+    # Reliability: warn on wide credible interval (high uncertainty)
+    if top and "ci_95" in top:
+        ci_low, ci_high = top["ci_95"]
+        width = ci_high - ci_low
+        if width > 0.35:
+            suggestions.append(
+                f"Credible interval is wide ({width:.2f}). Posterior remains uncertain; gather more independent evidence."
+            )
     if not suggestions:
         suggestions.append("Evidence is reasonably coherent. Monitor for new observations.")
     return suggestions
