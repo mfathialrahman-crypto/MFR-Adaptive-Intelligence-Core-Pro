@@ -152,6 +152,30 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(result["status"], "PROVISIONAL_FINDING")
         self.assertEqual(result["top_claim"]["evidence_count"], 1)
 
+    def test_multi_claim_opposing_correct(self):
+        """Multi-claim soft opposition must remain consistent after linearization."""
+        rec = IntelligenceRecord(
+            question="Multi?",
+            evidence=[
+                Evidence("A", "s1", 0.9, independent=True),
+                Evidence("B", "s2", 0.85, independent=True),
+                Evidence("C", "s3", 0.7, independent=False),
+                Evidence("A", "s4", 0.8, independent=True),
+            ],
+        )
+        result = rec.analyze()
+        self.assertIn(result["status"], ("PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE"))
+        self.assertGreaterEqual(len(result["competing_claims"]), 2)
+        # Fingerprint must still be stable
+        r2 = IntelligenceRecord(
+            question="Multi?",
+            evidence=rec.evidence,
+        ).analyze()
+        self.assertEqual(result["fingerprint"], r2["fingerprint"])
+        # Confidence bounded
+        self.assertGreaterEqual(result["confidence"], 0.0)
+        self.assertLessEqual(result["confidence"], 1.0)
+
     def test_prior_belief_affects_posterior(self):
         """prior_belief should influence the posterior when evidence is limited."""
         ev = [Evidence("yes", "A", 0.6)]
