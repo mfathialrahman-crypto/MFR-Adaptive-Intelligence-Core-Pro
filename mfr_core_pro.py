@@ -123,27 +123,32 @@ class IntelligenceRecord:
         prior_alpha = self.prior_belief * prior_strength
         prior_beta = (1.0 - self.prior_belief) * prior_strength
 
+        # Precompute effective weight per claim and global total (O(n) instead of O(n^2) opposing sum)
+        claim_effective: Dict[str, float] = {}
+        claim_indep: Dict[str, int] = {}
+        global_total_effective = 0.0
+        for claim, evs in by_claim.items():
+            own = 0.0
+            indep_c = 0
+            for ev in evs:
+                indep_factor = 1.0 if ev.independent else INDEPENDENCE_FACTOR
+                effective = min(ev.reliability * ev.weight * indep_factor, MAX_EFFECTIVE_WEIGHT)
+                own += effective
+                if ev.independent:
+                    indep_c += 1
+            claim_effective[claim] = own
+            claim_indep[claim] = indep_c
+            global_total_effective += own
+
         claim_stats: List[Dict[str, Any]] = []
         for claim, evs in by_claim.items():
             alpha = prior_alpha
             beta = prior_beta
-            total_weight = 0.0
-            indep_count = 0
-            for ev in evs:
-                indep_factor = 1.0 if ev.independent else INDEPENDENCE_FACTOR  # independence penalty
-                effective = min(ev.reliability * ev.weight * indep_factor, MAX_EFFECTIVE_WEIGHT)
-                # Soft positive observation
-                alpha += effective
-                total_weight += effective
-                if ev.independent:
-                    indep_count += 1
-            # Opposing evidence increases beta slightly via residual
-            opposing = sum(
-                min(o.reliability * o.weight * (1.0 if o.independent else INDEPENDENCE_FACTOR), MAX_EFFECTIVE_WEIGHT)
-                for other_claim, others in by_claim.items()
-                if other_claim != claim
-                for o in others
-            )
+            total_weight = claim_effective[claim]
+            indep_count = claim_indep[claim]
+            alpha += total_weight
+            # Soft opposition from all other evidence
+            opposing = global_total_effective - total_weight
             beta += opposing * 0.5  # soft opposition
 
             mean = alpha / (alpha + beta) if (alpha + beta) > 0 else 0.5
