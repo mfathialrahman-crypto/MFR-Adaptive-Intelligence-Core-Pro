@@ -183,7 +183,7 @@ class IntelligenceRecord:
             conclusion = top["claim"]
             confidence = top["posterior_mean"]
 
-        suggestions = _generate_suggestions(deduped, status, top, second)
+        suggestions = _generate_suggestions(deduped, status, top, second, self.alternatives)
         audit.append(f"Status={status}, confidence={confidence:.3f}, separation={separation:.3f}")
 
         report = {
@@ -214,6 +214,7 @@ def _generate_suggestions(
     status: str,
     top: Optional[Dict[str, Any]],
     second: Optional[Dict[str, Any]],
+    alternatives: Optional[List[str]] = None,
 ) -> List[str]:
     suggestions: List[str] = []
     if len(evidence) < 3:
@@ -229,6 +230,10 @@ def _generate_suggestions(
         )
     if top and top.get("evidence_count", 0) == 1:
         suggestions.append("Top claim rests on a single source. Seek additional confirmation.")
+    if alternatives:
+        alts = ", ".join(a.strip() for a in alternatives if a and a.strip())
+        if alts:
+            suggestions.append(f"Listed alternatives: {alts}. Consider gathering evidence that distinguishes among them.")
     if not suggestions:
         suggestions.append("Evidence is reasonably coherent. Monitor for new observations.")
     return suggestions

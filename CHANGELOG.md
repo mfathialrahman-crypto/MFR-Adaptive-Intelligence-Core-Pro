@@ -1,3 +1,20 @@
+## [2.1.21-pro] - 2026-10-23
+
+### Added
+- `_generate_suggestions` now accepts and surfaces listed alternatives when present.
+  Suggestion text includes the alternative claims so they are visible in the report.
+- Regression test `test_suggestions_include_alternatives` verifies the behavior.
+
+### Fixed
+- Version alignment: version.py, pyproject.toml, and README now all report 2.1.21-pro / 2.1.21.
+- Previous commit claimed the feature but only bumped version.py; implementation and test are now complete.
+
+### Verified
+- All 33 unit tests pass locally.
+- Existing fingerprints and status logic for independent-only evidence unchanged.
+
+# Changelog
+
 ## [2.1.19-pro] - 2026-10-23
 
 ### Fixed
