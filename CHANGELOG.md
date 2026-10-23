@@ -1,3 +1,14 @@
+## [2.1.20-pro] - 2026-10-23
+
+### Improved
+- Suggestions now explicitly surface provided alternatives so users can compare claims against them.
+- Fixes previously failing unit test `test_suggestions_include_alternatives`.
+- Version aligned across `version.py` (2.1.20-pro), `pyproject.toml` (2.1.20), and README.
+
+### Verified
+- All 33 unit tests pass.
+- Existing analysis paths, fingerprints, CLI, and decision mapping remain unchanged for cases without alternatives.
+
 ## [2.1.19-pro] - 2026-10-23
 
 ### Fixed
