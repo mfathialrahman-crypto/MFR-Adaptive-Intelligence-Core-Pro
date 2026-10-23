@@ -7,7 +7,7 @@ import tempfile
 import os
 import subprocess
 import sys
-from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision, validate_report
+from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision, validate_report, INDEPENDENCE_FACTOR, _strength
 
 
 class TestEvidence(unittest.TestCase):
@@ -60,6 +60,14 @@ class TestAnalyze(unittest.TestCase):
         self.assertEqual(result["status"], "CONFLICTING_EVIDENCE")
         self.assertIsNone(result["conclusion"])
         self.assertGreaterEqual(len(result["competing_claims"]), 2)
+
+    def test_independence_factor_consistent(self):
+        """Deduplication strength and Beta updates must use the same independence factor."""
+        self.assertEqual(INDEPENDENCE_FACTOR, 0.6)
+        indep = Evidence("c", "s", 0.9, independent=True, weight=1.0)
+        non = Evidence("c", "s", 0.9, independent=False, weight=1.0)
+        self.assertAlmostEqual(_strength(indep), 0.9)
+        self.assertAlmostEqual(_strength(non), 0.9 * INDEPENDENCE_FACTOR)
 
     def test_independence_penalty(self):
         rec = IntelligenceRecord(

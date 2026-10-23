@@ -34,6 +34,9 @@ MIN_SEPARATION = 0.05
 # Soft observation weight is capped to keep Beta parameters valid
 MAX_EFFECTIVE_WEIGHT = 5.0
 
+# Single source of truth for non-independent evidence down-weighting
+INDEPENDENCE_FACTOR = 0.6
+
 
 @dataclass
 class Evidence:
@@ -127,7 +130,7 @@ class IntelligenceRecord:
             total_weight = 0.0
             indep_count = 0
             for ev in evs:
-                indep_factor = 1.0 if ev.independent else 0.6  # independence penalty
+                indep_factor = 1.0 if ev.independent else INDEPENDENCE_FACTOR  # independence penalty
                 effective = min(ev.reliability * ev.weight * indep_factor, MAX_EFFECTIVE_WEIGHT)
                 # Soft positive observation
                 alpha += effective
@@ -136,7 +139,7 @@ class IntelligenceRecord:
                     indep_count += 1
             # Opposing evidence increases beta slightly via residual
             opposing = sum(
-                min(o.reliability * o.weight * (1.0 if o.independent else 0.6), MAX_EFFECTIVE_WEIGHT)
+                min(o.reliability * o.weight * (1.0 if o.independent else INDEPENDENCE_FACTOR), MAX_EFFECTIVE_WEIGHT)
                 for other_claim, others in by_claim.items()
                 if other_claim != claim
                 for o in others
@@ -203,7 +206,7 @@ class IntelligenceRecord:
 
 
 def _strength(ev: Evidence) -> float:
-    return ev.reliability * ev.weight * (1.0 if ev.independent else 0.7)
+    return ev.reliability * ev.weight * (1.0 if ev.independent else INDEPENDENCE_FACTOR)
 
 
 def _generate_suggestions(

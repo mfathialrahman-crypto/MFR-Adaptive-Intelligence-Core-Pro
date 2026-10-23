@@ -1,3 +1,15 @@
+## [2.1.19-pro] - 2026-10-23
+
+### Fixed
+- Unified independence penalty to a single constant `INDEPENDENCE_FACTOR = 0.6`.
+  Previously `_strength()` used 0.7 while Beta updates used 0.6, causing inconsistent ranking of non-independent evidence during deduplication.
+- Deduplication now uses the same factor as belief updating.
+
+### Verified
+- All existing unit tests pass.
+- Fingerprints and analysis outputs for independent-only evidence remain unchanged.
+- No regressions in status, confidence, or suggestion generation.
+
 ## [2.1.18-pro] - 2026-10-22
 
 ### Fixed
