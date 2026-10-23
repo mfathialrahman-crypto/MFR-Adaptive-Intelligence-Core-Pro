@@ -15,10 +15,10 @@ Superior implementation over the original:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from hashlib import sha256
-from typing import Any, Optional, TypedDict, List, Dict
+from typing import Any, Optional, List, Dict
 import json
 import math
 import uuid
