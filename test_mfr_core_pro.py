@@ -359,6 +359,22 @@ class TestSuggestionsAndEdgeCases(unittest.TestCase):
         self.assertIn("PROVISIONAL_FINDING", output)
         self.assertIn("fingerprint", output)
 
+    def test_all_non_independent_still_provisional(self):
+        """All non-independent evidence should still produce a provisional finding with appropriate suggestion."""
+        rec = IntelligenceRecord(
+            question="All non-indep?",
+            evidence=[
+                Evidence("yes", "A", 0.9, independent=False),
+                Evidence("yes", "B", 0.85, independent=False),
+            ],
+        )
+        result = rec.analyze()
+        self.assertEqual(result["status"], "PROVISIONAL_FINDING")
+        self.assertEqual(result["conclusion"], "yes")
+        joined = " ".join(result["suggestions"]).lower()
+        self.assertIn("non-independent", joined)
+        self.assertEqual(validate_report(result), [])
+
 
 class TestValidateReport(unittest.TestCase):
     def test_valid_provisional(self):
