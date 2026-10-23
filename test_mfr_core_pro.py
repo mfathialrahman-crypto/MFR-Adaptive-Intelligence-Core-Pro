@@ -334,6 +334,18 @@ class TestSuggestionsAndEdgeCases(unittest.TestCase):
         result = rec.analyze()
         self.assertTrue(any("non-independent" in s.lower() for s in result["suggestions"]))
 
+    def test_suggestions_include_alternatives(self):
+        rec = IntelligenceRecord(
+            question="Which is better?",
+            evidence=[Evidence("A", "src1", 0.8)],
+            alternatives=["B", "C"],
+        )
+        result = rec.analyze()
+        joined = " ".join(result["suggestions"]).lower()
+        self.assertIn("alternatives", joined)
+        self.assertIn("b", joined)
+        self.assertIn("c", joined)
+
     def test_demo_runs_without_error(self):
         # Direct call to cover demo path
         from mfr_core_pro import demo
