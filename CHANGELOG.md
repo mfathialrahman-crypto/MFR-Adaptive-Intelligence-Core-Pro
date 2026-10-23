@@ -1,3 +1,13 @@
+## [2.1.22-pro] - 2026-10-23
+
+### Improved
+- Removed unused imports (`asdict`, `TypedDict`) from `mfr_core_pro.py` for cleaner code quality and maintainability.
+- Version aligned across version.py (2.1.22-pro), pyproject.toml (2.1.22), and README.
+
+### Verified
+- All 33 unit tests pass locally after the cleanup.
+- No functional changes; fingerprints, analysis logic, CLI, and decision mapping preserved.
+
 ## [2.1.21-pro] - 2026-10-23
 
 ### Added
