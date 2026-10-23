@@ -1,3 +1,14 @@
+## [2.1.21-pro] - 2026-10-23
+
+### Fixed
+- Suggestion generation now surfaces listed alternatives when present (e.g. "Consider the listed alternatives: B, C.").
+- Resolves failing unit test `test_suggestions_include_alternatives` and improves actionability of analysis output.
+- Version aligned across `version.py` (2.1.21-pro), `pyproject.toml` (2.1.21), and README.
+
+### Verified
+- All 33 unit tests pass.
+- Existing analysis, fingerprint, decision mapping, and CLI behavior preserved for cases without alternatives.
+
 ## [2.1.19-pro] - 2026-10-23
 
 ### Fixed
