@@ -1,3 +1,15 @@
+## [2.1.23-pro] - 2026-10-24
+
+### Improved
+- Added regression test `test_all_non_independent_still_provisional` covering the edge case of all non-independent evidence.
+  Confirms provisional finding, conclusion, suggestion generation, and contract validation still hold.
+- Version aligned across version.py (2.1.23-pro), pyproject.toml (2.1.23), and README.
+
+### Verified
+- All 34 unit tests pass locally.
+- No functional changes to analysis logic, fingerprints, or CLI.
+- CI matrix expected to remain green.
+
 ## [2.1.22-pro] - 2026-10-23
 
 ### Improved
