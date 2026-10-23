@@ -1,3 +1,15 @@
+## [2.1.20-pro] - 2026-10-23
+
+### Improved
+- Optimized multi-claim opposing evidence aggregation from O(n²) to O(n) by precomputing total effective weight.
+- Soft opposition semantics and all numerical results remain identical.
+- Added regression test for multi-claim consistency and fingerprint stability.
+
+### Verified
+- All 33 unit tests pass.
+- Existing analysis outputs, statuses, and fingerprints for prior cases unchanged.
+- No regressions in CLI, decision mapping, or validation.
+
 ## [2.1.19-pro] - 2026-10-23
 
 ### Fixed
