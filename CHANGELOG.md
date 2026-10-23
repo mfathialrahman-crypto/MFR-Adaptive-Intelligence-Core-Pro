@@ -2,6 +2,7 @@
 
 ### Improved
 - Removed unused imports (`asdict`, `TypedDict`) from `mfr_core_pro.py` for cleaner code quality and maintainability.
+  (Cleanup completed in follow-up commit after the initial claim.)
 - Version aligned across version.py (2.1.22-pro), pyproject.toml (2.1.22), and README.
 
 ### Verified
