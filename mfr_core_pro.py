@@ -15,16 +15,17 @@ Superior implementation over the original:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
+import argparse
+import json
+import os
+import math
+import sys
+import uuid
+from collections import defaultdict
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from hashlib import sha256
-from typing import Any, Optional, TypedDict, List, Dict
-import json
-import math
-import uuid
-import argparse
-import sys
-from collections import defaultdict
+from typing import Any
 
 from version import VERSION
 
@@ -36,6 +37,10 @@ MAX_EFFECTIVE_WEIGHT = 5.0
 
 # Single source of truth for non-independent evidence down-weighting
 INDEPENDENCE_FACTOR = 0.6
+
+# Resource bounds to keep analysis reliable and prevent resource exhaustion
+MAX_EVIDENCE_ITEMS = 1000
+MAX_EVIDENCE_FILE_BYTES = 1_000_000  # 1 MiB
 
 
 @dataclass
@@ -64,8 +69,8 @@ class Evidence:
 @dataclass
 class IntelligenceRecord:
     question: str
-    evidence: List[Evidence] = field(default_factory=list)
-    alternatives: List[str] = field(default_factory=list)
+    evidence: list[Evidence] = field(default_factory=list)
+    alternatives: list[str] = field(default_factory=list)
     prior_belief: float = 0.5
     record_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -76,12 +81,14 @@ class IntelligenceRecord:
             raise ValueError("question must be non-empty")
         self.question = q
 
-    def analyze(self) -> Dict[str, Any]:
+    def analyze(self) -> dict[str, Any]:
         if not (0.0 <= self.prior_belief <= 1.0):
             raise ValueError(f"prior_belief must be in [0, 1], got {self.prior_belief}")
+        if len(self.evidence) > MAX_EVIDENCE_ITEMS:
+            raise ValueError(f"too many evidence items ({len(self.evidence)}); maximum is {MAX_EVIDENCE_ITEMS}")
 
         analyzed_at = datetime.now(timezone.utc).isoformat()
-        audit: List[str] = []
+        audit: list[str] = []
 
         if not self.evidence:
             report = {
@@ -104,7 +111,7 @@ class IntelligenceRecord:
             return report
 
         # Deduplicate by source: keep the strongest evidence per source
-        by_source: Dict[str, Evidence] = {}
+        by_source: dict[str, Evidence] = {}
         for ev in self.evidence:
             key = ev.source
             if key not in by_source or _strength(ev) > _strength(by_source[key]):
@@ -113,7 +120,7 @@ class IntelligenceRecord:
         audit.append(f"Deduplicated {len(self.evidence)} → {len(deduped)} unique sources.")
 
         # Group supporting evidence by claim
-        by_claim: Dict[str, List[Evidence]] = defaultdict(list)
+        by_claim: dict[str, list[Evidence]] = defaultdict(list)
         for ev in deduped:
             by_claim[ev.claim].append(ev)
 
@@ -123,7 +130,7 @@ class IntelligenceRecord:
         prior_alpha = self.prior_belief * prior_strength
         prior_beta = (1.0 - self.prior_belief) * prior_strength
 
-        claim_stats: List[Dict[str, Any]] = []
+        claim_stats: list[dict[str, Any]] = []
         for claim, evs in by_claim.items():
             alpha = prior_alpha
             beta = prior_beta
@@ -210,13 +217,13 @@ def _strength(ev: Evidence) -> float:
 
 
 def _generate_suggestions(
-    evidence: List[Evidence],
+    evidence: list[Evidence],
     status: str,
-    top: Optional[Dict[str, Any]],
-    second: Optional[Dict[str, Any]],
-    alternatives: Optional[List[str]] = None,
-) -> List[str]:
-    suggestions: List[str] = []
+    top: dict[str, Any] | None,
+    second: dict[str, Any] | None,
+    alternatives: list[str] | None = None,
+) -> list[str]:
+    suggestions: list[str] = []
     if len(evidence) < 3:
         suggestions.append("Sample size is small. Collect more independent observations.")
     non_indep = [e for e in evidence if not e.independent]
@@ -239,7 +246,7 @@ def _generate_suggestions(
     return suggestions
 
 
-def fingerprint(question: str, evidence: List[Evidence], prior: float) -> str:
+def fingerprint(question: str, evidence: list[Evidence], prior: float) -> str:
     """Content-addressable SHA-256 fingerprint. Independent of timestamps and record_id."""
     canonical = {
         "question": question.strip(),
@@ -262,7 +269,7 @@ def fingerprint(question: str, evidence: List[Evidence], prior: float) -> str:
     return sha256(raw).hexdigest()
 
 
-def to_fathimind_decision(report: Dict[str, Any]) -> Dict[str, Any]:
+def to_fathimind_decision(report: dict[str, Any]) -> dict[str, Any]:
     """Map analysis report to FathiMind Decision contract (RFC-0001 style)."""
     status_map = {
         "PROVISIONAL_FINDING": "stable" if report.get("confidence", 0) >= 0.75 else "warning",
@@ -271,7 +278,7 @@ def to_fathimind_decision(report: Dict[str, Any]) -> Dict[str, Any]:
     }
     mapped_status = status_map.get(report.get("status", ""), "warning")
     conf = max(0.3, min(0.98, report.get("confidence", 0.3)))
-    anomalies: List[str] = []
+    anomalies: list[str] = []
     if report.get("status") == "INSUFFICIENT_EVIDENCE":
         anomalies.append("insufficient evidence")
     if report.get("status") == "CONFLICTING_EVIDENCE":
@@ -288,9 +295,9 @@ def to_fathimind_decision(report: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def validate_report(report: Dict[str, Any]) -> List[str]:
+def validate_report(report: dict[str, Any]) -> list[str]:
     """Pure-Python contract checker against analysis.schema.json required fields."""
-    violations: List[str] = []
+    violations: list[str] = []
     required = [
         "version", "status", "question", "confidence", "suggestions",
         "audit_trail", "created_at", "analyzed_at", "fingerprint",
@@ -363,9 +370,14 @@ def main() -> None:
         print("question is required when providing evidence", file=sys.stderr)
         sys.exit(2)
 
-    evidence_list: List[Evidence] = []
+    evidence_list: list[Evidence] = []
     if args.evidence_file:
         try:
+            import os
+            size = os.path.getsize(args.evidence_file)
+            if size > MAX_EVIDENCE_FILE_BYTES:
+                print(f"Evidence file too large ({size} bytes); maximum is {MAX_EVIDENCE_FILE_BYTES}", file=sys.stderr)
+                sys.exit(2)
             with open(args.evidence_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
             for item in data:
@@ -376,7 +388,7 @@ def main() -> None:
                     independent=item.get("independent", True),
                     weight=float(item.get("weight", 1.0)),
                 ))
-        except Exception as exc:
+        except (OSError, json.JSONDecodeError, ValueError, KeyError, TypeError) as exc:
             print(f"Failed to load evidence file: {exc}", file=sys.stderr)
             sys.exit(2)
     if args.evidence:

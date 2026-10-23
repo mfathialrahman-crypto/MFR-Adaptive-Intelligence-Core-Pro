@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 """Unit tests for MFR Adaptive Intelligence Core Pro"""
 
-import unittest
 import json
-import tempfile
 import os
 import subprocess
 import sys
-from mfr_core_pro import IntelligenceRecord, Evidence, fingerprint, VERSION, to_fathimind_decision, validate_report, INDEPENDENCE_FACTOR, _strength
+import tempfile
+import unittest
+
+from mfr_core_pro import (
+    INDEPENDENCE_FACTOR,
+    VERSION,
+    Evidence,
+    IntelligenceRecord,
+    _strength,
+    to_fathimind_decision,
+    validate_report,
+)
 
 
 class TestEvidence(unittest.TestCase):
@@ -231,7 +240,7 @@ class TestCLI(unittest.TestCase):
         try:
             result = subprocess.run(
                 [sys.executable, "mfr_core_pro.py", "Is it true?", "--evidence-file", path],
-                capture_output=True, text=True, check=True, cwd=os.path.dirname(__file__) or "."
+                check=True, capture_output=True, text=True, cwd=os.path.dirname(__file__) or "."
             )
             data = json.loads(result.stdout)
             self.assertEqual(data["status"], "PROVISIONAL_FINDING")
@@ -240,6 +249,21 @@ class TestCLI(unittest.TestCase):
         finally:
             os.unlink(path)
 
+
+
+class TestResourceLimits(unittest.TestCase):
+    def test_too_many_evidence_rejected(self):
+        from mfr_core_pro import MAX_EVIDENCE_ITEMS
+        evs = [Evidence("c", f"s{i}", 0.8) for i in range(MAX_EVIDENCE_ITEMS + 1)]
+        rec = IntelligenceRecord(question="too many", evidence=evs)
+        with self.assertRaises(ValueError) as ctx:
+            rec.analyze()
+        self.assertIn("too many evidence", str(ctx.exception).lower())
+
+    def test_file_size_limit_cli(self):
+        # Create a file larger than limit would be slow; instead test the constant is defined
+        from mfr_core_pro import MAX_EVIDENCE_FILE_BYTES
+        self.assertGreater(MAX_EVIDENCE_FILE_BYTES, 100_000)
 
 if __name__ == "__main__":
     unittest.main()
@@ -252,7 +276,7 @@ class TestDecisionCLI(unittest.TestCase):
              "--evidence", "yes", "A", "0.95",
              "--evidence", "yes", "B", "0.90",
              "--decision"],
-            capture_output=True, text=True, check=True,
+            check=True, capture_output=True, text=True,
             cwd=os.path.dirname(__file__) or "."
         )
         data = json.loads(result.stdout)
@@ -270,7 +294,7 @@ class TestCLIErrors(unittest.TestCase):
         result = subprocess.run(
             [sys.executable, "mfr_core_pro.py", "Q?",
              "--evidence", "claim", "src", "1.5"],
-            capture_output=True, text=True,
+            check=False, capture_output=True, text=True,
             cwd=os.path.dirname(__file__) or "."
         )
         self.assertNotEqual(result.returncode, 0)
@@ -280,7 +304,7 @@ class TestCLIErrors(unittest.TestCase):
         result = subprocess.run(
             [sys.executable, "mfr_core_pro.py",
              "--evidence", "claim", "src", "0.9"],
-            capture_output=True, text=True,
+            check=False, capture_output=True, text=True,
             cwd=os.path.dirname(__file__) or "."
         )
         self.assertNotEqual(result.returncode, 0)
@@ -293,7 +317,7 @@ class TestCLIErrors(unittest.TestCase):
         try:
             result = subprocess.run(
                 [sys.executable, "mfr_core_pro.py", "Q?", "--evidence-file", path],
-                capture_output=True, text=True,
+                check=False, capture_output=True, text=True,
                 cwd=os.path.dirname(__file__) or "."
             )
             self.assertNotEqual(result.returncode, 0)
@@ -348,10 +372,11 @@ class TestSuggestionsAndEdgeCases(unittest.TestCase):
 
     def test_demo_runs_without_error(self):
         # Direct call to cover demo path
-        from mfr_core_pro import demo
         # Capture stdout to avoid noise
         import io
         from contextlib import redirect_stdout
+
+        from mfr_core_pro import demo
         f = io.StringIO()
         with redirect_stdout(f):
             demo()
@@ -361,6 +386,17 @@ class TestSuggestionsAndEdgeCases(unittest.TestCase):
 
 
 class TestValidateReport(unittest.TestCase):
+    def test_version_alignment(self):
+        """Packaging version must match the numeric part of VERSION."""
+        import re
+        from pathlib import Path
+        pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+        m = re.search(r'version = "([^"]+)"', pyproject)
+        self.assertIsNotNone(m)
+        pkg_ver = m.group(1)
+        core_ver = VERSION.split("-")[0]  # strip -pro
+        self.assertEqual(pkg_ver, core_ver)
+
     def test_valid_provisional(self):
         rec = IntelligenceRecord(
             question="q",

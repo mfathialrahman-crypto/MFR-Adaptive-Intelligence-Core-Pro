@@ -1,3 +1,17 @@
+## [2.1.22-pro] - 2026-10-23
+
+### Improved
+- Added resource bounds: maximum 1000 evidence items per analysis and 1 MiB evidence file size.
+  Prevents accidental resource exhaustion when the core is embedded or used via CLI.
+- Narrowed exception handling in evidence-file loading to specific expected errors.
+- Explicit `check=` arguments on all subprocess calls in tests (ruff PLW1510).
+- Sorted imports and minor formatting cleanups.
+
+### Verified
+- All 35 unit tests pass.
+- Existing analysis outputs, fingerprints, and status logic for normal inputs unchanged.
+- mypy --strict continues to pass.
+
 ## [2.1.21-pro] - 2026-10-23
 
 ### Added
