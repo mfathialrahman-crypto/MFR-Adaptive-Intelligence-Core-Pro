@@ -459,3 +459,40 @@ class TestValidateReportEdges(unittest.TestCase):
         }
         violations = validate_report(report)
         self.assertTrue(any("fingerprint" in v for v in violations))
+
+
+class TestCLIAdditionalEdges(unittest.TestCase):
+    def test_incomplete_evidence_args(self):
+        """CLI must reject --evidence with fewer than 3 parts."""
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "Q?",
+             "--evidence", "claim", "src"],  # missing reliability
+            capture_output=True, text=True,
+            cwd=os.path.dirname(__file__) or "."
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("at least claim source reliability", result.stderr)
+
+    def test_invalid_prior_cli(self):
+        """CLI must reject prior outside [0,1]."""
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "Q?",
+             "--evidence", "yes", "A", "0.9",
+             "--prior", "1.5"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(__file__) or "."
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("prior_belief", result.stderr.lower())
+
+    def test_evidence_with_independent_flag(self):
+        """Optional independent flag is parsed correctly."""
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "Indep test?",
+             "--evidence", "yes", "A", "0.9", "1.0", "false"],
+            capture_output=True, text=True, check=True,
+            cwd=os.path.dirname(__file__) or "."
+        )
+        data = json.loads(result.stdout)
+        self.assertEqual(data["status"], "PROVISIONAL_FINDING")
+        self.assertTrue(any("non-independent" in s.lower() for s in data["suggestions"]))
