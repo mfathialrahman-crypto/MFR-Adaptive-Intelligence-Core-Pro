@@ -5,11 +5,13 @@
   clearer error messages, and narrower exception handling (no bare Exception).
   Improves reliability for automated and scripted use.
 - Added regression tests for malformed and valid evidence files.
+- Aligned README version badge to 2.1.28-pro (was still showing 2.1.27-pro). Public surface now matches version.py and pyproject.toml.
 
 ### Verified
 - All 28 unit tests pass.
 - Existing analysis, fingerprint, and other CLI behavior unchanged.
 - mypy --strict clean.
+- Version badge, version.py, pyproject.toml, and README body are consistent.
 
 ## [2.1.27-pro] - 2026-10-24
 
