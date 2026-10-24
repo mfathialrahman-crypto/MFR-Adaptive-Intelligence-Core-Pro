@@ -23,5 +23,6 @@ The main risks are related to:
 
 - Incorrect interpretation of confidence scores as absolute certainty
 - Supply-chain attacks if the package is installed from an untrusted source
+- Resource exhaustion via oversized `--evidence-file` inputs (mitigated by 1 MiB hard limit + regular-file check in v2.1.29-pro)
 
 Always verify the source and review the fingerprint of critical decisions.
