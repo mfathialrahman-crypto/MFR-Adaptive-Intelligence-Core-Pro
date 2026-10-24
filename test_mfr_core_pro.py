@@ -412,3 +412,50 @@ class TestCLIValidate(unittest.TestCase):
         data = json.loads(result.stdout)
         self.assertIn("status", data)
         self.assertEqual(validate_report(data), [])
+
+
+class TestValidateReportEdges(unittest.TestCase):
+    def test_invalid_status_detected(self):
+        report = {
+            "version": "2.1.24-pro",
+            "status": "INVALID_STATUS",
+            "question": "q",
+            "confidence": 0.5,
+            "suggestions": [],
+            "audit_trail": [],
+            "created_at": "2026-01-01T00:00:00+00:00",
+            "analyzed_at": "2026-01-01T00:00:00+00:00",
+            "fingerprint": "a" * 64,
+        }
+        violations = validate_report(report)
+        self.assertTrue(any("invalid status" in v for v in violations))
+
+    def test_confidence_out_of_range_detected(self):
+        report = {
+            "version": "2.1.24-pro",
+            "status": "PROVISIONAL_FINDING",
+            "question": "q",
+            "confidence": 1.5,
+            "suggestions": [],
+            "audit_trail": [],
+            "created_at": "2026-01-01T00:00:00+00:00",
+            "analyzed_at": "2026-01-01T00:00:00+00:00",
+            "fingerprint": "a" * 64,
+        }
+        violations = validate_report(report)
+        self.assertTrue(any("confidence out of" in v for v in violations))
+
+    def test_short_fingerprint_detected(self):
+        report = {
+            "version": "2.1.24-pro",
+            "status": "INSUFFICIENT_EVIDENCE",
+            "question": "q",
+            "confidence": 0.0,
+            "suggestions": [],
+            "audit_trail": [],
+            "created_at": "2026-01-01T00:00:00+00:00",
+            "analyzed_at": "2026-01-01T00:00:00+00:00",
+            "fingerprint": "abc",
+        }
+        violations = validate_report(report)
+        self.assertTrue(any("fingerprint" in v for v in violations))
