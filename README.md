@@ -3,12 +3,12 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
-[![Version](https://img.shields.io/badge/version-2.1.24--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.25--pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.24-pro**  
+Version **2.1.25-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
 A rigorous, transparent, and self-improving evidence analysis engine designed for real decisions — not toy averaging.
@@ -38,7 +38,7 @@ git clone https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Cor
 cd MFR-Adaptive-Intelligence-Core-Pro
 pip install -e .
 python mfr_core_pro.py          # runs the three demo cases
-python -m unittest test_mfr_core_pro.py -v
+python -m pytest test_mfr_core_pro.py -v
 ```
 
 Or single-file usage (zero install):
@@ -160,7 +160,7 @@ The full Project Engineering Constitution that governs continuous improvement of
 ## Testing & Quality
 
 ```bash
-python -m unittest test_mfr_core_pro.py -v
+python -m pytest test_mfr_core_pro.py -v
 ```
 
 All critical paths are covered. The core is intentionally dependency-free (stdlib only) so it can be dropped into any environment.
