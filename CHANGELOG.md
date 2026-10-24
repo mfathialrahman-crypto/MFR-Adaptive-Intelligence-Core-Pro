@@ -1,3 +1,15 @@
+## [2.1.26-pro] - 2026-10-24
+
+### Added
+- CLI `--version` flag that prints the current version (from single source of truth `version.py`) and exits.
+  Improves usability for scripts, packaging, and competitive CLI expectations.
+
+### Verified
+- All 38 unit tests continue to pass.
+- Existing analysis, fingerprint, and other CLI behavior unchanged.
+- mypy-style typing preserved.
+
+
 ## [2.1.25-pro] - 2026-10-24
 
 ### Improved
