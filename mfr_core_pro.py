@@ -352,6 +352,7 @@ def main() -> None:
     parser.add_argument("--alternatives", nargs="*", default=[], help="Alternative claims")
     parser.add_argument("--prior", type=float, default=0.5, help="Prior belief [0-1]")
     parser.add_argument("--decision", action="store_true", help="Emit FathiMind Decision contract")
+    parser.add_argument("--validate", action="store_true", help="Validate report against contract and exit non-zero on violations")
     parser.add_argument("--demo", action="store_true", help="Run demo cases")
     args = parser.parse_args()
 
@@ -408,9 +409,20 @@ def main() -> None:
         sys.exit(2)
 
     if args.decision:
-        print(json.dumps(to_fathimind_decision(result), indent=2, ensure_ascii=False))
+        output = to_fathimind_decision(result)
     else:
-        print(json.dumps(result, indent=2, ensure_ascii=False))
+        output = result
+
+    if args.validate:
+        violations = validate_report(result)
+        if violations:
+            print("Validation failed:", file=sys.stderr)
+            for v in violations:
+                print(f"  - {v}", file=sys.stderr)
+            sys.exit(1)
+        print("Validation passed.", file=sys.stderr)
+
+    print(json.dumps(output, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

@@ -1,3 +1,14 @@
+## [2.1.24-pro] - 2026-10-24
+
+### Added
+- CLI flag `--validate`: runs `validate_report()` on the analysis result and exits with code 1 (and a clear message) if the contract is violated. Improves reliability for automated use and CI integration.
+- Regression test `test_validate_flag_passes_on_valid_report` confirms the happy path.
+
+### Verified
+- All 35 unit tests pass locally.
+- Existing analysis logic, fingerprints, and other CLI flags unchanged.
+- mypy --strict clean.
+
 ## [2.1.23-pro] - 2026-10-24
 
 ### Improved

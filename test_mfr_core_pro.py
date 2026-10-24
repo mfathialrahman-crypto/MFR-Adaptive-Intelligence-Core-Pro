@@ -396,3 +396,19 @@ class TestValidateReport(unittest.TestCase):
                "created_at": "t", "analyzed_at": "t"}
         violations = validate_report(bad)
         self.assertTrue(any("fingerprint" in v for v in violations))
+
+
+class TestCLIValidate(unittest.TestCase):
+    def test_validate_flag_passes_on_valid_report(self):
+        """--validate should succeed and still emit JSON on a valid analysis."""
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "Is it secure?",
+             "--evidence", "secure", "audit", "0.9",
+             "--validate"],
+            capture_output=True, text=True, cwd=os.path.dirname(__file__) or ".",
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Validation passed.", result.stderr)
+        data = json.loads(result.stdout)
+        self.assertIn("status", data)
+        self.assertEqual(validate_report(data), [])
