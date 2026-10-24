@@ -3,9 +3,14 @@
 ### Added
 - CLI `--version` flag that prints the current version (from single source of truth `version.py`) and exits.
   Improves usability for scripts, packaging, and competitive CLI expectations.
+- Regression test `TestCLIVersion.test_version_flag_prints_version_and_exits_zero` locks the flag behavior.
+
+### Fixed
+- Aligned README version badge and text, FathiMind HQ references, and public-signals snapshot to 2.1.26-pro.
+  Eliminates public-surface version drift.
 
 ### Verified
-- All 38 unit tests continue to pass.
+- All 39 unit tests pass.
 - Existing analysis, fingerprint, and other CLI behavior unchanged.
 - mypy-style typing preserved.
 
