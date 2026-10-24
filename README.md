@@ -57,7 +57,8 @@ python mfr_core_pro.py "Is the system secure?" \
   --evidence "secure" "audit-firm" 0.91 \
   --evidence "vulnerable" "researcher" 0.87 1.2 false \
   --alternatives "partially secure" \
-  --prior 0.5
+  --prior 0.5 \
+  --validate
 
 # Or load from JSON file:
 python mfr_core_pro.py "Is the system secure?" --evidence-file evidence.json
@@ -65,6 +66,8 @@ python mfr_core_pro.py "Is the system secure?" --evidence-file evidence.json
 
 The fourth argument (optional) is weight (>0, default 1.0).  
 The fifth argument (optional) is independent flag (`true`/`false`/`yes`/`no`, default true).
+
+Use `--validate` to enforce the analysis contract (exits non-zero if required fields or fingerprint are invalid).
 
 Or run the demo:
 
