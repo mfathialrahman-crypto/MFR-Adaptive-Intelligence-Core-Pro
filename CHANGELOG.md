@@ -1,3 +1,18 @@
+## [2.1.27-pro] - 2026-10-24
+
+### Fixed
+- Restored full unit test suite in `test_mfr_core_pro.py` (previously a placeholder). 
+  26 tests now cover Evidence validation, analysis contracts (insufficient/provisional/conflict), 
+  non-independent down-weighting, deduplication, fingerprint determinism, validate_report edge cases, 
+  Decision contract mapping, and CLI flags (`--version`, `--demo`, `--validate`, invalid input).
+- CI can again verify the public contract instead of running a stub.
+
+### Verified
+- All 26 unit tests pass locally on Python 3.10.
+- mypy --strict remains clean.
+- Existing analysis behavior, fingerprints, and CLI unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.26-pro] - 2026-10-24
 
 ### Added
