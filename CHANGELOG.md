@@ -1,3 +1,18 @@
+## [2.1.26-pro] - 2026-10-24
+
+### Improved
+- Added regression tests for additional CLI edge cases:
+  - Incomplete `--evidence` arguments (fewer than 3 parts) are rejected.
+  - Invalid `--prior` outside [0, 1] is rejected with clear message.
+  - Optional independent flag (`true`/`false`) is correctly parsed and affects suggestions.
+- Raises confidence in CLI reliability and input validation coverage.
+- Version aligned across version.py, pyproject.toml, and README.
+
+### Verified
+- All 41 unit tests pass locally.
+- Existing analysis logic, fingerprints, decision mapping, and other CLI flags unchanged.
+- mypy --strict clean.
+
 ## [2.1.25-pro] - 2026-10-24
 
 ### Improved
