@@ -368,7 +368,15 @@ def main() -> None:
     evidence_list: List[Evidence] = []
     if args.evidence_file:
         try:
-            with open(args.evidence_file, "r", encoding="utf-8") as f:
+            from pathlib import Path
+            p = Path(args.evidence_file).resolve(strict=False)
+            # Fail closed on oversized or non-file paths
+            if not p.is_file():
+                raise ValueError(f"evidence file path is not a regular file: {args.evidence_file}")
+            size = p.stat().st_size
+            if size > 1_048_576:  # 1 MiB hard limit
+                raise ValueError(f"evidence file too large ({size} bytes > 1 MiB limit)")
+            with open(p, "r", encoding="utf-8") as f:
                 data = json.load(f)
             if not isinstance(data, list):
                 raise ValueError("evidence file must contain a JSON array")
