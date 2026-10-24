@@ -225,6 +225,34 @@ class TestCLI:
         data = json.loads(result.stdout)
         assert data["status"] == "PROVISIONAL_FINDING"
 
+    def test_evidence_file_malformed_exits_nonzero(self, tmp_path: Path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text('{"not": "a list"}', encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "q", "--evidence-file", str(bad)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "Failed to load evidence file" in result.stderr
+
+    def test_evidence_file_valid_loads(self, tmp_path: Path) -> None:
+        good = tmp_path / "good.json"
+        good.write_text(json.dumps([
+            {"claim": "yes", "source": "file", "reliability": 0.85, "independent": True}
+        ]), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "from file?", "--evidence-file", str(good)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["status"] == "PROVISIONAL_FINDING"
+        assert data["conclusion"] == "yes"
+
     def test_cli_invalid_evidence_exits_nonzero(self) -> None:
         result = subprocess.run(
             [

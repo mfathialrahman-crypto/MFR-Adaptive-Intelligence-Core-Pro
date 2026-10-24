@@ -370,15 +370,21 @@ def main() -> None:
         try:
             with open(args.evidence_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            for item in data:
+            if not isinstance(data, list):
+                raise ValueError("evidence file must contain a JSON array")
+            for i, item in enumerate(data):
+                if not isinstance(item, dict):
+                    raise ValueError(f"evidence item {i} must be an object")
+                if "claim" not in item or "source" not in item or "reliability" not in item:
+                    raise ValueError(f"evidence item {i} missing required keys (claim, source, reliability)")
                 evidence_list.append(Evidence(
-                    claim=item["claim"],
-                    source=item["source"],
+                    claim=str(item["claim"]),
+                    source=str(item["source"]),
                     reliability=float(item["reliability"]),
-                    independent=item.get("independent", True),
+                    independent=bool(item.get("independent", True)),
                     weight=float(item.get("weight", 1.0)),
                 ))
-        except Exception as exc:
+        except (OSError, json.JSONDecodeError, ValueError, KeyError, TypeError) as exc:
             print(f"Failed to load evidence file: {exc}", file=sys.stderr)
             sys.exit(2)
     if args.evidence:

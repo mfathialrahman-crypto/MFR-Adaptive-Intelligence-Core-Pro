@@ -1,3 +1,16 @@
+## [2.1.28-pro] - 2026-10-24
+
+### Improved
+- Hardened CLI `--evidence-file` loading: requires a JSON array of objects with required keys,
+  clearer error messages, and narrower exception handling (no bare Exception).
+  Improves reliability for automated and scripted use.
+- Added regression tests for malformed and valid evidence files.
+
+### Verified
+- All 28 unit tests pass.
+- Existing analysis, fingerprint, and other CLI behavior unchanged.
+- mypy --strict clean.
+
 ## [2.1.27-pro] - 2026-10-24
 
 ### Fixed
