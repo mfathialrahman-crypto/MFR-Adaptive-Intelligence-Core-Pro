@@ -51,3 +51,13 @@
 ### Improved
 - Removed unused imports (`asdict`, `TypedDict`) from `mfr_core_pro.py` for cleaner code quality and maintainability.
   (Cleanup completed in follow-up commit after the initial claim.)
+
+## [2.1.21-pro] - 2026-10-23
+
+### Improved
+- Strengthened `validate_report()` with additional checks.
+- Added tests for fingerprint length and status validation.
+
+### Verified
+- Tests pass.
+- No behavior change to analysis.
