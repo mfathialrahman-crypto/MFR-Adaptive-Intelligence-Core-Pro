@@ -253,6 +253,19 @@ class TestCLI:
         assert data["status"] == "PROVISIONAL_FINDING"
         assert data["conclusion"] == "yes"
 
+    def test_evidence_file_too_large_exits_nonzero(self, tmp_path: Path) -> None:
+        huge = tmp_path / "huge.json"
+        # Create a file just over 1 MiB
+        huge.write_bytes(b"[" + b" " * 1_048_577 + b"]")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "q", "--evidence-file", str(huge)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "too large" in result.stderr
+
     def test_cli_invalid_evidence_exits_nonzero(self) -> None:
         result = subprocess.run(
             [
