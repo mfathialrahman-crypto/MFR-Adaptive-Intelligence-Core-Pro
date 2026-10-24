@@ -1,3 +1,17 @@
+## [2.1.30-pro] - 2026-10-24
+
+### Improved
+- Added explicit `__all__` to `mfr_core_pro.py` declaring the public API
+  (Evidence, IntelligenceRecord, VERSION, fingerprint, to_fathimind_decision,
+  validate_report, demo, main). Improves maintainability, documentation, and
+  mypy compatibility for consumers and tests that import from the module.
+
+### Verified
+- All 34 unit tests pass.
+- mypy --strict on mfr_core_pro.py remains clean.
+- Analysis behavior, fingerprints, CLI, and contracts unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.29-pro] - 2026-10-24
 
 ### Improved
