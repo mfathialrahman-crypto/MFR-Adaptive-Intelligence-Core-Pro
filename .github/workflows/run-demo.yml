@@ -28,10 +28,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
+      - name: Install test dependencies
+        run: pip install pytest
+
       - name: Run Unit Tests
         run: |
           echo "=== Running Unit Tests (Python ${{ matrix.python-version }}) ==="
-          python -m unittest test_mfr_core_pro.py -v
+          python -m pytest test_mfr_core_pro.py -v --tb=short
 
       - name: Run Adaptive Intelligence Demo
         run: |
