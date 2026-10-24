@@ -1,3 +1,15 @@
+## [2.1.25-pro] - 2026-10-24
+
+### Improved
+- Added regression tests for `validate_report()` edge cases (invalid status, confidence out of range, short fingerprint).
+  Raises confidence in the public contract checker.
+- Version aligned across version.py, pyproject.toml, and README.
+
+### Verified
+- All 38 unit tests pass locally.
+- Existing analysis logic, fingerprints, and CLI unchanged.
+- mypy --strict clean.
+
 ## [2.1.24-pro] - 2026-10-24
 
 ### Added
