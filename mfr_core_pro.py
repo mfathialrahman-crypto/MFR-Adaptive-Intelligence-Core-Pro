@@ -28,6 +28,17 @@ from collections import defaultdict
 
 from version import VERSION
 
+__all__ = [
+    "Evidence",
+    "IntelligenceRecord",
+    "VERSION",
+    "fingerprint",
+    "to_fathimind_decision",
+    "validate_report",
+    "demo",
+    "main",
+]
+
 # Posterior mean difference below this threshold indicates insufficient separation
 MIN_SEPARATION = 0.05
 
