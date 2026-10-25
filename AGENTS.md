@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-24. Matches attached constitution plus long-horizon cycle. Verified present across FathiMind, Core Pro, public-signals, and private engines.*
+*Last reviewed and confirmed in repository: 2026-10-25. Matches attached constitution plus long-horizon cycle. Verified present across FathiMind, Core Pro, public-signals, and private engines. Public surface version alignment completed.*
