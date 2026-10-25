@@ -1,3 +1,15 @@
+## [2.1.34-pro] - 2026-10-25
+
+### Improved
+- Optimized multi-claim opposition calculation from O(n²) nested summation to O(n) via precomputed effective weights.
+- No change to numerical results, fingerprints, or status decisions; improves scalability for larger evidence sets while keeping the soft-opposition model.
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior and CLI unchanged.
+- Version aligned.
+
 ## [2.1.33-pro] - 2026-10-25
 
 ### Fixed

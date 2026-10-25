@@ -123,6 +123,16 @@ class IntelligenceRecord:
         prior_alpha = self.prior_belief * prior_strength
         prior_beta = (1.0 - self.prior_belief) * prior_strength
 
+        # Precompute effective weight per claim for O(n) opposition calculation
+        claim_effective: Dict[str, float] = {}
+        for claim, evs in by_claim.items():
+            total = 0.0
+            for ev in evs:
+                indep_factor = 1.0 if ev.independent else INDEPENDENCE_FACTOR
+                total += min(ev.reliability * ev.weight * indep_factor, MAX_EFFECTIVE_WEIGHT)
+            claim_effective[claim] = total
+        total_effective = sum(claim_effective.values())
+
         claim_stats: List[Dict[str, Any]] = []
         for claim, evs in by_claim.items():
             alpha = prior_alpha
@@ -138,12 +148,7 @@ class IntelligenceRecord:
                 if ev.independent:
                     indep_count += 1
             # Opposing evidence increases beta slightly via residual
-            opposing = sum(
-                min(o.reliability * o.weight * (1.0 if o.independent else INDEPENDENCE_FACTOR), MAX_EFFECTIVE_WEIGHT)
-                for other_claim, others in by_claim.items()
-                if other_claim != claim
-                for o in others
-            )
+            opposing = total_effective - claim_effective.get(claim, 0.0)
             beta += opposing * 0.5  # soft opposition
 
             mean = alpha / (alpha + beta) if (alpha + beta) > 0 else 0.5
