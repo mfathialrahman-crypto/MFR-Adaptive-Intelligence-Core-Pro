@@ -1,3 +1,16 @@
+## [2.1.30-pro] - 2026-10-25
+
+### Improved
+- Suggestion generator now surfaces wide 95% credible intervals (width > 0.25).
+  Informs users when posterior precision is limited so additional independent evidence can be prioritized.
+- Regression test locks the new informational suggestion.
+
+### Verified
+- All 35 unit tests pass.
+- mypy --strict clean.
+- Analysis means, fingerprints, status logic, and prior CLI behavior unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.29-pro] - 2026-10-24
 
 ### Improved
