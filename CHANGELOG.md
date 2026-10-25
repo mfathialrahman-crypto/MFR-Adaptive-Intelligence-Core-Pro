@@ -1,3 +1,18 @@
+## [2.1.33-pro] - 2026-10-25
+
+### Fixed
+- CLI `--evidence` parsing now catches invalid weight (and other conversion) values and exits cleanly with code 2 instead of raising an uncaught ValueError traceback.
+- Improves reliability of the public CLI surface for malformed input.
+
+### Added
+- Regression test confirming invalid weight produces exit code 2 with no traceback.
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior, fingerprints, and valid CLI paths unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.32-pro] - 2026-10-25
 
 ### Improved
