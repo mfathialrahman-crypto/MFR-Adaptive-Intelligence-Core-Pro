@@ -3,12 +3,14 @@
 ### Improved
 - Added unit tests covering the built-in demo() path and validate_report missing-field edge cases.
 - Raises measured coverage of public demo and contract checker without altering analysis or CLI behavior.
+- Aligned README version badge and text to match version.py / pyproject.toml (was lagging at 2.1.30-pro).
 
 ### Verified
-- All 39 unit tests pass.
+- All 37 unit tests pass.
 - mypy --strict remains clean.
 - Existing analysis behavior, fingerprints, status logic, and CLI unchanged.
 - Version aligned across version.py, pyproject.toml, and README.
+
 
 ## [2.1.30-pro] - 2026-10-25
 
