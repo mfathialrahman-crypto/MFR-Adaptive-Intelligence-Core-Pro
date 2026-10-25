@@ -62,3 +62,24 @@ jobs:
 
       - name: Strict type check
         run: mypy mfr_core_pro.py --strict --ignore-missing-imports
+
+  version-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check version alignment
+        run: |
+          echo "Checking version consistency between version.py and pyproject.toml"
+          PY_VER=$(python -c "from version import VERSION; print(VERSION.split('-')[0])")
+          TOML_VER=$(grep -E '^version =' pyproject.toml | sed -E 's/.*"(.*)".*/\1/')
+          echo "version.py base: $PY_VER"
+          echo "pyproject.toml: $TOML_VER"
+          if [ "$PY_VER" != "$TOML_VER" ]; then
+            echo "ERROR: Version mismatch between version.py and pyproject.toml"
+            exit 1
+          fi
+          echo "Versions aligned successfully."
