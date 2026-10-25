@@ -1,3 +1,14 @@
+## [2.1.32-pro] - 2026-10-25
+
+### Improved
+- Added CI job `version-consistency` that fails the build if the base version in `version.py` does not match `pyproject.toml`.
+- Prevents public-surface version drift that previously required manual alignment commits.
+
+### Verified
+- Existing 37 unit tests continue to pass locally.
+- mypy --strict remains clean.
+- No change to analysis behavior, fingerprints, or CLI.
+
 ## [2.1.31-pro] - 2026-10-25
 
 ### Improved
