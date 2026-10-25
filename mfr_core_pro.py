@@ -230,12 +230,21 @@ def _generate_suggestions(
         )
     if top and top.get("evidence_count", 0) == 1:
         suggestions.append("Top claim rests on a single source. Seek additional confirmation.")
+    if top and "ci_95" in top:
+        ci = top["ci_95"]
+        width = ci[1] - ci[0]
+        if width > 0.25:
+            suggestions.append(
+                f"Credible interval is wide ({width:.2f}). More independent evidence would tighten precision."
+            )
     if alternatives:
         alts = ", ".join(a.strip() for a in alternatives if a and a.strip())
         if alts:
             suggestions.append(f"Listed alternatives: {alts}. Consider gathering evidence that distinguishes among them.")
-    if not suggestions:
-        suggestions.append("Evidence is reasonably coherent. Monitor for new observations.")
+    # Default coherent message when no major issues (CI width is informational)
+    major = [s for s in suggestions if "Credible interval is wide" not in s]
+    if not major:
+        suggestions.insert(0, "Evidence is reasonably coherent. Monitor for new observations.")
     return suggestions
 
 
