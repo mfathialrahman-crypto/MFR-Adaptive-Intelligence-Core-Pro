@@ -333,6 +333,18 @@ class TestSuggestionCoverage:
         report = rec.analyze()
         assert any("Listed alternatives" in s and "no" in s for s in report["suggestions"])
 
+    def test_wide_credible_interval_suggestion(self) -> None:
+        rec = IntelligenceRecord(
+            "Wide CI?",
+            evidence=[
+                Evidence("yes", "a", 0.7, independent=True),
+                Evidence("yes", "b", 0.65, independent=True),
+            ],
+        )
+        report = rec.analyze()
+        assert any("Credible interval is wide" in s for s in report["suggestions"])
+        assert validate_report(report) == []
+
 
 class TestCLIAdditional:
     def test_decision_flag_emits_contract(self) -> None:
