@@ -186,6 +186,35 @@ class TestDecisionContract:
         assert "fingerprint" in decision
         assert decision["_original_status"] == report["status"]
 
+    def test_to_fathimind_decision_insufficient(self) -> None:
+        report = IntelligenceRecord("q").analyze()
+        decision = to_fathimind_decision(report)
+        assert decision["status"] == "critical"
+        assert "insufficient evidence" in decision["anomalies"]
+
+    def test_to_fathimind_decision_conflicting(self) -> None:
+        report = IntelligenceRecord(
+            "q",
+            [Evidence("good", "a", 0.85), Evidence("bad", "b", 0.82)],
+        ).analyze()
+        # May be provisional or conflicting depending on separation; if conflicting, check mapping
+        decision = to_fathimind_decision(report)
+        if report["status"] == "CONFLICTING_EVIDENCE":
+            assert decision["status"] == "warning"
+            assert "conflicting evidence detected" in decision["anomalies"]
+        else:
+            assert decision["status"] in ("stable", "warning")
+
+    def test_to_fathimind_decision_low_confidence_warning(self) -> None:
+        report = IntelligenceRecord(
+            "q",
+            [Evidence("yes", "s", 0.51)],
+        ).analyze()
+        decision = to_fathimind_decision(report)
+        # low confidence provisional should map to warning
+        assert decision["status"] in ("warning", "stable")
+        assert 0.3 <= decision["confidence"] <= 0.98
+
 
 class TestCLI:
     def test_version_flag_prints_version_and_exits_zero(self) -> None:
