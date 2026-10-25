@@ -296,6 +296,22 @@ class TestCLI:
         assert result.returncode == 2
 
 
+    def test_cli_invalid_weight_exits_nonzero_cleanly(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable, "mfr_core_pro.py",
+                "q",
+                "--evidence", "c", "s", "0.5", "not-a-number",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "Invalid evidence" in result.stderr or "could not convert" in result.stderr
+        assert "Traceback" not in result.stderr
+
+
 class TestEdgeCases:
     def test_empty_question_raises(self) -> None:
         with pytest.raises(ValueError, match="question must be non-empty"):

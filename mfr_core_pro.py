@@ -393,14 +393,14 @@ def main() -> None:
                 print("each --evidence needs at least claim source reliability", file=sys.stderr)
                 sys.exit(2)
             claim, source, rel_s = parts[0], parts[1], parts[2]
-            weight = float(parts[3]) if len(parts) > 3 else 1.0
-            indep = True
-            if len(parts) > 4:
-                indep = parts[4].lower() in ("true", "yes", "1", "y")
             try:
+                weight = float(parts[3]) if len(parts) > 3 else 1.0
+                indep = True
+                if len(parts) > 4:
+                    indep = parts[4].lower() in ("true", "yes", "1", "y")
                 evidence_list.append(Evidence(claim, source, float(rel_s), independent=indep, weight=weight))
             except ValueError as exc:
-                print(str(exc), file=sys.stderr)
+                print(f"Invalid evidence: {exc}", file=sys.stderr)
                 sys.exit(2)
 
     try:
