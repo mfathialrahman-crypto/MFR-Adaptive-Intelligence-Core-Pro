@@ -1,8 +1,20 @@
 ## [Unreleased]
 
 ### Documented
-- Independent full inspection cycle (2026-10-27): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note across public surfaces. No critical issues; public surface remains at v2.1.38-pro.
-- Independent full inspection cycle (2026-10-26): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note. No critical issues; public surface remains at v2.1.38-pro.
+- Independent full inspection cycle (2026-10-27): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note. No critical issues; public surface at v2.1.39-pro.
+
+## [2.1.39-pro] - 2026-10-27
+
+### Improved
+- Extracted remaining magic numbers in the credible-interval calculation (fallback variance 0.01 and variance floor 1e-8) into named constants FALLBACK_VARIANCE and VARIANCE_FLOOR.
+- Improves code clarity and consistency with prior named constants (CI_Z_SCORE, PRIOR_STRENGTH, etc.).
+- No change to numerical results, fingerprints, status decisions, or CLI behavior.
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior and public surface unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
 
 ## [2.1.38-pro] - 2026-10-26
 

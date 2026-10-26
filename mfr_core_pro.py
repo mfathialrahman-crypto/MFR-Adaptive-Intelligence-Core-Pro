@@ -46,6 +46,12 @@ PRIOR_STRENGTH = 2.0
 # z-score for approximate 95% credible interval (normal approximation on Beta)
 CI_Z_SCORE = 1.96
 
+# Floor for variance in CI calculation to avoid zero/near-zero under extreme Beta parameters
+VARIANCE_FLOOR = 1e-8
+
+# Fallback variance when total observations are too few for the Beta variance formula
+FALLBACK_VARIANCE = 0.01
+
 
 @dataclass
 class Evidence:
@@ -162,8 +168,8 @@ class IntelligenceRecord:
 
             mean = alpha / (alpha + beta) if (alpha + beta) > 0 else 0.5
             # Approximate 95% CI using normal approximation on Beta
-            var = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1)) if (alpha + beta) > 1 else 0.01
-            std = math.sqrt(max(var, 1e-8))
+            var = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1)) if (alpha + beta) > 1 else FALLBACK_VARIANCE
+            std = math.sqrt(max(var, VARIANCE_FLOOR))
             ci_low = max(0.0, mean - CI_Z_SCORE * std)
             ci_high = min(1.0, mean + CI_Z_SCORE * std)
 
