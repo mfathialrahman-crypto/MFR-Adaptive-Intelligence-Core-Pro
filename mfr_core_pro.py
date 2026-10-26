@@ -126,6 +126,7 @@ class IntelligenceRecord:
                 by_source[key] = ev
         deduped = list(by_source.values())
         audit.append(f"Deduplicated {len(self.evidence)} → {len(deduped)} unique sources.")
+        audit.append(f"Using constants: INDEPENDENCE_FACTOR={INDEPENDENCE_FACTOR}, OPPOSITION_FACTOR={OPPOSITION_FACTOR}, PRIOR_STRENGTH={PRIOR_STRENGTH}, MAX_EFFECTIVE_WEIGHT={MAX_EFFECTIVE_WEIGHT}.")
 
         # Group supporting evidence by claim
         by_claim: Dict[str, List[Evidence]] = defaultdict(list)
@@ -183,6 +184,7 @@ class IntelligenceRecord:
                 "alpha": alpha,
                 "beta": beta,
             })
+            audit.append(f"Claim '{claim}': effective_weight={total_weight:.3f}, independent={indep_count}/{len(evs)}, posterior={mean:.3f}, CI=[{ci_low:.3f},{ci_high:.3f}].")
 
         claim_stats.sort(key=lambda c: c["posterior_mean"], reverse=True)
         top = claim_stats[0] if claim_stats else None

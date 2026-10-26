@@ -1,7 +1,20 @@
 ## [Unreleased]
 
 ### Documented
-- Independent full inspection cycle (2026-10-27): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note. No critical issues; public surface at v2.1.39-pro.
+- Independent full inspection cycle (2026-10-27): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note. No critical issues; public surface at v2.1.40-pro.
+
+## [2.1.40-pro] - 2026-10-27
+
+### Improved
+- Enriched audit_trail with explicit logging of reasoning constants (INDEPENDENCE_FACTOR, OPPOSITION_FACTOR, PRIOR_STRENGTH, MAX_EFFECTIVE_WEIGHT) and per-claim effective weights, independent counts, posteriors, and credible intervals.
+- Increases transparency and replayability of the Bayesian update without changing numerical results, status decisions, fingerprints, or public contract fields.
+- Additive only; existing consumers unaffected.
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior and public surface unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
 
 ## [2.1.39-pro] - 2026-10-27
 
