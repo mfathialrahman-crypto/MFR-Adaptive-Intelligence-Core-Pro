@@ -1,7 +1,20 @@
 ## [Unreleased]
 
-### Documented
-- Independent full inspection cycle (2026-10-27): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note. No critical issues; public surface at v2.1.39-pro.
+## [2.1.40-pro] - 2026-10-27
+
+### Improved
+- Added `py.typed` marker for full PEP 561 type-checker support.
+- Strengthened packaging for competitive public release:
+  - Version aligned to 2.1.40 across version.py and pyproject.toml.
+  - Added `Typing :: Typed` classifier.
+  - Expanded keywords and description for better discoverability.
+  - Explicitly package the `version` module.
+- No change to analysis engine behavior, fingerprints, status decisions, or CLI.
+
+### Verified
+- Packaging metadata is consistent and ready for distribution.
+- Type checkers can now treat the package as typed.
+- Existing test suite and mypy --strict remain the quality gate.
 
 ## [2.1.39-pro] - 2026-10-27
 
@@ -117,7 +130,6 @@
 - mypy --strict remains clean.
 - Existing analysis behavior, fingerprints, status logic, and CLI unchanged.
 - Version aligned across version.py, pyproject.toml, and README.
-
 
 ## [2.1.30-pro] - 2026-10-25
 
