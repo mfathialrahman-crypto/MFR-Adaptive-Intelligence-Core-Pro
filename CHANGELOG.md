@@ -1,3 +1,16 @@
+## [2.1.38-pro] - 2026-10-26
+
+### Improved
+- Extracted the approximate 95% CI z-score (previously magic 1.96) into the named constant CI_Z_SCORE.
+- Improves code clarity and consistency with other named constants (PRIOR_STRENGTH, OPPOSITION_FACTOR, etc.).
+- No change to numerical results, fingerprints, status decisions, or CLI behavior.
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior and public surface unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.37-pro] - 2026-10-26
 
 ### Fixed
