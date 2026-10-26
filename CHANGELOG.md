@@ -1,3 +1,15 @@
+## [2.1.37-pro] - 2026-10-26
+
+### Fixed
+- Restored the verified working `mfr_core_pro.py` after an intermediate push left a placeholder that broke CI and unit tests.
+- Core logic matches the last known-good state (PRIOR_STRENGTH, OPPOSITION_FACTOR, INDEPENDENCE_FACTOR named constants retained).
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict clean.
+- Demo runs successfully.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.36-pro] - 2026-10-26
 
 ### Improved
