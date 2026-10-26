@@ -3,15 +3,16 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
-[![Version](https://img.shields.io/badge/version-2.1.39-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.40-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Typed](https://img.shields.io/badge/typing-typed-blue)](https://peps.python.org/pep-0561/)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.39-pro**  
+Version **2.1.40-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
-A rigorous, transparent, and self-improving evidence analysis engine designed for real decisions — not toy averaging.
+A rigorous, transparent, zero-dependency evidence analysis engine built for real decisions — not toy averaging.
 
 ---
 
@@ -28,27 +29,32 @@ This core does better:
 - **Stable content-addressable fingerprinting**
 - **Weight-capped soft observations** so posteriors stay valid even with extreme weights
 - **Conflict detection** with explanatory status
+- **Fully typed** (`py.typed` + PEP 561)
 
 ---
 
-## Quick Start
+## Install
+
+```bash
+pip install -e git+https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro.git#egg=mfr-adaptive-intelligence-core-pro
+```
+
+Or clone and develop:
 
 ```bash
 git clone https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro.git
 cd MFR-Adaptive-Intelligence-Core-Pro
 pip install -e .
-python mfr_core_pro.py          # runs the three demo cases
 python -m pytest test_mfr_core_pro.py -v
 ```
 
-Or single-file usage (zero install):
+Single-file usage (zero install) is also supported:
 
 ```bash
-python mfr_core_pro.py
+python mfr_core_pro.py --demo
 ```
 
 ---
-
 
 ## CLI Usage
 
@@ -69,11 +75,7 @@ The fifth argument (optional) is independent flag (`true`/`false`/`yes`/`no`, de
 
 Use `--validate` to enforce the analysis contract (exits non-zero if required fields or fingerprint are invalid).
 
-Or run the demo:
-
-```bash
-python mfr_core_pro.py --demo
-```
+---
 
 ## Minimal Example
 
@@ -163,7 +165,7 @@ The full Project Engineering Constitution that governs continuous improvement of
 python -m pytest test_mfr_core_pro.py -v
 ```
 
-All critical paths are covered. The core is intentionally dependency-free (stdlib only) so it can be dropped into any environment.
+All critical paths are covered. The core is intentionally dependency-free (stdlib only) so it can be dropped into any environment. Fully typed.
 
 ---
 
