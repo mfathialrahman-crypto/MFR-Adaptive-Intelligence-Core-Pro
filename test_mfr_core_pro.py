@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 
 from mfr_core_pro import (
+    main,
     Evidence,
     IntelligenceRecord,
     VERSION,
@@ -412,3 +413,91 @@ class TestCLIAdditional:
         )
         assert result.returncode == 2
         assert "prior_belief" in result.stderr
+
+
+class TestMainInProcessCoverage:
+    """In-process tests for CLI main() to raise measurable coverage of argument parsing and error paths."""
+
+    def test_main_demo_via_no_args(self, monkeypatch, capsys):
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py"])
+        main()
+        captured = capsys.readouterr()
+        assert "MFR Adaptive Intelligence Core Pro Demo" in captured.out
+
+    def test_main_with_evidence_and_validate(self, monkeypatch, capsys):
+        monkeypatch.setattr(sys, "argv", [
+            "prog", "Is secure?",
+            "--evidence", "secure", "auditor", "0.92", "1.1", "true",
+            "--validate",
+        ])
+        main()
+        captured = capsys.readouterr()
+        assert "Validation passed" in captured.err
+        data = json.loads(captured.out)
+        assert data["status"] == "PROVISIONAL_FINDING"
+
+    def test_main_evidence_file_and_cli(self, monkeypatch, capsys, tmp_path):
+        good = tmp_path / "ev.json"
+        good.write_text(json.dumps([{"claim": "yes", "source": "file-src", "reliability": 0.8}]))
+        monkeypatch.setattr(sys, "argv", [
+            "prog", "Mixed?",
+            "--evidence-file", str(good),
+            "--evidence", "yes", "cli-src", "0.75",
+        ])
+        main()
+        captured = capsys.readouterr()
+        data = json.loads(captured.out)
+        assert data["status"] == "PROVISIONAL_FINDING"
+
+    def test_main_missing_question_exits(self, monkeypatch, capsys):
+        monkeypatch.setattr(sys, "argv", ["prog", "--evidence", "c", "s", "0.5"])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+        assert "question is required" in capsys.readouterr().err
+
+    def test_main_short_evidence_exits(self, monkeypatch, capsys):
+        monkeypatch.setattr(sys, "argv", ["prog", "q", "--evidence", "only-two"])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+
+    def test_main_decision_flag(self, monkeypatch, capsys):
+        monkeypatch.setattr(sys, "argv", [
+            "prog", "Q?", "--evidence", "yes", "src", "0.88", "--decision",
+        ])
+        main()
+        data = json.loads(capsys.readouterr().out)
+        assert "_original_status" in data
+
+    def test_main_invalid_prior_exits(self, monkeypatch, capsys):
+        monkeypatch.setattr(sys, "argv", [
+            "prog", "q", "--evidence", "c", "s", "0.5", "--prior", "2.0",
+        ])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+
+    def test_main_bad_evidence_file_not_list(self, monkeypatch, tmp_path):
+        bad = tmp_path / "bad.json"
+        bad.write_text('{"not": "list"}')
+        monkeypatch.setattr(sys, "argv", ["prog", "q", "--evidence-file", str(bad)])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+
+    def test_main_evidence_file_missing_keys(self, monkeypatch, tmp_path):
+        bad = tmp_path / "bad.json"
+        bad.write_text('[{"claim": "only"}]')
+        monkeypatch.setattr(sys, "argv", ["prog", "q", "--evidence-file", str(bad)])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+
+    def test_main_independent_false(self, monkeypatch, capsys):
+        monkeypatch.setattr(sys, "argv", [
+            "prog", "q", "--evidence", "yes", "src", "0.7", "1.0", "false",
+        ])
+        main()
+        data = json.loads(capsys.readouterr().out)
+        assert any("non-independent" in s for s in data["suggestions"])
