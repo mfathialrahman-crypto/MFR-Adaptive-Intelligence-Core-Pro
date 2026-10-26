@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-26 (cycle: full ecosystem inspection via agent). Core Pro 38/38 unit tests passed, mypy --strict clean, demo verified. No critical issues found. Continuous improvement cycle active. Public surface at v2.1.36-pro. PRIOR_STRENGTH constant extracted (no behavior change).*
+*Last reviewed and confirmed in repository: 2026-10-26 (cycle: core restore after placeholder breakage). Core Pro restored; 38/38 unit tests passed, mypy --strict clean, demo verified. Public surface at v2.1.37-pro. Continuous improvement cycle active.*
