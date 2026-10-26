@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 ### Documented
+- Independent full inspection cycle (2026-10-27): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note across public surfaces. No critical issues; public surface remains at v2.1.38-pro.
 - Independent full inspection cycle (2026-10-26): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note. No critical issues; public surface remains at v2.1.38-pro.
 
 ## [2.1.38-pro] - 2026-10-26
