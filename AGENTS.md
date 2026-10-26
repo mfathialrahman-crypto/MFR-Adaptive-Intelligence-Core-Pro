@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-26 (independent cycle: full repo inspection, pytest 38/38 passed, mypy --strict clean). AGENTS.md constitution verified and aligned with long-horizon doctrine. No critical issues found. Continuous improvement cycle active. Public surface at v2.1.38-pro.*
+*Last reviewed and confirmed in repository: 2026-10-26 (cycle: version alignment + full pytest 38/38 pass). pyproject.toml now exactly matches version.py (2.1.38-pro). AGENTS.md constitution verified. No critical issues. Continuous improvement cycle active. Public surface at v2.1.38-pro.*
