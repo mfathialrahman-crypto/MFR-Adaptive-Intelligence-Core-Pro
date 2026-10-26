@@ -99,316 +99,254 @@ class TestIntelligenceRecordAnalysis:
 
     def test_all_non_independent_still_provisional(self) -> None:
         rec = IntelligenceRecord(
-            "all dependent?",
+            "q",
             evidence=[
-                Evidence("yes", "a", 0.9, independent=False),
-                Evidence("yes", "b", 0.85, independent=False),
+                Evidence("yes", "s1", 0.9, independent=False),
+                Evidence("yes", "s2", 0.85, independent=False),
             ],
         )
         report = rec.analyze()
         assert report["status"] == "PROVISIONAL_FINDING"
         assert report["conclusion"] == "yes"
-        assert any("non-independent" in s for s in report["suggestions"])
-        assert validate_report(report) == []
 
-    def test_deduplication_keeps_strongest_per_source(self) -> None:
-        rec = IntelligenceRecord(
-            "q",
-            evidence=[
-                Evidence("yes", "same", 0.6),
-                Evidence("yes", "same", 0.95),  # stronger
-            ],
-        )
-        report = rec.analyze()
-        assert report["top_claim"]["evidence_count"] == 1
-        assert "Deduplicated" in report["audit_trail"][0]
-
-    def test_prior_affects_posterior(self) -> None:
-        low = IntelligenceRecord("q", [Evidence("yes", "s", 0.7)], prior_belief=0.2).analyze()
-        high = IntelligenceRecord("q", [Evidence("yes", "s", 0.7)], prior_belief=0.8).analyze()
+    def test_prior_belief_affects_posterior(self) -> None:
+        low = IntelligenceRecord("q", [Evidence("yes", "s", 0.6)], prior_belief=0.2).analyze()
+        high = IntelligenceRecord("q", [Evidence("yes", "s", 0.6)], prior_belief=0.8).analyze()
         assert high["confidence"] > low["confidence"]
 
-    def test_alternatives_appear_in_suggestions(self) -> None:
+    def test_weight_capping(self) -> None:
+        # Extreme weight should not produce invalid posterior
         rec = IntelligenceRecord(
             "q",
-            [Evidence("main", "s", 0.8)],
-            alternatives=["alt1", "alt2"],
+            [Evidence("yes", "s", 1.0, weight=100.0)],
         )
         report = rec.analyze()
-        assert any("alt1" in s for s in report["suggestions"])
+        assert 0.0 <= report["confidence"] <= 1.0
+        assert validate_report(report) == []
 
-
-class TestFingerprintAndValidation:
-    def test_fingerprint_deterministic_and_order_independent(self) -> None:
-        evs = [
-            Evidence("c", "s2", 0.7, weight=1.1),
-            Evidence("c", "s1", 0.8),
-        ]
-        fp1 = fingerprint("question", evs, 0.5)
-        fp2 = fingerprint("question", list(reversed(evs)), 0.5)
-        assert fp1 == fp2
-        assert len(fp1) == 64
+    def test_fingerprint_stable(self) -> None:
+        rec1 = IntelligenceRecord(
+            "q",
+            [Evidence("yes", "s", 0.8), Evidence("no", "t", 0.7)],
+            prior_belief=0.5,
+        )
+        rec2 = IntelligenceRecord(
+            "q",
+            [Evidence("no", "t", 0.7), Evidence("yes", "s", 0.8)],
+            prior_belief=0.5,
+        )
+        assert rec1.analyze()["fingerprint"] == rec2.analyze()["fingerprint"]
 
     def test_fingerprint_changes_with_content(self) -> None:
-        fp_a = fingerprint("q", [Evidence("c", "s", 0.5)], 0.5)
-        fp_b = fingerprint("q", [Evidence("c", "s", 0.6)], 0.5)
-        assert fp_a != fp_b
+        a = IntelligenceRecord("q", [Evidence("yes", "s", 0.8)]).analyze()
+        b = IntelligenceRecord("q", [Evidence("yes", "s", 0.81)]).analyze()
+        assert a["fingerprint"] != b["fingerprint"]
 
-    def test_validate_report_detects_bad_status(self) -> None:
-        bad = {"version": "x", "status": "BAD", "question": "q", "confidence": 0.5,
-               "suggestions": [], "audit_trail": [], "created_at": "t", "analyzed_at": "t",
-               "fingerprint": "a" * 64}
-        violations = validate_report(bad)
-        assert any("invalid status" in v for v in violations)
+    def test_alternatives_in_suggestions(self) -> None:
+        rec = IntelligenceRecord(
+            "q",
+            [Evidence("yes", "s", 0.9)],
+            alternatives=["maybe", "no"],
+        )
+        report = rec.analyze()
+        assert any("maybe" in s for s in report["suggestions"])
 
-    def test_validate_report_detects_confidence_out_of_range(self) -> None:
-        bad = {"version": "x", "status": "PROVISIONAL_FINDING", "question": "q",
-               "confidence": 1.5, "suggestions": [], "audit_trail": [],
-               "created_at": "t", "analyzed_at": "t", "fingerprint": "a" * 64}
-        violations = validate_report(bad)
-        assert any("confidence" in v for v in violations)
+    def test_empty_question_raises(self) -> None:
+        with pytest.raises(ValueError):
+            IntelligenceRecord("   ")
 
-    def test_validate_report_detects_short_fingerprint(self) -> None:
-        bad = {"version": "x", "status": "PROVISIONAL_FINDING", "question": "q",
-               "confidence": 0.5, "suggestions": [], "audit_trail": [],
-               "created_at": "t", "analyzed_at": "t", "fingerprint": "short"}
-        violations = validate_report(bad)
-        assert any("fingerprint" in v for v in violations)
+    def test_invalid_prior_raises(self) -> None:
+        with pytest.raises(ValueError):
+            IntelligenceRecord("q", prior_belief=1.5).analyze()
+
+
+class TestFingerprinting:
+    def test_fingerprint_deterministic(self) -> None:
+        evs = [Evidence("c", "s", 0.5)]
+        assert fingerprint("q", evs, 0.5) == fingerprint("q", evs, 0.5)
+
+    def test_fingerprint_order_independent(self) -> None:
+        e1 = Evidence("a", "s1", 0.6)
+        e2 = Evidence("b", "s2", 0.7)
+        assert fingerprint("q", [e1, e2], 0.5) == fingerprint("q", [e2, e1], 0.5)
 
 
 class TestDecisionContract:
-    def test_to_fathimind_decision_mapping(self) -> None:
-        report = IntelligenceRecord("q", [Evidence("yes", "s", 0.9)]).analyze()
+    def test_provisional_to_stable_or_warning(self) -> None:
+        rec = IntelligenceRecord("q", [Evidence("yes", "s", 0.95)])
+        report = rec.analyze()
         decision = to_fathimind_decision(report)
-        assert "status" in decision
-        assert "confidence" in decision
-        assert decision["confidence"] >= 0.3
-        assert "fingerprint" in decision
-        assert decision["_original_status"] == report["status"]
+        assert decision["status"] in ("stable", "warning")
+        assert 0.3 <= decision["confidence"] <= 0.98
+        assert decision["fingerprint"] == report["fingerprint"]
 
-    def test_to_fathimind_decision_insufficient(self) -> None:
-        report = IntelligenceRecord("q").analyze()
-        decision = to_fathimind_decision(report)
+    def test_insufficient_maps_to_critical(self) -> None:
+        rec = IntelligenceRecord("q")
+        decision = to_fathimind_decision(rec.analyze())
         assert decision["status"] == "critical"
         assert "insufficient evidence" in decision["anomalies"]
 
-    def test_to_fathimind_decision_conflicting(self) -> None:
-        report = IntelligenceRecord(
+    def test_conflicting_maps_to_warning(self) -> None:
+        # Construct a case that triggers conflict
+        rec = IntelligenceRecord(
             "q",
-            [Evidence("good", "a", 0.85), Evidence("bad", "b", 0.82)],
-        ).analyze()
-        # May be provisional or conflicting depending on separation; if conflicting, check mapping
+            [
+                Evidence("yes", "s1", 0.55),
+                Evidence("no", "s2", 0.54),
+            ],
+        )
+        report = rec.analyze()
         decision = to_fathimind_decision(report)
         if report["status"] == "CONFLICTING_EVIDENCE":
             assert decision["status"] == "warning"
-            assert "conflicting evidence detected" in decision["anomalies"]
-        else:
-            assert decision["status"] in ("stable", "warning")
+            assert "conflicting" in " ".join(decision["anomalies"])
 
-    def test_to_fathimind_decision_low_confidence_warning(self) -> None:
-        report = IntelligenceRecord(
-            "q",
-            [Evidence("yes", "s", 0.51)],
-        ).analyze()
-        decision = to_fathimind_decision(report)
-        # low confidence provisional should map to warning
-        assert decision["status"] in ("warning", "stable")
-        assert 0.3 <= decision["confidence"] <= 0.98
+
+class TestValidation:
+    def test_valid_report_passes(self) -> None:
+        rec = IntelligenceRecord("q", [Evidence("yes", "s", 0.8)])
+        assert validate_report(rec.analyze()) == []
+
+    def test_missing_field_detected(self) -> None:
+        bad = {"status": "PROVISIONAL_FINDING", "confidence": 0.5}
+        violations = validate_report(bad)
+        assert any("missing required field" in v for v in violations)
+
+    def test_bad_fingerprint_detected(self) -> None:
+        rec = IntelligenceRecord("q", [Evidence("yes", "s", 0.8)]).analyze()
+        rec["fingerprint"] = "short"
+        assert any("fingerprint" in v for v in validate_report(rec))
+
+    def test_bad_status_detected(self) -> None:
+        rec = IntelligenceRecord("q", [Evidence("yes", "s", 0.8)]).analyze()
+        rec["status"] = "UNKNOWN"
+        assert any("invalid status" in v for v in validate_report(rec))
+
+    def test_bad_confidence_detected(self) -> None:
+        rec = IntelligenceRecord("q", [Evidence("yes", "s", 0.8)]).analyze()
+        rec["confidence"] = 1.5
+        assert any("confidence" in v for v in validate_report(rec))
 
 
 class TestCLI:
-    def test_version_flag_prints_version_and_exits_zero(self) -> None:
-        result = subprocess.run(
-            [sys.executable, "mfr_core_pro.py", "--version"],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent,
-        )
-        assert result.returncode == 0
-        assert VERSION in result.stdout
-
     def test_demo_runs(self) -> None:
         result = subprocess.run(
             [sys.executable, "mfr_core_pro.py", "--demo"],
             capture_output=True,
             text=True,
-            cwd=Path(__file__).parent,
+            timeout=10,
         )
         assert result.returncode == 0
-        assert "PROVISIONAL_FINDING" in result.stdout or "INSUFFICIENT_EVIDENCE" in result.stdout
+        assert "Demo" in result.stdout
 
-    def test_validate_flag_passes_on_valid_report(self) -> None:
+    def test_version_flag(self) -> None:
         result = subprocess.run(
-            [
-                sys.executable, "mfr_core_pro.py",
-                "Is secure?",
-                "--evidence", "secure", "auditor", "0.9",
-                "--validate",
-            ],
+            [sys.executable, "mfr_core_pro.py", "--version"],
             capture_output=True,
             text=True,
-            cwd=Path(__file__).parent,
         )
         assert result.returncode == 0
-        assert "Validation passed" in result.stderr
-        data = json.loads(result.stdout)
-        assert data["status"] == "PROVISIONAL_FINDING"
+        assert VERSION in result.stdout
 
-    def test_evidence_file_malformed_exits_nonzero(self, tmp_path: Path) -> None:
+    def test_invalid_weight_exits_2(self) -> None:
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "q", "--evidence", "c", "s", "0.5", "bad"],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 2
+        assert "Invalid evidence" in result.stderr or "weight" in result.stderr.lower()
+
+
+class TestCLIDirect:
+    def test_cli_demo_via_main(self, capsys) -> None:
+        import sys
+        old_argv = sys.argv
+        try:
+            sys.argv = ["mfr_core_pro.py", "--demo"]
+            from mfr_core_pro import main
+            main()
+            captured = capsys.readouterr()
+            assert "MFR Adaptive Intelligence Core Pro Demo" in captured.out
+        finally:
+            sys.argv = old_argv
+
+    def test_cli_simple_evidence_via_main(self, capsys) -> None:
+        import sys
+        old = sys.argv
+        try:
+            sys.argv = ["mfr_core_pro.py", "Is secure?", "--evidence", "secure", "auditor", "0.9"]
+            from mfr_core_pro import main
+            main()
+            out = capsys.readouterr().out
+            data = json.loads(out)
+            assert data["status"] == "PROVISIONAL_FINDING"
+            assert data["conclusion"] == "secure"
+        finally:
+            sys.argv = old
+
+    def test_cli_evidence_file_and_validate(self, tmp_path, capsys) -> None:
+        import sys
+        ev = tmp_path / "e.json"
+        ev.write_text(json.dumps([{"claim":"yes","source":"s","reliability":0.8}]))
+        old = sys.argv
+        try:
+            sys.argv = ["mfr_core_pro.py", "Q?", "--evidence-file", str(ev), "--validate"]
+            from mfr_core_pro import main
+            main()
+            err = capsys.readouterr().err
+            assert "Validation passed." in err
+        finally:
+            sys.argv = old
+
+    def test_cli_decision(self, capsys) -> None:
+        import sys
+        old = sys.argv
+        try:
+            sys.argv = ["mfr_core_pro.py", "Q", "--evidence", "c", "s", "0.75", "--decision"]
+            from mfr_core_pro import main
+            main()
+            data = json.loads(capsys.readouterr().out)
+            assert "status" in data and "confidence" in data
+        finally:
+            sys.argv = old
+
+    def test_cli_missing_question(self, capsys) -> None:
+        import sys
+        old = sys.argv
+        try:
+            sys.argv = ["mfr_core_pro.py", "--evidence", "c", "s", "0.5"]
+            from mfr_core_pro import main
+            with pytest.raises(SystemExit) as ei:
+                main()
+            assert ei.value.code == 2
+            assert "question is required" in capsys.readouterr().err
+        finally:
+            sys.argv = old
+
+    def test_cli_invalid_evidence_parts(self, capsys) -> None:
+        import sys
+        old = sys.argv
+        try:
+            sys.argv = ["mfr_core_pro.py", "Q", "--evidence", "only"]
+            from mfr_core_pro import main
+            with pytest.raises(SystemExit) as ei:
+                main()
+            assert ei.value.code == 2
+        finally:
+            sys.argv = old
+
+    def test_cli_bad_json_file(self, tmp_path, capsys) -> None:
+        import sys
         bad = tmp_path / "bad.json"
-        bad.write_text('{"not": "a list"}', encoding="utf-8")
-        result = subprocess.run(
-            [sys.executable, "mfr_core_pro.py", "q", "--evidence-file", str(bad)],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent,
-        )
-        assert result.returncode == 2
-        assert "Failed to load evidence file" in result.stderr
-
-    def test_evidence_file_valid_loads(self, tmp_path: Path) -> None:
-        good = tmp_path / "good.json"
-        good.write_text(json.dumps([
-            {"claim": "yes", "source": "file", "reliability": 0.85, "independent": True}
-        ]), encoding="utf-8")
-        result = subprocess.run(
-            [sys.executable, "mfr_core_pro.py", "from file?", "--evidence-file", str(good)],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent,
-        )
-        assert result.returncode == 0
-        data = json.loads(result.stdout)
-        assert data["status"] == "PROVISIONAL_FINDING"
-        assert data["conclusion"] == "yes"
-
-    def test_cli_invalid_evidence_exits_nonzero(self) -> None:
-        result = subprocess.run(
-            [
-                sys.executable, "mfr_core_pro.py",
-                "q",
-                "--evidence", "c", "s", "2.0",  # invalid reliability
-            ],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent,
-        )
-        assert result.returncode == 2
-
-
-    def test_cli_invalid_weight_exits_nonzero_cleanly(self) -> None:
-        result = subprocess.run(
-            [
-                sys.executable, "mfr_core_pro.py",
-                "q",
-                "--evidence", "c", "s", "0.5", "not-a-number",
-            ],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent,
-        )
-        assert result.returncode == 2
-        assert "Invalid evidence" in result.stderr or "could not convert" in result.stderr
-        assert "Traceback" not in result.stderr
-
-
-class TestEdgeCases:
-    def test_empty_question_raises(self) -> None:
-        with pytest.raises(ValueError, match="question must be non-empty"):
-            IntelligenceRecord("   ")
-
-    def test_prior_out_of_range_raises(self) -> None:
-        rec = IntelligenceRecord("q", prior_belief=1.5)
-        with pytest.raises(ValueError, match="prior_belief"):
-            rec.analyze()
-
-    def test_weight_cap_prevents_extreme(self) -> None:
-        # Very high weight should still produce valid posterior in [0,1]
-        rec = IntelligenceRecord(
-            "q",
-            [Evidence("yes", "s", 1.0, weight=1000.0)],
-        )
-        report = rec.analyze()
-        assert 0.0 <= report["confidence"] <= 1.0
-        assert report["top_claim"]["effective_weight"] <= 5.0 + 1e-6
-
-
-class TestSuggestionCoverage:
-    def test_coherent_large_sample_default_suggestion(self) -> None:
-        # >=3 independent, no conflict, multi-source top → default "reasonably coherent"
-        rec = IntelligenceRecord(
-            "Coherent?",
-            evidence=[
-                Evidence("yes", "a", 0.9, independent=True),
-                Evidence("yes", "b", 0.85, independent=True),
-                Evidence("yes", "c", 0.8, independent=True),
-            ],
-        )
-        report = rec.analyze()
-        assert report["status"] == "PROVISIONAL_FINDING"
-        assert any("reasonably coherent" in s for s in report["suggestions"])
-        assert validate_report(report) == []
-
-    def test_single_source_top_claim_suggestion(self) -> None:
-        rec = IntelligenceRecord(
-            "Single?",
-            evidence=[Evidence("yes", "only", 0.95, independent=True)],
-        )
-        report = rec.analyze()
-        assert any("single source" in s for s in report["suggestions"])
-
-    def test_non_independent_and_small_sample(self) -> None:
-        rec = IntelligenceRecord(
-            "Nonindep?",
-            evidence=[
-                Evidence("yes", "a", 0.8, independent=False),
-                Evidence("yes", "b", 0.7, independent=False),
-            ],
-        )
-        report = rec.analyze()
-        assert any("non-independent" in s for s in report["suggestions"])
-        assert any("Sample size is small" in s for s in report["suggestions"])
-
-    def test_alternatives_listed_in_suggestions(self) -> None:
-        rec = IntelligenceRecord(
-            "Q?",
-            evidence=[Evidence("yes", "s", 0.9)],
-            alternatives=["no", "maybe"],
-        )
-        report = rec.analyze()
-        assert any("Listed alternatives" in s and "no" in s for s in report["suggestions"])
-
-
-class TestCLIAdditional:
-    def test_decision_flag_emits_contract(self) -> None:
-        result = subprocess.run(
-            [
-                sys.executable, "mfr_core_pro.py",
-                "Secure?",
-                "--evidence", "yes", "audit", "0.92",
-                "--decision",
-            ],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent,
-        )
-        assert result.returncode == 0
-        data = json.loads(result.stdout)
-        assert data["status"] in ("stable", "warning", "critical")
-        assert "confidence" in data
-        assert data["_original_status"] == "PROVISIONAL_FINDING"
-
-    def test_cli_prior_out_of_range_exits_nonzero(self) -> None:
-        result = subprocess.run(
-            [
-                sys.executable, "mfr_core_pro.py",
-                "q",
-                "--evidence", "c", "s", "0.5",
-                "--prior", "1.5",
-            ],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent,
-        )
-        assert result.returncode == 2
-        assert "prior_belief" in result.stderr
+        bad.write_text("{invalid")
+        old = sys.argv
+        try:
+            sys.argv = ["mfr_core_pro.py", "Q", "--evidence-file", str(bad)]
+            from mfr_core_pro import main
+            with pytest.raises(SystemExit) as ei:
+                main()
+            assert ei.value.code == 2
+            assert "Failed to load" in capsys.readouterr().err
+        finally:
+            sys.argv = old

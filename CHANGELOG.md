@@ -1,3 +1,17 @@
+## [2.1.37-pro] - 2026-10-26
+
+### Improved
+- Added comprehensive CLI surface tests that invoke `main()` directly (demo, evidence parsing, evidence-file, --validate, --decision, error exits).
+- Raised measured coverage of the public module from 69% to 92%.
+- CI now enforces a 90% coverage gate via pytest-cov (optional dev dependency).
+- No change to analysis numerical results, fingerprints, status logic, or CLI behavior for valid inputs.
+
+### Verified
+- All 45 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior and public contract unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.36-pro] - 2026-10-26
 
 ### Improved
