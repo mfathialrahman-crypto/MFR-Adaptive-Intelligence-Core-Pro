@@ -412,3 +412,31 @@ class TestCLIAdditional:
         )
         assert result.returncode == 2
         assert "prior_belief" in result.stderr
+
+
+class TestCoverageImprovements:
+    def test_demo_function_runs_without_error(self, capsys) -> None:
+        from mfr_core_pro import demo
+        demo()
+        captured = capsys.readouterr()
+        assert "MFR Adaptive Intelligence Core Pro Demo" in captured.out
+        assert "PROVISIONAL_FINDING" in captured.out or "INSUFFICIENT_EVIDENCE" in captured.out
+
+    def test_validate_report_missing_fields(self) -> None:
+        bad = {"status": "PROVISIONAL_FINDING", "confidence": 0.5}
+        violations = validate_report(bad)
+        assert any("missing required field" in v for v in violations)
+        assert len(violations) >= 5
+
+    def test_generate_suggestions_conflict_and_single(self) -> None:
+        rec = IntelligenceRecord(
+            "conflict?",
+            evidence=[
+                Evidence("yes", "a", 0.7, independent=True),
+                Evidence("no", "b", 0.69, independent=True),
+            ],
+        )
+        report = rec.analyze()
+        # Force check suggestions path
+        assert isinstance(report["suggestions"], list)
+        assert len(report["suggestions"]) > 0
