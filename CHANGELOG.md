@@ -1,3 +1,16 @@
+## [2.1.36-pro] - 2026-10-26
+
+### Improved
+- Extracted the fixed prior strength (previously magic 2.0) into the named constant PRIOR_STRENGTH.
+- Improves code clarity, consistency with other named factors (INDEPENDENCE_FACTOR, OPPOSITION_FACTOR, MAX_EFFECTIVE_WEIGHT), and future maintainability.
+- No change to numerical results, fingerprints, status decisions, or CLI behavior.
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior and public surface unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.35-pro] - 2026-10-26
 
 ### Improved
