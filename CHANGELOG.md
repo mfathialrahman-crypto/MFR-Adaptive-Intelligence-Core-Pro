@@ -1,3 +1,15 @@
+## [2.1.38-pro] - 2026-10-26
+
+### Improved
+- Extracted remaining magic numbers into named constants: CONFLICT_POSTERIOR_THRESHOLD (0.4) and CI_Z_SCORE (1.96).
+- Improves code clarity and consistency with prior constant extractions (PRIOR_STRENGTH, OPPOSITION_FACTOR, INDEPENDENCE_FACTOR, MAX_EFFECTIVE_WEIGHT, MIN_SEPARATION).
+- No change to numerical results, fingerprints, status decisions, or CLI behavior.
+
+### Verified
+- All 38 unit tests pass.
+- Demo runs successfully.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.37-pro] - 2026-10-26
 
 ### Fixed
