@@ -37,6 +37,9 @@ MAX_EFFECTIVE_WEIGHT = 5.0
 # Single source of truth for non-independent evidence down-weighting
 INDEPENDENCE_FACTOR = 0.6
 
+# Soft opposition weight for residual evidence from other claims
+OPPOSITION_FACTOR = 0.5
+
 
 @dataclass
 class Evidence:
@@ -149,7 +152,7 @@ class IntelligenceRecord:
                     indep_count += 1
             # Opposing evidence increases beta slightly via residual
             opposing = total_effective - claim_effective.get(claim, 0.0)
-            beta += opposing * 0.5  # soft opposition
+            beta += opposing * OPPOSITION_FACTOR  # soft opposition
 
             mean = alpha / (alpha + beta) if (alpha + beta) > 0 else 0.5
             # Approximate 95% CI using normal approximation on Beta
