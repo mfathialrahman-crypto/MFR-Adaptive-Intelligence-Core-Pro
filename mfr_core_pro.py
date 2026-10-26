@@ -43,6 +43,12 @@ OPPOSITION_FACTOR = 0.5
 # Fixed prior strength (pseudo-observations) for Beta prior stability
 PRIOR_STRENGTH = 2.0
 
+# Posterior mean above this on the runner-up triggers conflict when separation is low
+CONFLICT_POSTERIOR_THRESHOLD = 0.4
+
+# Approximate 95% normal z-score for credible interval
+CI_Z_SCORE = 1.96
+
 
 @dataclass
 class Evidence:
@@ -161,8 +167,8 @@ class IntelligenceRecord:
             # Approximate 95% CI using normal approximation on Beta
             var = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1)) if (alpha + beta) > 1 else 0.01
             std = math.sqrt(max(var, 1e-8))
-            ci_low = max(0.0, mean - 1.96 * std)
-            ci_high = min(1.0, mean + 1.96 * std)
+            ci_low = max(0.0, mean - CI_Z_SCORE * std)
+            ci_high = min(1.0, mean + CI_Z_SCORE * std)
 
             claim_stats.append({
                 "claim": claim,
@@ -185,7 +191,7 @@ class IntelligenceRecord:
             status = "INSUFFICIENT_EVIDENCE"
             conclusion = None
             confidence = 0.0
-        elif second and separation < MIN_SEPARATION and second["posterior_mean"] > 0.4:
+        elif second and separation < MIN_SEPARATION and second["posterior_mean"] > CONFLICT_POSTERIOR_THRESHOLD:
             status = "CONFLICTING_EVIDENCE"
             conclusion = None
             confidence = top["posterior_mean"]
