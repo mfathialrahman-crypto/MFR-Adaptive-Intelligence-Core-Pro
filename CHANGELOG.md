@@ -1,3 +1,15 @@
+## [2.1.37-pro] - 2026-10-26
+
+### Improved
+- Added regression test for CLI path that provides --evidence without a question (must exit 2 with clear message).
+- Raises confidence in public CLI contract and error handling without altering analysis or valid paths.
+
+### Verified
+- All 39 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior, fingerprints, status logic, and CLI unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.36-pro] - 2026-10-26
 
 ### Improved
