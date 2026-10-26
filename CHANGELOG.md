@@ -1,3 +1,18 @@
+# Changelog
+
+## [2.1.39-pro] - 2026-10-26
+
+### Added
+- In-process unit tests for CLI `main()` argument parsing, error paths, evidence-file loading, and `--decision`/`--validate` combinations.
+- Coverage measurement in CI with a minimum gate of 90% (`pytest-cov --cov-fail-under=90`).
+
+### Changed
+- Test suite now exercises previously uncovered CLI branches, raising measured coverage from ~69% to 95%.
+
+### Notes
+- No behavioral changes to the analysis engine or public contracts.
+- Version alignment between `version.py` and `pyproject.toml` preserved.
+
 ## [2.1.38-pro] - 2026-10-26
 
 ### Improved
