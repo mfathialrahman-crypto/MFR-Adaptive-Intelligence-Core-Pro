@@ -1,3 +1,16 @@
+## [2.1.36-pro] - 2026-10-26
+
+### Improved
+- Added unit tests that directly exercise the public `demo()` function and additional contract validation edge cases (missing required fields).
+- Raises measured statement coverage of the core from ~68% to ~71% on the analysis and suggestion paths without altering numerical results, fingerprints, or CLI behavior.
+- Improves confidence in the public demonstration and validation surfaces.
+
+### Verified
+- All 41 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior, fingerprints, status decisions, and valid CLI paths unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ## [2.1.35-pro] - 2026-10-26
 
 ### Improved
