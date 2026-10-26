@@ -40,6 +40,9 @@ INDEPENDENCE_FACTOR = 0.6
 # Soft opposition weight for residual evidence from other claims
 OPPOSITION_FACTOR = 0.5
 
+# Fixed prior strength (pseudo-observations) for Beta prior stability
+PRIOR_STRENGTH = 2.0
+
 
 @dataclass
 class Evidence:
@@ -121,8 +124,8 @@ class IntelligenceRecord:
             by_claim[ev.claim].append(ev)
 
         # Beta prior from prior_belief
-        # Prior strength fixed at 2 pseudo-observations for stability
-        prior_strength = 2.0
+        # Prior strength fixed at PRIOR_STRENGTH pseudo-observations for stability
+        prior_strength = PRIOR_STRENGTH
         prior_alpha = self.prior_belief * prior_strength
         prior_beta = (1.0 - self.prior_belief) * prior_strength
 
