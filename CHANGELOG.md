@@ -1,5 +1,18 @@
 ## [Unreleased]
 
+## [2.1.39-pro] - 2026-10-26
+
+### Improved
+- Extracted remaining magic numbers in the approximate credible-interval variance calculation (fallback 0.01 and floor 1e-8) into the named constants FALLBACK_VARIANCE and MIN_VARIANCE.
+- Improves code clarity, consistency with the other named constants, and future maintainability.
+- No change to numerical results, fingerprints, status decisions, or CLI behavior.
+
+### Verified
+- All 38 unit tests pass.
+- mypy --strict remains clean.
+- Existing analysis behavior and public surface unchanged.
+- Version aligned across version.py, pyproject.toml, and README.
+
 ### Documented
 - Independent full inspection cycle (2026-10-26): re-ran pytest (38/38 pass) and mypy --strict (clean). Updated AGENTS.md review note. No critical issues; public surface remains at v2.1.38-pro.
 
@@ -41,7 +54,7 @@
 - Existing analysis behavior and public surface unchanged.
 - Version aligned across version.py, pyproject.toml, and README.
 
-## [2.1.35-pro] - 2026-10-26
+## [2.1.35-pro] - 2026-10-25
 
 ### Improved
 - Extracted the soft opposition residual weight (previously magic 0.5) into the named constant OPPOSITION_FACTOR.
