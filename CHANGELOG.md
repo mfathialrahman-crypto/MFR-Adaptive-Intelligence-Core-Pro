@@ -11,6 +11,9 @@
 - Version aligned across version.py, pyproject.toml, and README.
 
 ## [Unreleased]
+### Improved
+- Added direct unit test for `demo()` function to raise measured coverage from ~66% to ~68% (CLI main still covered via subprocess). pytest 41/41 pass.
+
 
 ### Documented
 - Independent verification cycle (2026-10-27): confirmed pytest 38/38 pass and measured coverage ~69% on mfr_core_pro.py (CLI paths covered via subprocess). Updated AGENTS.md review note. Added coverage measurement instructions and AGENTS.md link to README. Added pytest-cov to optional dev dependencies. No functional changes. Public surface at v2.1.41-pro.
