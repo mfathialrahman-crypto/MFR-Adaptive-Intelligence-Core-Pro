@@ -1,3 +1,17 @@
+## [2.1.43-pro] - 2026-10-28
+
+### Improved
+- Strengthened `validate_report` with consistency rules: PROVISIONAL_FINDING requires non-empty string conclusion; other statuses require conclusion=None; fingerprint must be valid hex; suggestions must be a list; competing_claims must be list if present.
+- Added 5 regression tests covering the new validation rules.
+- No change to analysis logic, Bayesian updates, fingerprints, or numerical results.
+
+### Verified
+- pytest 46/46 pass.
+- mypy --strict clean.
+- Coverage remains high on core analysis paths.
+- Version aligned across version.py, pyproject.toml, and README.
+
+
 ## [2.1.42-pro] - 2026-10-27
 
 ### Fixed
