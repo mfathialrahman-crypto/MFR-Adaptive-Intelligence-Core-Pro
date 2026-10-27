@@ -1,3 +1,16 @@
+## [2.1.43-pro] - 2026-10-27
+
+### Added
+- Uncertainty-aware suggestion: when the approximate 95% credible interval on the top claim is wide (>0.65), the analysis now recommends collecting additional independent evidence to reduce uncertainty.
+- Regression test covering the new suggestion path.
+
+### Verified
+- pytest 40/40 pass.
+- mypy --strict clean.
+- No change to core Bayesian updates, fingerprints, or status logic for existing cases.
+- Version aligned across version.py, pyproject.toml, and README.
+
+
 ## [2.1.42-pro] - 2026-10-27
 
 ### Fixed
