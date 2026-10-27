@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-27 (independent cycle: pytest 39/39 passed, coverage measured 69% on mfr_core_pro.py (CLI paths covered via subprocess, not counted in coverage), CLI --version and demo functional, evidence-file object format supported and regression-tested, version alignment checked, no critical issues). AGENTS.md constitution present, aligned, and saved. Continuous improvement cycle active. Public surface at v2.1.42-pro.*
+*Last reviewed and confirmed in repository: 2026-10-27 (independent cycle: added MAX_EVIDENCE_ITEMS=1000 reliability bound against large inputs, regression test, pytest 40/40 passed, version 2.1.43-pro). AGENTS.md constitution present, aligned, and saved. Continuous improvement cycle active. Public surface at v2.1.43-pro.*
