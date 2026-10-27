@@ -20,6 +20,8 @@ from mfr_core_pro import (
     fingerprint,
     to_fathimind_decision,
     validate_report,
+    demo,
+    main,
 )
 
 
@@ -295,7 +297,6 @@ class TestCLI:
         )
         assert result.returncode == 2
 
-
     def test_cli_invalid_weight_exits_nonzero_cleanly(self) -> None:
         result = subprocess.run(
             [
@@ -437,3 +438,25 @@ class TestCLIAdditional:
         )
         assert result.returncode == 2
         assert "prior_belief" in result.stderr
+
+
+class TestDirectCoverage:
+    """Direct calls to demo and main to exercise paths not counted via subprocess coverage."""
+
+    def test_demo_direct(self, capsys: pytest.CaptureFixture[str]) -> None:
+        demo()
+        captured = capsys.readouterr()
+        assert "MFR Adaptive Intelligence Core Pro Demo" in captured.out
+        assert "PROVISIONAL_FINDING" in captured.out or "INSUFFICIENT_EVIDENCE" in captured.out
+
+    def test_main_demo_flag(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--demo"])
+        main()
+        captured = capsys.readouterr()
+        assert "Demo" in captured.out
+
+    def test_main_no_args_runs_demo(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py"])
+        main()
+        captured = capsys.readouterr()
+        assert "Demo" in captured.out
