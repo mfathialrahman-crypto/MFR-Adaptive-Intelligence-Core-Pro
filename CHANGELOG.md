@@ -1,3 +1,15 @@
+## [2.1.43-pro] - 2026-10-27
+
+### Added
+- Reliability bound: maximum of 1000 evidence items accepted from file or CLI (`MAX_EVIDENCE_ITEMS`). Prevents accidental or excessive resource use on very large inputs. Clear error and non-zero exit.
+- Regression test covering the limit.
+
+### Verified
+- pytest 40/40 pass.
+- No change to analysis results for inputs under the limit.
+- Version aligned across version.py, pyproject.toml, and README.
+
+
 ## [2.1.42-pro] - 2026-10-27
 
 ### Fixed
