@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Documented
+- Independent verification cycle (2026-10-27): confirmed pytest 38/38 pass and measured coverage ~69% on mfr_core_pro.py (CLI paths covered via subprocess). Updated AGENTS.md review note. Added coverage measurement instructions and AGENTS.md link to README. Added pytest-cov to optional dev dependencies. No functional changes. Public surface at v2.1.41-pro.
+
 ### Fixed
 - Restored full CLI argument parser and demo() function that were accidentally removed during the magic-number extraction in v2.1.40-pro.
 - --demo, positional question, --evidence, --evidence-file, --alternatives, --version, --decision, and --validate now work again.
