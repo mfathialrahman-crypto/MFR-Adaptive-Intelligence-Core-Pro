@@ -37,6 +37,26 @@ Given a question and a list of evidence items (claim, source, reliability, indep
 - Weight-capped soft observations so posteriors stay valid even with extreme weights
 - Conflict detection with explanatory status
 
+## Architecture
+
+```mermaid
+flowchart TD
+    A[Question + Evidence Items] --> B[Evidence Validation]
+    B --> C[Beta Prior + Soft Observations]
+    C --> D[Independence Penalty]
+    D --> E[Posterior Means + Credible Intervals]
+    E --> F{Conflict / Separation Check}
+    F -->|Clear| G[PROVISIONAL_FINDING]
+    F -->|Conflicting| H[CONFLICTING_EVIDENCE]
+    F -->|Insufficient| I[INSUFFICIENT_EVIDENCE]
+    G --> J[Suggestions + Audit Trail]
+    H --> J
+    I --> J
+    J --> K[SHA-256 Fingerprint + Decision Contract]
+```
+
+The core is a pure function from validated evidence to a deterministic, auditable report. No external services, no mutable global state, full replayability via the fingerprint.
+
 ---
 
 ## Quick Start
@@ -103,7 +123,7 @@ pytest test_mfr_core_pro.py --cov=mfr_core_pro --cov-report=term-missing
 
 39 unit tests covering validation, analysis paths, fingerprint stability, decision contract, CLI edge cases, and suggestion generation.
 
-Coverage on the core module is currently ~69% (CLI entry points are exercised via subprocess and not counted in the default coverage run). CI runs the same tests plus a strict mypy check and a version-consistency gate on Python 3.10–3.13.
+Coverage on the core module is currently ~66–69% (CLI entry points are exercised via subprocess and not counted in the default coverage run). CI runs the same tests plus a strict mypy check and a version-consistency gate on Python 3.10–3.13.
 
 ---
 
