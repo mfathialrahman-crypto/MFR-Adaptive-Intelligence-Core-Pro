@@ -437,3 +437,18 @@ class TestCLIAdditional:
         )
         assert result.returncode == 2
         assert "prior_belief" in result.stderr
+
+
+class TestEvidenceLimit:
+    def test_evidence_file_exceeds_max_exits_nonzero(self, tmp_path) -> None:
+        items = [{"claim": "x", "source": f"s{i}", "reliability": 0.5} for i in range(1001)]
+        p = tmp_path / "big.json"
+        p.write_text(json.dumps(items), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "--evidence-file", str(p)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "exceeds maximum" in result.stderr or "Too many evidence items" in result.stderr
