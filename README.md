@@ -3,31 +3,39 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
-[![Version](https://img.shields.io/badge/version-2.1.39-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.40-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.39-pro**  
+Version **2.1.40-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
-A rigorous, transparent, and self-improving evidence analysis engine designed for real decisions — not toy averaging.
+Zero external dependencies. Pure Python. MIT licensed.
 
----
+## What it does
 
-## Why this exists
+Given a question and a list of evidence items (claim, source, reliability, independence, weight), it produces:
 
-Most “intelligence” scripts do simple averaging and call it confidence.  
-This core does better:
+- A status: `PROVISIONAL_FINDING`, `CONFLICTING_EVIDENCE`, or `INSUFFICIENT_EVIDENCE`
+- A confidence score and (when appropriate) a conclusion
+- Approximate 95% credible intervals on the top claims
+- An ordered list of competing claims with posterior means
+- Actionable improvement suggestions
+- A full audit trail
+- A stable, content-addressable SHA-256 fingerprint
+- A mapping to the FathiMind Decision contract
 
-- **Bayesian-inspired belief updating** (Beta prior + soft observations)
-- **Real independence penalty** (non-independent evidence is down-weighted)
-- **Approximate 95% credible intervals**
-- **Full audit trail** for every decision
-- **Automatic generation of actionable improvement suggestions**
-- **Stable content-addressable fingerprinting**
-- **Weight-capped soft observations** so posteriors stay valid even with extreme weights
-- **Conflict detection** with explanatory status
+### Design properties
+
+- Bayesian-inspired belief updating (Beta prior + soft observations)
+- Real independence penalty (non-independent evidence is down-weighted)
+- Approximate 95% credible intervals
+- Full audit trail for every decision
+- Automatic generation of actionable improvement suggestions
+- Stable content-addressable fingerprinting
+- Weight-capped soft observations so posteriors stay valid even with extreme weights
+- Conflict detection with explanatory status
 
 ---
 
@@ -38,140 +46,77 @@ git clone https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Cor
 cd MFR-Adaptive-Intelligence-Core-Pro
 pip install -e .
 python mfr_core_pro.py          # runs the three demo cases
-python -m pytest test_mfr_core_pro.py -v
 ```
 
-Or single-file usage (zero install):
+Or use the installed entry point:
 
 ```bash
-python mfr_core_pro.py
+mfr-core --version
+mfr-core --validate
+mfr-core --decision
 ```
 
----
+### Analyze your own evidence
 
+Create `evidence.json`:
 
-## CLI Usage
+```json
+{
+  "question": "Is the release safe to ship?",
+  "prior_belief": 0.5,
+  "evidence": [
+    {"claim": "safe", "source": "ci-green", "reliability": 0.95, "independent": true, "weight": 1.0},
+    {"claim": "safe", "source": "reviewer-A", "reliability": 0.8, "independent": true, "weight": 1.0},
+    {"claim": "unsafe", "source": "flaky-test", "reliability": 0.4, "independent": false, "weight": 0.5}
+  ],
+  "alternatives": ["needs more tests", "hold for review"]
+}
+```
+
+Then:
 
 ```bash
-python mfr_core_pro.py "Is the system secure?" \
-  --evidence "secure" "audit-firm" 0.91 \
-  --evidence "vulnerable" "researcher" 0.87 1.2 false \
-  --alternatives "partially secure" \
-  --prior 0.5 \
-  --validate
-
-# Or load from JSON file:
-python mfr_core_pro.py "Is the system secure?" --evidence-file evidence.json
+python mfr_core_pro.py --evidence-file evidence.json
+python mfr_core_pro.py --evidence-file evidence.json --decision
+python mfr_core_pro.py --evidence-file evidence.json --validate
 ```
 
-The fourth argument (optional) is weight (>0, default 1.0).  
-The fifth argument (optional) is independent flag (`true`/`false`/`yes`/`no`, default true).
+---
 
-Use `--validate` to enforce the analysis contract (exits non-zero if required fields or fingerprint are invalid).
+## Output contract
 
-Or run the demo:
+The analysis report matches `schemas/analysis.schema.json`.
+
+Key fields: `version`, `status`, `question`, `confidence`, `conclusion`, `top_claim`, `competing_claims`, `suggestions`, `audit_trail`, `fingerprint`.
+
+See the schema for the full contract. Additive fields are allowed.
+
+---
+
+## Testing
 
 ```bash
-python mfr_core_pro.py --demo
+pip install pytest
+pytest test_mfr_core_pro.py -v
 ```
 
-## Minimal Example
+38 unit tests covering validation, analysis paths, fingerprint stability, decision contract, CLI edge cases, and suggestion generation.
 
-```python
-from mfr_core_pro import IntelligenceRecord, Evidence
-
-record = IntelligenceRecord(
-    question="هل هذا المستند صحيح؟",
-    evidence=[
-        Evidence("المستند صحيح", "source-A", 0.92, independent=True, weight=1.2),
-        Evidence("المستند صحيح", "source-B", 0.88, independent=True),
-        Evidence("المستند صحيح", "source-C", 0.75, independent=False),
-    ],
-    alternatives=["المستند مزيف", "المستند جزئياً صحيح"],
-)
-
-result = record.analyze()
-print(result["status"])          # PROVISIONAL_FINDING or CONFLICTING_EVIDENCE
-print(result["confidence"])      # posterior mean
-print(result["conclusion"])
-print(result["suggestions"])
-print(result["fingerprint"])     # content-addressable hash
-
-# Optional: emit a FathiMind Decision contract object (RFC-0001)
-from mfr_core_pro import to_fathimind_decision
-decision = to_fathimind_decision(result)
-print(decision["status"], decision["confidence"])
-```
+CI runs the same tests plus a strict mypy check and a version-consistency gate on Python 3.10–3.13.
 
 ---
 
-## Architecture (Inside the Core)
+## Versioning
 
-```
-INPUT (question + Evidence list)
-        │
-        ▼
-   Deduplication by source (keep strongest)
-        │
-        ▼
-   Independence penalty + weight capping
-        │
-        ▼
-   Beta-style update (alpha / beta) per claim
-        │
-        ▼
-   Ranking by effective score + posterior mean
-        │
-        ▼
-   Conflict detection → status
-        │
-        ▼
-   Suggestions + Audit trail + Fingerprint
-```
-
-Every output is a complete, replayable decision object.
-
----
-
-## Design Doctrine (aligned with FathiMind)
-
-1. **No strong claim at low confidence.**
-2. **Independence is enforced, not just declared.**
-3. **Every decision leaves a replayable trace.**
-4. **The system must suggest its own next improvement.**
-5. **Provisional findings only — never absolute certainty.**
-
-The full Project Engineering Constitution that governs continuous improvement of this repository lives in [`AGENTS.md`](./AGENTS.md).
-
----
-
-## Part of the FathiMind Stack
-
-| Layer | Role |
-|-------|------|
-| HelixMind | measure |
-| MFR-Cognition | verify |
-| AetherMind | reason |
-| SovereignEvolution | evolve |
-| **This Core (public)** | transparent adaptive analysis |
-
----
-
-## Testing & Quality
-
-```bash
-python -m pytest test_mfr_core_pro.py -v
-```
-
-All critical paths are covered. The core is intentionally dependency-free (stdlib only) so it can be dropped into any environment.
+Single source of truth is `version.py`. `pyproject.toml` and this README stay aligned.
 
 ---
 
 ## License
 
-MIT License — free to use, modify, and distribute with attribution.
+MIT. See [LICENSE](LICENSE).
 
 ---
 
-Built and continuously evolved by **Mohamed Fathi Alrahman**  
-[FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) — human-centric cognitive engineering.
+Part of the FathiMind cognitive operating system.
+Public transparent layer. No secrets. Evidence first.
