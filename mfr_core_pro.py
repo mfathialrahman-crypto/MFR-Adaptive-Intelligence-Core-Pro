@@ -259,6 +259,13 @@ def _generate_suggestions(
         )
     if top and top.get("evidence_count", 0) == 1:
         suggestions.append("Top claim rests on a single source. Seek additional confirmation.")
+    # Uncertainty-aware suggestion based on approximate 95% credible interval width
+    if top and isinstance(top.get("ci_95"), list) and len(top["ci_95"]) == 2:
+        ci_width = top["ci_95"][1] - top["ci_95"][0]
+        if ci_width > 0.65:
+            suggestions.append(
+                f"Credible interval is wide ({ci_width:.2f}). Additional independent evidence would meaningfully reduce uncertainty."
+            )
     if alternatives:
         alts = ", ".join(a.strip() for a in alternatives if a and a.strip())
         if alts:
