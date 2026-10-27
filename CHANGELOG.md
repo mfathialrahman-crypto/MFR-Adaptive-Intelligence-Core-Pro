@@ -1,5 +1,18 @@
 ## [Unreleased]
 
+### Fixed
+- Restored full CLI argument parser and demo() function that were accidentally removed during the magic-number extraction in v2.1.40-pro.
+- --demo, positional question, --evidence, --evidence-file, --alternatives, --version, --decision, and --validate now work again.
+- Evidence file loading, error messages, and exit codes match the previous tested contract.
+- No change to analysis logic, constants, fingerprints, or numerical results.
+
+### Verified
+- pytest 38/38 pass.
+- mypy --strict clean.
+- Public surface at v2.1.41-pro.
+
+## [Unreleased]
+
 ### Documented
 - Independent development cycle (2026-10-27): extracted remaining magic numbers (conflict threshold, stable confidence, decision confidence clamps) into named constants. No numerical or behavioral change. pytest 38/38 passed. Public surface at v2.1.40-pro.
 
