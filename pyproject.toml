@@ -29,7 +29,7 @@ Repository = "https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence
 "FathiMind HQ" = "https://github.com/mfathialrahman-crypto/FathiMind"
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "pytest-cov"]
 
 [build-system]
 requires = ["setuptools>=61"]
