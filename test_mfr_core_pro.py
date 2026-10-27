@@ -369,6 +369,15 @@ class TestSuggestionCoverage:
         assert any("non-independent" in s for s in report["suggestions"])
         assert any("Sample size is small" in s for s in report["suggestions"])
 
+    def test_wide_credible_interval_suggestion(self) -> None:
+        rec = IntelligenceRecord(
+            "Uncertain?",
+            evidence=[Evidence("yes", "only", 0.55, independent=True)],
+        )
+        report = rec.analyze()
+        assert any("Credible interval is wide" in s for s in report["suggestions"])
+        assert validate_report(report) == []
+
     def test_alternatives_listed_in_suggestions(self) -> None:
         rec = IntelligenceRecord(
             "Q?",
