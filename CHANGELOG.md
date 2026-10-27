@@ -1,5 +1,25 @@
 ## [Unreleased]
 
+### Fixed
+- Restored and completed CLI interface so unit tests and CI pass (38/38).
+- Supported --evidence inline triples, optional positional question, --demo, --evidence-file as JSON list of evidence objects.
+- Proper error messages and exit codes for malformed evidence, invalid numbers, and file load failures.
+- Validation message aligned ("Validation passed").
+
+### Verified
+- pytest 38/38 passed.
+- mypy --strict clean.
+- Demo and CLI paths functional.
+- Version bumped to 2.1.41-pro and aligned.
+
+## [2.1.41-pro] - 2026-10-27
+
+### Fixed
+- Critical CI failure: unit tests no longer matched the simplified CLI. Restored full CLI support for inline evidence and evidence-file (JSON list) without changing core analysis logic.
+- All 38 tests now pass; type check clean.
+
+## [Unreleased]
+
 ### Documented
 - Independent development cycle (2026-10-27): extracted remaining magic numbers (conflict threshold, stable confidence, decision confidence clamps) into named constants. No numerical or behavioral change. pytest 38/38 passed. Public surface at v2.1.40-pro.
 

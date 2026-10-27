@@ -1,6 +1,6 @@
 [project]
 name = "mfr-adaptive-intelligence-core-pro"
-version = "2.1.40"
+version = "2.1.41"
 description = "Evidence → Bayesian Reasoning → Verification → Self-Improvement. Transparent adaptive intelligence core of the FathiMind ecosystem."
 readme = "README.md"
 requires-python = ">=3.10"
