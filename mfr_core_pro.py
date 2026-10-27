@@ -58,6 +58,9 @@ CONFLICT_SECOND_THRESHOLD = 0.4
 # Confidence threshold above which a provisional finding maps to "stable"
 STABLE_CONFIDENCE_THRESHOLD = 0.75
 
+# Maximum evidence items accepted (reliability bound against resource exhaustion)
+MAX_EVIDENCE_ITEMS = 1000
+
 # Clamps for the FathiMind decision contract confidence field
 MIN_DECISION_CONFIDENCE = 0.3
 MAX_DECISION_CONFIDENCE = 0.98
@@ -409,6 +412,8 @@ def main() -> None:
                 file_alternatives = data.get("alternatives")
             else:
                 raise ValueError("evidence file must be a JSON array or an object containing an 'evidence' array")
+            if len(items) > MAX_EVIDENCE_ITEMS:
+                raise ValueError(f"evidence file exceeds maximum of {MAX_EVIDENCE_ITEMS} items")
             for i, item in enumerate(items):
                 if not isinstance(item, dict):
                     raise ValueError(f"evidence item {i} must be an object")
@@ -439,6 +444,10 @@ def main() -> None:
             except ValueError as exc:
                 print(f"Invalid evidence: {exc}", file=sys.stderr)
                 sys.exit(2)
+
+    if len(evidence_list) > MAX_EVIDENCE_ITEMS:
+        print(f"Too many evidence items (max {MAX_EVIDENCE_ITEMS})", file=sys.stderr)
+        sys.exit(2)
 
     # Prefer explicit CLI, then file values, then error
     effective_question = args.question or file_question
