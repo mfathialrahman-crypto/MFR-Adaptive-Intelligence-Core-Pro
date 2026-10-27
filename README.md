@@ -3,12 +3,12 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
-[![Version](https://img.shields.io/badge/version-2.1.42-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.43-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.42-pro**  
+Version **2.1.43-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
 Zero external dependencies. Pure Python. MIT licensed.
@@ -101,9 +101,9 @@ pytest test_mfr_core_pro.py -v
 pytest test_mfr_core_pro.py --cov=mfr_core_pro --cov-report=term-missing
 ```
 
-41 unit tests covering validation, analysis paths, fingerprint stability, decision contract, CLI edge cases, and suggestion generation.
+46 unit tests covering validation, analysis paths, fingerprint stability, decision contract, CLI edge cases, and suggestion generation.
 
-Coverage on the core module is currently ~68% (CLI entry points are exercised via subprocess and not counted in the default coverage run). CI runs the same tests plus a strict mypy check and a version-consistency gate on Python 3.10–3.13.
+Coverage on the core module is currently ~69% (CLI entry points are exercised via subprocess and not counted in the default coverage run). CI runs the same tests plus a strict mypy check and a version-consistency gate on Python 3.10–3.13.
 
 ---
 
