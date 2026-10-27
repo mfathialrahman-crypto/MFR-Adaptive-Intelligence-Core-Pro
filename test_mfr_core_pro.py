@@ -454,3 +454,49 @@ class TestDirectCoverage:
         rec = IntelligenceRecord("q", evidence=[Evidence("c", "s", 0.5)])
         result = rec.analyze()
         assert result["status"] in ("PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE", "INSUFFICIENT_EVIDENCE")
+
+
+class TestEnhancedValidation:
+    def test_provisional_requires_conclusion(self) -> None:
+        bad = {
+            "version": "x", "status": "PROVISIONAL_FINDING", "question": "q",
+            "confidence": 0.8, "suggestions": ["ok"], "audit_trail": [],
+            "created_at": "t", "analyzed_at": "t", "fingerprint": "a" * 64,
+            "conclusion": None,
+        }
+        violations = validate_report(bad)
+        assert any("conclusion" in v for v in violations)
+
+    def test_insufficient_rejects_conclusion(self) -> None:
+        bad = {
+            "version": "x", "status": "INSUFFICIENT_EVIDENCE", "question": "q",
+            "confidence": 0.0, "suggestions": [], "audit_trail": [],
+            "created_at": "t", "analyzed_at": "t", "fingerprint": "b" * 64,
+            "conclusion": "something",
+        }
+        violations = validate_report(bad)
+        assert any("conclusion" in v for v in violations)
+
+    def test_valid_provisional_passes_enhanced(self) -> None:
+        rec = IntelligenceRecord("q", [Evidence("yes", "s", 0.9)]).analyze()
+        assert validate_report(rec) == []
+
+    def test_invalid_fingerprint_hex(self) -> None:
+        bad = {
+            "version": "x", "status": "PROVISIONAL_FINDING", "question": "q",
+            "confidence": 0.5, "suggestions": [], "audit_trail": [],
+            "created_at": "t", "analyzed_at": "t", "fingerprint": "g" * 64,
+            "conclusion": "yes",
+        }
+        violations = validate_report(bad)
+        assert any("fingerprint" in v for v in violations)
+
+    def test_suggestions_must_be_list(self) -> None:
+        bad = {
+            "version": "x", "status": "PROVISIONAL_FINDING", "question": "q",
+            "confidence": 0.5, "suggestions": "not-a-list", "audit_trail": [],
+            "created_at": "t", "analyzed_at": "t", "fingerprint": "a" * 64,
+            "conclusion": "yes",
+        }
+        violations = validate_report(bad)
+        assert any("suggestions" in v for v in violations)
