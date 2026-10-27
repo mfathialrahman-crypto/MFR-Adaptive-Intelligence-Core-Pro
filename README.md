@@ -96,19 +96,29 @@ See the schema for the full contract. Additive fields are allowed.
 ## Testing
 
 ```bash
-pip install pytest
+pip install pytest pytest-cov
 pytest test_mfr_core_pro.py -v
+pytest test_mfr_core_pro.py --cov=mfr_core_pro --cov-report=term-missing
 ```
 
 38 unit tests covering validation, analysis paths, fingerprint stability, decision contract, CLI edge cases, and suggestion generation.
 
-CI runs the same tests plus a strict mypy check and a version-consistency gate on Python 3.10–3.13.
+Coverage on the core module is currently ~69% (CLI entry points are exercised via subprocess and not counted in the default coverage run). CI runs the same tests plus a strict mypy check and a version-consistency gate on Python 3.10–3.13.
 
 ---
 
 ## Versioning
 
 Single source of truth is `version.py`. `pyproject.toml` and this README stay aligned.
+
+---
+
+## Documentation
+
+- [AGENTS.md](AGENTS.md) — Project Engineering Constitution (continuous improvement rules)
+- [CHANGELOG.md](CHANGELOG.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SECURITY.md](SECURITY.md)
 
 ---
 
