@@ -318,7 +318,7 @@ def to_fathimind_decision(report: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def validate_report(report: Dict[str, Any]) -> List[str]:
-    """Pure-Python contract checker against analysis.schema.json required fields."""
+    """Pure-Python contract checker against analysis.schema.json required fields and consistency rules."""
     violations: List[str] = []
     required = [
         "version", "status", "question", "confidence", "suggestions",
@@ -328,7 +328,7 @@ def validate_report(report: Dict[str, Any]) -> List[str]:
         if key not in report:
             violations.append(f"missing required field: {key}")
     fp = report.get("fingerprint", "")
-    if not isinstance(fp, str) or len(fp) != 64:
+    if not isinstance(fp, str) or len(fp) != 64 or not all(c in "0123456789abcdef" for c in fp.lower()):
         violations.append("fingerprint must be a 64-character hex string")
     status = report.get("status")
     if status not in ("PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE", "INSUFFICIENT_EVIDENCE"):
@@ -336,6 +336,20 @@ def validate_report(report: Dict[str, Any]) -> List[str]:
     conf = report.get("confidence")
     if not isinstance(conf, (int, float)) or not (0.0 <= conf <= 1.0):
         violations.append(f"confidence out of range or not numeric: {conf}")
+    # Consistency rules for stronger contract
+    conclusion = report.get("conclusion")
+    if status == "PROVISIONAL_FINDING":
+        if not isinstance(conclusion, str) or not conclusion.strip():
+            violations.append("PROVISIONAL_FINDING requires a non-empty string conclusion")
+    else:
+        if conclusion is not None:
+            violations.append(f"non-provisional status requires conclusion=None, got {conclusion!r}")
+    competing = report.get("competing_claims")
+    if competing is not None and not isinstance(competing, list):
+        violations.append("competing_claims must be a list when present")
+    suggestions = report.get("suggestions")
+    if not isinstance(suggestions, list):
+        violations.append("suggestions must be a list")
     return violations
 
 
