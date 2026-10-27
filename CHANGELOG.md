@@ -13,6 +13,9 @@
 ## [Unreleased]
 
 ### Documented
+- Independent verification cycle (2026-10-27): confirmed pytest 39/39 pass, mypy --strict clean, coverage ~66% on core (CLI paths via subprocess). Updated AGENTS.md review note. Added direct unit tests for demo() and main() early paths to improve measured coverage. No functional changes. Public surface at v2.1.42-pro.
+
+### Documented (previous)
 - Independent verification cycle (2026-10-27): confirmed pytest 38/38 pass and measured coverage ~69% on mfr_core_pro.py (CLI paths covered via subprocess). Updated AGENTS.md review note. Added coverage measurement instructions and AGENTS.md link to README. Added pytest-cov to optional dev dependencies. No functional changes. Public surface at v2.1.41-pro.
 
 ### Fixed
