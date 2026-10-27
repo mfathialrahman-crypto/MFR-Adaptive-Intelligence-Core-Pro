@@ -3,12 +3,12 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
-[![Version](https://img.shields.io/badge/version-2.1.40-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
+[![Version](https://img.shields.io/badge/version-2.1.41-pro-orange)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro)
 [![FathiMind](https://img.shields.io/badge/FathiMind-Public%20Core-blueviolet)](https://github.com/mfathialrahman-crypto/FathiMind)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
-Version **2.1.40-pro**  
+Version **2.1.41-pro**  
 Public cognitive component of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) ecosystem.
 
 Zero external dependencies. Pure Python. MIT licensed.
@@ -58,27 +58,28 @@ mfr-core --decision
 
 ### Analyze your own evidence
 
-Create `evidence.json`:
+Create `evidence.json` (JSON list of evidence objects; question is supplied on the command line):
 
 ```json
-{
-  "question": "Is the release safe to ship?",
-  "prior_belief": 0.5,
-  "evidence": [
-    {"claim": "safe", "source": "ci-green", "reliability": 0.95, "independent": true, "weight": 1.0},
-    {"claim": "safe", "source": "reviewer-A", "reliability": 0.8, "independent": true, "weight": 1.0},
-    {"claim": "unsafe", "source": "flaky-test", "reliability": 0.4, "independent": false, "weight": 0.5}
-  ],
-  "alternatives": ["needs more tests", "hold for review"]
-}
+[
+  {"claim": "safe", "source": "ci-green", "reliability": 0.95, "independent": true, "weight": 1.0},
+  {"claim": "safe", "source": "reviewer-A", "reliability": 0.8, "independent": true, "weight": 1.0},
+  {"claim": "unsafe", "source": "flaky-test", "reliability": 0.4, "independent": false, "weight": 0.5}
+]
 ```
 
 Then:
 
 ```bash
-python mfr_core_pro.py --evidence-file evidence.json
-python mfr_core_pro.py --evidence-file evidence.json --decision
-python mfr_core_pro.py --evidence-file evidence.json --validate
+python mfr_core_pro.py "Is the release safe to ship?" --evidence-file evidence.json
+python mfr_core_pro.py "Is the release safe to ship?" --evidence-file evidence.json --decision
+python mfr_core_pro.py "Is the release safe to ship?" --evidence-file evidence.json --validate
+```
+
+Or use inline evidence:
+
+```bash
+python mfr_core_pro.py "Is secure?" --evidence secure auditor 0.9 --validate
 ```
 
 ---
