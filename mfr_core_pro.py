@@ -341,24 +341,46 @@ def validate_report(report: Dict[str, Any]) -> List[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="MFR Adaptive Intelligence Core Pro")
+    parser.add_argument("question", nargs="?", default=None, help="Question to analyze")
     parser.add_argument("--version", action="store_true", help="Print version and exit")
-    parser.add_argument("--validate", action="store_true", help="Validate the demo report against the contract")
-    parser.add_argument("--decision", action="store_true", help="Emit FathiMind decision contract for the demo")
-    parser.add_argument("--evidence-file", type=str, help="JSON file with question/evidence for analysis")
+    parser.add_argument("--validate", action="store_true", help="Validate the report against the contract")
+    parser.add_argument("--decision", action="store_true", help="Emit FathiMind decision contract")
+    parser.add_argument("--evidence-file", type=str, help="JSON file with evidence (list or object)")
     parser.add_argument("--prior", type=float, default=0.5, help="Prior belief [0,1]")
+    parser.add_argument("--demo", action="store_true", help="Run the built-in demo cases")
+    parser.add_argument("--evidence", nargs="*", action="append", default=[], help="Evidence: claim source reliability [weight]")
     args = parser.parse_args()
 
     if args.version:
         print(VERSION)
         sys.exit(0)
 
+    def _print_and_maybe_validate(report: Dict[str, Any], decision: bool, validate: bool) -> None:
+        if decision:
+            print(json.dumps(to_fathimind_decision(report), indent=2))
+        else:
+            print(json.dumps(report, indent=2))
+        if validate:
+            viol = validate_report(report)
+            if viol:
+                print("VALIDATION FAILED:", file=sys.stderr)
+                for v in viol:
+                    print(" -", v, file=sys.stderr)
+                sys.exit(2)
+            else:
+                print("Validation passed", file=sys.stderr)
+
     if args.evidence_file:
         try:
             with open(args.evidence_file, "r", encoding="utf-8") as fh:
                 data = json.load(fh)
-            question = data.get("question", "")
-            prior = float(data.get("prior_belief", args.prior))
-            raw_ev = data.get("evidence", [])
+            if isinstance(data, list):
+                raw_ev = data
+                question = args.question or "from file"
+                prior = args.prior
+                alts: List[str] = []
+            else:
+                raise ValueError("evidence file must be a JSON list of evidence objects")
             evidence = [
                 Evidence(
                     claim=e.get("claim", ""),
@@ -369,28 +391,59 @@ def main() -> None:
                 )
                 for e in raw_ev
             ]
-            alts = data.get("alternatives", [])
             rec = IntelligenceRecord(question=question, evidence=evidence, alternatives=alts, prior_belief=prior)
             report = rec.analyze()
-            if args.decision:
-                print(json.dumps(to_fathimind_decision(report), indent=2))
-            else:
-                print(json.dumps(report, indent=2))
-            if args.validate:
-                viol = validate_report(report)
-                if viol:
-                    print("VALIDATION FAILED:", file=sys.stderr)
-                    for v in viol:
-                        print(" -", v, file=sys.stderr)
-                    sys.exit(2)
-                else:
-                    print("VALIDATION PASSED")
+            _print_and_maybe_validate(report, args.decision, args.validate)
             sys.exit(0)
-        except (json.JSONDecodeError, ValueError, OSError) as exc:
-            print(f"Error loading evidence file: {exc}", file=sys.stderr)
+        except (json.JSONDecodeError, ValueError, OSError, KeyError) as exc:
+            print(f"Failed to load evidence file: {exc}", file=sys.stderr)
             sys.exit(2)
 
-    # Demo cases
+    # Inline evidence
+    inline_evidence: List[Evidence] = []
+    for group in args.evidence:
+        if not group:
+            continue
+        i = 0
+        while i < len(group):
+            if i + 2 >= len(group):
+                print("Invalid evidence: incomplete triple", file=sys.stderr)
+                sys.exit(2)
+            try:
+                claim = group[i]
+                source = group[i + 1]
+                reliability = float(group[i + 2])
+                weight = 1.0
+                independent = True
+                consumed = 3
+                if i + 3 < len(group):
+                    try:
+                        weight = float(group[i + 3])
+                        consumed = 4
+                    except ValueError:
+                        print(f"Invalid evidence: could not convert {group[i + 3]!r}", file=sys.stderr)
+                        sys.exit(2)
+                inline_evidence.append(Evidence(claim, source, reliability, independent, weight))
+                i += consumed
+            except ValueError as exc:
+                print(f"Invalid evidence: {exc}", file=sys.stderr)
+                sys.exit(2)
+
+    if inline_evidence or (args.question and not args.demo):
+        try:
+            if not (0.0 <= args.prior <= 1.0):
+                print(f"prior_belief must be in [0, 1], got {args.prior}", file=sys.stderr)
+                sys.exit(2)
+            q = args.question or "Analysis"
+            rec = IntelligenceRecord(question=q, evidence=inline_evidence, prior_belief=args.prior)
+            report = rec.analyze()
+            _print_and_maybe_validate(report, args.decision, args.validate)
+            sys.exit(0)
+        except ValueError as exc:
+            print(f"Invalid evidence: {exc}", file=sys.stderr)
+            sys.exit(2)
+
+    # Demo path
     print("=== MFR Adaptive Intelligence Core Pro Demo ===")
     cases = [
         IntelligenceRecord(
@@ -428,11 +481,11 @@ def main() -> None:
         if viol:
             print("VALIDATION FAILED", file=sys.stderr)
             sys.exit(2)
-        print("VALIDATION PASSED")
+        print("Validation passed", file=sys.stderr)
     if args.decision:
         last = cases[0].analyze()
         print(json.dumps(to_fathimind_decision(last), indent=2))
-
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
