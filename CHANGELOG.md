@@ -1,5 +1,8 @@
 ## [Unreleased]
 ### Documented
+- Independent verification cycle (2026-10-28 22:15Z): confirmed AGENTS.md constitution present and saved on GitHub. Local verification: pytest 43/43 pass, coverage 68% on mfr_core_pro.py. CI green. No functional changes. Public surface at v2.1.42-pro.
+
+### Documented
 - Independent full inspection cycle (2026-10-28 21:16Z): confirmed AGENTS.md constitution present and saved on GitHub. Local verification: pytest 43/43 pass, coverage ~68% on mfr_core_pro.py. CI green on recent runs. No functional changes. Public surface at v2.1.42-pro.
 
 ### Improved
