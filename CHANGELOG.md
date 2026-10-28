@@ -14,6 +14,9 @@
 - Documentation updated to match measured test count and coverage.
 
 ## [Unreleased]
+### Documented
+- Independent verification cycle (2026-10-28): confirmed pytest 41/41 pass and measured coverage ~68% on mfr_core_pro.py. Updated AGENTS.md last-reviewed footer on Core Pro and FathiMind HQ. No functional changes. Public surface at v2.1.42-pro.
+
 ### Improved
 - Added direct unit test for `demo()` function to raise measured coverage from ~66% to ~68% (CLI main still covered via subprocess). pytest 41/41 pass.
 
