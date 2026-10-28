@@ -62,6 +62,9 @@ STABLE_CONFIDENCE_THRESHOLD = 0.75
 MIN_DECISION_CONFIDENCE = 0.3
 MAX_DECISION_CONFIDENCE = 0.98
 
+# Maximum evidence items accepted to bound memory and CPU (reliability / DoS hardening)
+MAX_EVIDENCE_ITEMS = 1000
+
 
 @dataclass
 class Evidence:
@@ -100,6 +103,8 @@ class IntelligenceRecord:
         if not q:
             raise ValueError("question must be non-empty")
         self.question = q
+        if len(self.evidence) > MAX_EVIDENCE_ITEMS:
+            raise ValueError(f"evidence list exceeds maximum of {MAX_EVIDENCE_ITEMS} items (got {len(self.evidence)})")
 
     def analyze(self) -> Dict[str, Any]:
         if not (0.0 <= self.prior_belief <= 1.0):

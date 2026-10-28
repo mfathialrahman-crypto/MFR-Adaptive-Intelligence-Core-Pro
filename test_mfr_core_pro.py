@@ -504,3 +504,14 @@ class TestPriorOverride:
         # Just ensure it runs and produces a valid confidence
         assert 0.0 <= data["confidence"] <= 1.0
         assert data["status"] == "PROVISIONAL_FINDING"
+
+
+def test_evidence_limit_enforced():
+    """Regression: refuse oversized evidence lists to bound resources."""
+    from mfr_core_pro import IntelligenceRecord, Evidence, MAX_EVIDENCE_ITEMS
+    huge = [Evidence(claim="c", source=f"s{i}", reliability=0.5) for i in range(MAX_EVIDENCE_ITEMS + 1)]
+    try:
+        IntelligenceRecord(question="test", evidence=huge)
+        assert False, "should have raised"
+    except ValueError as e:
+        assert "exceeds maximum" in str(e)
