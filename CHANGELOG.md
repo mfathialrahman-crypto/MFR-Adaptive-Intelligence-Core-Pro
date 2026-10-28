@@ -1,4 +1,7 @@
 ## [Unreleased]
+### Documented
+- Independent verification cycle (2026-10-28 17:20Z): full audit of public Core Pro; pytest 43/43 pass, coverage ~68% on mfr_core_pro.py, mypy --strict clean. Updated AGENTS.md review timestamp. No functional changes. Public surface at v2.1.42-pro.
+
 ### Improved
 - CLI `--prior` handling is now explicit: default is `None` so that an explicit `--prior` always overrides any `prior_belief` present in an evidence file, and the fallback to 0.5 is unambiguous when neither is supplied. Previous logic relied on the default value 0.5 being distinguishable, which was fragile.
 - Added two regression tests covering CLI-override and default-prior cases. pytest 43/43 pass.
