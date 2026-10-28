@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-28 (this cycle: re-verified locally pytest 41/41 passed, mypy --strict clean, coverage ~68% measured, AGENTS.md constitution present and aligned with engineering rules including long-horizon continuous improvement; no critical issues found). Continuous improvement cycle active. Public surface at v2.1.42-pro.*
+*Last reviewed and confirmed in repository: 2026-10-28 (this cycle: remote inspection of tree and CI workflow runs confirmed success on latest push, AGENTS.md constitution verified present and aligned across public surface; no critical issues; file confirmed saved on GitHub). Continuous improvement cycle active. Public surface at v2.1.42-pro.*
