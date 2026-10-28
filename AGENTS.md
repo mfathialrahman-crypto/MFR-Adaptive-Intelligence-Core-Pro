@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-28 (cycle: local clone + pytest 41/41 passed, coverage 68% on mfr_core_pro.py measured, constitution present and aligned; no critical issues detected; verified saved on GitHub). Continuous improvement cycle active. Public surface at v2.1.42-pro.*
+*Last reviewed and confirmed in repository: 2026-10-28T11:15Z (cycle: full ecosystem inspection + AGENTS.md verified present and aligned across HQ, public Core Pro, public-signals, and private engines; no critical issues detected; file confirmed saved on GitHub). Continuous improvement cycle active. Public surface at v2.1.42-pro.*
