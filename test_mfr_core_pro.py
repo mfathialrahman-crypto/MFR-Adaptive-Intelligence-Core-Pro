@@ -454,3 +454,276 @@ class TestDirectCoverage:
         rec = IntelligenceRecord("q", evidence=[Evidence("c", "s", 0.5)])
         result = rec.analyze()
         assert result["status"] in ("PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE", "INSUFFICIENT_EVIDENCE")
+
+
+class TestCLIErrorPaths:
+    """Additional CLI coverage for error paths and edge parsing."""
+
+    def test_evidence_too_few_parts(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable, "mfr_core_pro.py",
+                "q",
+                "--evidence", "only-claim", "only-source",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "at least claim source reliability" in result.stderr
+
+    def test_evidence_file_not_array_or_object(self, tmp_path: Path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text('"just a string"', encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "q", "--evidence-file", str(bad)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "Failed to load evidence file" in result.stderr
+
+    def test_evidence_file_item_not_dict(self, tmp_path: Path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text(json.dumps(["not-a-dict"]), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "q", "--evidence-file", str(bad)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "must be an object" in result.stderr
+
+    def test_evidence_file_missing_keys(self, tmp_path: Path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text(json.dumps([{"claim": "c", "source": "s"}]), encoding="utf-8")  # missing reliability
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "q", "--evidence-file", str(bad)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "missing required keys" in result.stderr
+
+    def test_no_question_with_evidence_file_only_array(self, tmp_path: Path) -> None:
+        good = tmp_path / "arr.json"
+        good.write_text(json.dumps([
+            {"claim": "yes", "source": "s", "reliability": 0.8}
+        ]), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "--evidence-file", str(good)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 2
+        assert "question is required" in result.stderr
+
+    def test_cli_with_independent_flag_false(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable, "mfr_core_pro.py",
+                "q",
+                "--evidence", "yes", "s", "0.8", "1.0", "false",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["status"] == "PROVISIONAL_FINDING"
+
+    def test_decision_and_validate_together(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable, "mfr_core_pro.py",
+                "q",
+                "--evidence", "yes", "s", "0.9",
+                "--decision",
+                "--validate",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 0
+        assert "Validation passed" in result.stderr
+        data = json.loads(result.stdout)
+        assert "status" in data
+        assert data["_original_status"] == "PROVISIONAL_FINDING"
+
+    def test_file_prior_and_alternatives_override_when_cli_default(self, tmp_path: Path) -> None:
+        obj = tmp_path / "obj.json"
+        obj.write_text(json.dumps({
+            "question": "from file",
+            "prior_belief": 0.3,
+            "alternatives": ["alt"],
+            "evidence": [{"claim": "yes", "source": "s", "reliability": 0.7}]
+        }), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, "mfr_core_pro.py", "--evidence-file", str(obj)],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent,
+        )
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["question"] == "from file"
+        assert any("alt" in s for s in data.get("suggestions", []))
+
+
+class TestMainDirectCoverage:
+    """Invoke main() under the same process for coverage of CLI logic."""
+
+    def test_main_demo_via_argv(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--demo"])
+        from mfr_core_pro import main
+        main()
+        captured = capsys.readouterr()
+        assert "Demo" in captured.out
+
+    def test_main_no_args_runs_demo(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py"])
+        from mfr_core_pro import main
+        main()
+        captured = capsys.readouterr()
+        assert "Demo" in captured.out
+
+    def test_main_valid_evidence(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", [
+            "mfr_core_pro.py", "Is it secure?",
+            "--evidence", "yes", "auditor", "0.95"
+        ])
+        from mfr_core_pro import main
+        main()
+        captured = capsys.readouterr()
+        data = json.loads(captured.out)
+        assert data["status"] == "PROVISIONAL_FINDING"
+        assert data["conclusion"] == "yes"
+
+    def test_main_evidence_file_object(self, monkeypatch, capsys, tmp_path) -> None:
+        obj = tmp_path / "e.json"
+        obj.write_text(json.dumps({
+            "question": "file q",
+            "evidence": [{"claim": "ok", "source": "src", "reliability": 0.8}]
+        }), encoding="utf-8")
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--evidence-file", str(obj)])
+        from mfr_core_pro import main
+        main()
+        captured = capsys.readouterr()
+        data = json.loads(captured.out)
+        assert data["question"] == "file q"
+
+    def test_main_invalid_evidence_exits(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", [
+            "mfr_core_pro.py", "q",
+            "--evidence", "c", "s", "bad-rel"
+        ])
+        from mfr_core_pro import main
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+        captured = capsys.readouterr()
+        assert "Invalid evidence" in captured.err
+
+    def test_main_short_evidence_exits(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", [
+            "mfr_core_pro.py", "q",
+            "--evidence", "onlyone"
+        ])
+        from mfr_core_pro import main
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+
+    def test_main_validate_passes(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", [
+            "mfr_core_pro.py", "q",
+            "--evidence", "yes", "s", "0.9",
+            "--validate"
+        ])
+        from mfr_core_pro import main
+        main()
+        captured = capsys.readouterr()
+        assert "Validation passed" in captured.err
+
+    def test_main_decision_flag(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", [
+            "mfr_core_pro.py", "q",
+            "--evidence", "yes", "s", "0.9",
+            "--decision"
+        ])
+        from mfr_core_pro import main
+        main()
+        captured = capsys.readouterr()
+        data = json.loads(captured.out)
+        assert "_original_status" in data
+
+
+class TestMainMoreEdges:
+    def test_main_evidence_file_invalid_json(self, monkeypatch, capsys, tmp_path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text("{not json", encoding="utf-8")
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "q", "--evidence-file", str(bad)])
+        from mfr_core_pro import main
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+        assert "Failed to load" in capsys.readouterr().err
+
+    def test_main_evidence_file_wrong_type(self, monkeypatch, capsys, tmp_path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text("123", encoding="utf-8")
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "q", "--evidence-file", str(bad)])
+        from mfr_core_pro import main
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+
+    def test_main_evidence_item_missing_key(self, monkeypatch, capsys, tmp_path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text(json.dumps([{"claim": "c", "source": "s"}]), encoding="utf-8")
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "q", "--evidence-file", str(bad)])
+        from mfr_core_pro import main
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+
+    def test_main_no_question_when_evidence_present(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", [
+            "mfr_core_pro.py",
+            "--evidence", "yes", "s", "0.8"
+        ])
+        from mfr_core_pro import main
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 2
+        assert "question is required" in capsys.readouterr().err
+
+    def test_main_independent_false_string(self, monkeypatch, capsys) -> None:
+        monkeypatch.setattr(sys, "argv", [
+            "mfr_core_pro.py", "q",
+            "--evidence", "yes", "s", "0.8", "1.0", "no"
+        ])
+        from mfr_core_pro import main
+        main()
+        data = json.loads(capsys.readouterr().out)
+        assert data["status"] == "PROVISIONAL_FINDING"
+
+    def test_main_prior_from_file_when_cli_default(self, monkeypatch, capsys, tmp_path) -> None:
+        obj = tmp_path / "o.json"
+        obj.write_text(json.dumps({
+            "question": "q",
+            "prior_belief": 0.2,
+            "evidence": [{"claim": "yes", "source": "s", "reliability": 0.6}]
+        }), encoding="utf-8")
+        monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--evidence-file", str(obj)])
+        from mfr_core_pro import main
+        main()
+        data = json.loads(capsys.readouterr().out)
+        assert data["question"] == "q"
