@@ -1,3 +1,14 @@
+## [2.1.43-pro] - 2026-10-28
+
+### Improved
+- Added direct unit tests for `main()` CLI paths (demo, evidence, evidence-file object, decision+validate, error cases).
+- Measured coverage on mfr_core_pro.py raised from ~68% to ~92% (CLI main now counted; remaining misses are argparse version exit and a few rare branches).
+- pytest 48/48 pass.
+
+### Verified
+- All existing analysis contracts, fingerprints, and numerical results unchanged.
+- No regressions in CLI behavior.
+
 ## [2.1.42-pro] - 2026-10-27
 
 ### Fixed
