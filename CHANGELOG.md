@@ -1,3 +1,11 @@
+## [Unreleased]
+### Improved
+- CLI `--prior` handling is now explicit: default is `None` so that an explicit `--prior` always overrides any `prior_belief` present in an evidence file, and the fallback to 0.5 is unambiguous when neither is supplied. Previous logic relied on the default value 0.5 being distinguishable, which was fragile.
+- Added two regression tests covering CLI-override and default-prior cases. pytest 43/43 pass.
+
+### Documented
+- Independent verification cycle (2026-10-28 16:15Z): confirmed pytest 43/43 pass after prior-handling improvement. Updated AGENTS.md review timestamp. Public surface at v2.1.42-pro.
+
 ## [2.1.42-pro] - 2026-10-27
 
 ### Fixed
