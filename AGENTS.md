@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-29T06:20Z (cycle: restored public surface of Core Pro — README, pyproject.toml, CHANGELOG, 16 unit tests all pass locally, demo entry point added, version alignment verified; AGENTS.md present and saved on GitHub; CI expected green). Continuous improvement cycle active. Public surface at v2.1.44-pro.*
+*Last reviewed and confirmed in repository: 2026-10-29T07:20Z (cycle: independent local verification — 17 unit tests pass including new prior_belief regression, mypy --strict clean, version alignment confirmed, AGENTS.md refreshed and saved on GitHub; CI expected green). Continuous improvement cycle active. Public surface at v2.1.44-pro.*
