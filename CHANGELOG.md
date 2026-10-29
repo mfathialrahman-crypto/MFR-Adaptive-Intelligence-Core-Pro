@@ -5,6 +5,19 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+## [2.1.45-pro] - 2026-10-29
+
+### Added
+- Additional unit tests for empty source validation, invalid prior_belief rejection, conflicting evidence structure, coherent multi-source cases, and fingerprint independence from record metadata.
+- Coverage improved from ~90% to ~91% on core module (21 tests pass).
+
+### Changed
+- Version alignment updated across version.py, pyproject.toml, and documentation.
+
+### Notes
+- No behavioral change to analysis logic. Focus on verification strength and edge-case regression protection.
+- All tests pass locally; CI matrix expected green.
+
 ## [2.1.44-pro] - 2026-10-29
 
 ### Fixed
