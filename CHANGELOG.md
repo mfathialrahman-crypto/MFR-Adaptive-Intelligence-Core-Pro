@@ -1,3 +1,11 @@
+## [2.1.43-pro] - 2026-10-29
+
+### Added
+- Hard limit of 1000 evidence items per analysis (`MAX_EVIDENCE_ITEMS`). Oversized inputs raise `ValueError` before processing. Bounds memory and CPU for reliability and basic DoS resistance. Regression test included.
+
+### Changed
+- Version bump to 2.1.43-pro. AGENTS.md review timestamp refreshed after independent verification cycle.
+
 ## [Unreleased]
 ### Documented
 - Independent verification cycle (2026-10-28 22:15Z): confirmed AGENTS.md constitution present and saved on GitHub. Local verification: pytest 43/43 pass, coverage 68% on mfr_core_pro.py. CI green. No functional changes. Public surface at v2.1.42-pro.
