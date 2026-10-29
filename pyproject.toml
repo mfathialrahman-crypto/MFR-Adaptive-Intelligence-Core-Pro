@@ -1,1 +1,33 @@
-PLACEHOLDER
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mfr-adaptive-intelligence-core-pro"
+version = "2.1.44"
+description = "MFR Adaptive Intelligence Core Pro — transparent Bayesian evidence analysis for the FathiMind ecosystem. Zero-dependency public package."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Mohamed Fathi Alrahman"}]
+keywords = ["bayesian", "evidence", "decision-making", "fathimind", "cognitive-systems"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "mypy"]
+
+[tool.setuptools]
+py-modules = ["mfr_core_pro", "version"]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
