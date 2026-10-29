@@ -170,3 +170,44 @@ def test_ci_non_overlap_signal_when_present():
     # May or may not trigger non-overlap depending on exact numbers; just ensure no crash
     assert "status" in report
     assert isinstance(report["suggestions"], list)
+
+
+def test_evidence_validation_rejects_empty_source():
+    with pytest.raises(ValueError, match="source must be non-empty"):
+        Evidence(claim="ok", source="   ", reliability=0.5)
+
+
+def test_invalid_prior_belief_rejected():
+    rec = IntelligenceRecord(question="Q?", prior_belief=1.5)
+    with pytest.raises(ValueError, match="prior_belief must be in"):
+        rec.analyze()
+
+
+def test_ci_non_overlap_strong_separation():
+    rec = IntelligenceRecord(
+        question="Clear separation?",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="yes", source="b", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="yes", source="c", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="yes", source="e", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="no", source="d", reliability=0.05, independent=True, weight=0.5),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert any("95% CI does not overlap" in a for a in report["audit_trail"])
+    assert any("credible intervals of top and second claims do not overlap" in s for s in report["suggestions"])
+    top_ci = report["top_claim"]["ci_95"]
+    second_ci = report["competing_claims"][1]["ci_95"]
+    assert top_ci[0] > second_ci[1]
+
+
+def test_demo_runs_without_error(capsys):
+    from mfr_core_pro import _demo
+    _demo()
+    captured = capsys.readouterr()
+    assert "MFR Adaptive Intelligence Core Pro — Demo" in captured.out
+    assert "Version:" in captured.out
+    assert "Status:" in captured.out
+    assert "Demo complete." in captured.out
