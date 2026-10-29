@@ -170,3 +170,10 @@ def test_ci_non_overlap_signal_when_present():
     # May or may not trigger non-overlap depending on exact numbers; just ensure no crash
     assert "status" in report
     assert isinstance(report["suggestions"], list)
+
+
+def test_prior_belief_validation_rejects_out_of_range():
+    with pytest.raises(ValueError, match="prior_belief must be in"):
+        IntelligenceRecord(question="Q?", prior_belief=1.5).analyze()
+    with pytest.raises(ValueError, match="prior_belief must be in"):
+        IntelligenceRecord(question="Q?", prior_belief=-0.1).analyze()
