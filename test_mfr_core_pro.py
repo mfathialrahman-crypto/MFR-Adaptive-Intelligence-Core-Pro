@@ -47,6 +47,14 @@ class TestEvidenceValidation:
         with pytest.raises(ValueError, match="weight must be > 0"):
             Evidence("c", "s", 0.5, weight=0.0)
 
+    def test_claim_too_long_raises(self) -> None:
+        with pytest.raises(ValueError, match="claim exceeds maximum length"):
+            Evidence("x" * 4097, "source", 0.5)
+
+    def test_source_too_long_raises(self) -> None:
+        with pytest.raises(ValueError, match="source exceeds maximum length"):
+            Evidence("claim", "y" * 4097, 0.5)
+
 
 class TestIntelligenceRecordAnalysis:
     def test_no_evidence_insufficient(self) -> None:
@@ -59,6 +67,10 @@ class TestIntelligenceRecordAnalysis:
         assert validate_report(report) == []
         assert report["version"] == VERSION
         assert len(report["fingerprint"]) == 64
+
+    def test_question_too_long_raises(self) -> None:
+        with pytest.raises(ValueError, match="question exceeds maximum length"):
+            IntelligenceRecord("q" * 4097)
 
     def test_single_strong_evidence_provisional(self) -> None:
         rec = IntelligenceRecord(

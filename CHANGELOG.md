@@ -1,3 +1,11 @@
+## [2.1.44-pro] - 2026-10-29
+
+### Added
+- Hard limit of 4096 characters on claim, source, question, and alternative strings (`MAX_STRING_LENGTH`). Oversized inputs raise `ValueError`. Further bounds memory for reliability and basic DoS resistance. Regression tests included.
+
+### Changed
+- Version bump to 2.1.44-pro. AGENTS.md review timestamp refreshed.
+
 ## [2.1.43-pro] - 2026-10-29
 
 ### Added

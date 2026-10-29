@@ -65,6 +65,9 @@ MAX_DECISION_CONFIDENCE = 0.98
 # Maximum evidence items accepted to bound memory and CPU (reliability / DoS hardening)
 MAX_EVIDENCE_ITEMS = 1000
 
+# Maximum length for claim, source, question, and alternative strings (reliability / DoS hardening)
+MAX_STRING_LENGTH = 4096
+
 
 @dataclass
 class Evidence:
@@ -81,6 +84,10 @@ class Evidence:
             raise ValueError("claim must be non-empty")
         if not source:
             raise ValueError("source must be non-empty")
+        if len(claim) > MAX_STRING_LENGTH:
+            raise ValueError(f"claim exceeds maximum length of {MAX_STRING_LENGTH} characters")
+        if len(source) > MAX_STRING_LENGTH:
+            raise ValueError(f"source exceeds maximum length of {MAX_STRING_LENGTH} characters")
         if not (0.0 <= self.reliability <= 1.0):
             raise ValueError(f"reliability must be in [0, 1], got {self.reliability}")
         if self.weight <= 0:
@@ -102,9 +109,18 @@ class IntelligenceRecord:
         q = (self.question or "").strip()
         if not q:
             raise ValueError("question must be non-empty")
+        if len(q) > MAX_STRING_LENGTH:
+            raise ValueError(f"question exceeds maximum length of {MAX_STRING_LENGTH} characters")
         self.question = q
         if len(self.evidence) > MAX_EVIDENCE_ITEMS:
             raise ValueError(f"evidence list exceeds maximum of {MAX_EVIDENCE_ITEMS} items (got {len(self.evidence)})")
+        # Also bound alternatives
+        cleaned_alts = []
+        for alt in self.alternatives:
+            a = (alt or "").strip()
+            if a and len(a) <= MAX_STRING_LENGTH:
+                cleaned_alts.append(a)
+        self.alternatives = cleaned_alts
 
     def analyze(self) -> Dict[str, Any]:
         if not (0.0 <= self.prior_belief <= 1.0):
