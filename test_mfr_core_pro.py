@@ -170,3 +170,54 @@ def test_ci_non_overlap_signal_when_present():
     # May or may not trigger non-overlap depending on exact numbers; just ensure no crash
     assert "status" in report
     assert isinstance(report["suggestions"], list)
+
+
+def test_evidence_validation_rejects_empty_source():
+    with pytest.raises(ValueError, match="source must be non-empty"):
+        Evidence(claim="ok", source="   ", reliability=0.5)
+
+
+def test_invalid_prior_belief_rejected():
+    rec = IntelligenceRecord(question="Q?", prior_belief=1.5)
+    with pytest.raises(ValueError, match="prior_belief must be in"):
+        rec.analyze()
+
+
+def test_conflicting_evidence_status_and_suggestions():
+    rec = IntelligenceRecord(
+        question="Status?",
+        evidence=[
+            Evidence(claim="healthy", source="a", reliability=0.9, independent=True),
+            Evidence(claim="degraded", source="b", reliability=0.85, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    # Depending on exact numbers, may be conflicting or provisional; verify structure
+    assert report["status"] in ("CONFLICTING_EVIDENCE", "PROVISIONAL_FINDING")
+    assert isinstance(report["suggestions"], list)
+    assert "fingerprint" in report
+
+
+def test_coherent_evidence_default_suggestion():
+    # Many strong independent sources on same claim → coherent, may hit default suggestion
+    rec = IntelligenceRecord(
+        question="Stable?",
+        evidence=[
+            Evidence(claim="yes", source=f"s{i}", reliability=0.95, independent=True)
+            for i in range(5)
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert report["confidence"] > 0.8
+    # Should have at least the default or specific suggestions
+    assert len(report["suggestions"]) >= 1
+
+
+def test_fingerprint_independent_of_record_id_and_timestamps():
+    ev = [Evidence(claim="yes", source="a", reliability=0.9)]
+    fp1 = fingerprint("Q?", ev, 0.5)
+    # Call analyze which uses fingerprint
+    rec = IntelligenceRecord(question="Q?", evidence=ev, prior_belief=0.5)
+    report = rec.analyze()
+    assert report["fingerprint"] == fp1
