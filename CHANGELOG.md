@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensured zero-dependency core remains installable and testable via standard Python tooling.
 
 ### Added
+- Regression test for prior_belief out-of-range rejection (now 17 unit tests).
 - Full unit test coverage for Evidence validation, insufficient evidence, provisional findings, conflicting evidence, independence penalties, fingerprint determinism, and CI non-overlap signals.
 - Minimal demo entry point under `if __name__ == "__main__"` for the Actions demo step.
 
