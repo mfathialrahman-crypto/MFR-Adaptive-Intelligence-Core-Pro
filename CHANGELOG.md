@@ -5,6 +5,16 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+## [2.1.45-pro] - 2026-10-29
+
+### Added
+- Additional unit tests for empty source rejection, invalid prior_belief, strong CI non-overlap signal (audit + suggestion + interval assertion), and demo entry point.
+- Coverage improved from ~90% to 98% on the core analysis module.
+
+### Notes
+- No behavioral change to analysis logic. Verification strengthened for edge cases and the stronger-separation signal path.
+- CI matrix remains green; version alignment preserved.
+
 ## [2.1.44-pro] - 2026-10-29
 
 ### Fixed
