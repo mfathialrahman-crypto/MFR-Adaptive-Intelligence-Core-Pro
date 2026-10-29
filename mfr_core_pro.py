@@ -304,3 +304,28 @@ def fingerprint(question: str, evidence: List[Evidence], prior: float) -> str:
     }
     raw = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return sha256(raw).hexdigest()
+
+
+def _demo() -> None:
+    """Minimal self-contained demo for CI and local verification."""
+    print("MFR Adaptive Intelligence Core Pro — Demo")
+    print(f"Version: {VERSION}")
+    record = IntelligenceRecord(
+        question="Is the public core healthy and auditable?",
+        evidence=[
+            Evidence(claim="yes", source="unit-tests", reliability=0.95, independent=True),
+            Evidence(claim="yes", source="fingerprint", reliability=0.9, independent=True),
+            Evidence(claim="yes", source="zero-deps", reliability=0.85, independent=True),
+        ],
+        alternatives=["yes", "needs-work"],
+    )
+    report = record.analyze()
+    print(f"Status: {report['status']}")
+    print(f"Conclusion: {report['conclusion']}")
+    print(f"Confidence: {report['confidence']:.3f}")
+    print(f"Fingerprint: {report['fingerprint'][:16]}...")
+    print("Demo complete.")
+
+
+if __name__ == "__main__":
+    _demo()
