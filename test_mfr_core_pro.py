@@ -1,7 +1,7 @@
 """Unit tests for MFR Adaptive Intelligence Core Pro."""
 
 import pytest
-from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION
+from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION, validate_report
 
 
 def test_version_present():
@@ -170,3 +170,41 @@ def test_ci_non_overlap_signal_when_present():
     # May or may not trigger non-overlap depending on exact numbers; just ensure no crash
     assert "status" in report
     assert isinstance(report["suggestions"], list)
+
+
+def test_report_satisfies_output_contract():
+    """Every analyze() result must pass the pure-Python public contract validator."""
+    cases = [
+        IntelligenceRecord(question="Empty?"),
+        IntelligenceRecord(
+            question="Healthy?",
+            evidence=[Evidence(claim="yes", source="a", reliability=0.9, independent=True)],
+        ),
+        IntelligenceRecord(
+            question="Conflict?",
+            evidence=[
+                Evidence(claim="a", source="s1", reliability=0.8),
+                Evidence(claim="b", source="s2", reliability=0.8),
+            ],
+        ),
+    ]
+    for rec in cases:
+        report = rec.analyze()
+        validate_report(report)  # must not raise
+        assert report["version"] == VERSION
+        assert 0.0 <= report["confidence"] <= 1.0
+        assert len(report["fingerprint"]) == 64
+
+
+def test_prior_belief_extremes():
+    """prior_belief at boundaries must remain valid and produce finite confidence."""
+    for prior in (0.0, 1.0):
+        rec = IntelligenceRecord(
+            question="Boundary?",
+            evidence=[Evidence(claim="yes", source="s", reliability=0.7)],
+            prior_belief=prior,
+        )
+        report = rec.analyze()
+        validate_report(report)
+        assert 0.0 <= report["confidence"] <= 1.0
+        assert report["status"] in ("PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE", "INSUFFICIENT_EVIDENCE")

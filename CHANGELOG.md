@@ -5,6 +5,16 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+## [2.1.45-pro] - 2026-10-29
+
+### Added
+- Pure-Python `validate_report()` that enforces the public analysis output contract (required fields, status enum, confidence range [0,1], 64-char fingerprint, basic types). Called automatically at the end of every `analyze()`.
+- Unit tests covering contract validation on multiple scenarios and prior_belief boundary values (0.0 / 1.0).
+
+### Notes
+- Zero new runtime dependencies. Improves reliability and makes the published schema contract enforceable without external libraries.
+- All previous behavior preserved; existing 16 tests continue to pass plus 2 new ones.
+
 ## [2.1.44-pro] - 2026-10-29
 
 ### Fixed

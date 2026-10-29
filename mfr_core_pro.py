@@ -243,7 +243,46 @@ class IntelligenceRecord:
             "analyzed_at": analyzed_at,
             "fingerprint": fingerprint(self.question, deduped, self.prior_belief),
         }
+        # Enforce public analysis contract (pure stdlib, no external schema lib)
+        validate_report(report)
         return report
+
+
+def validate_report(report: Dict[str, Any]) -> None:
+    """Validate analysis report against the public output contract (essential schema rules).
+
+    Raises ValueError on violation. Pure Python — zero dependencies.
+    Covers required fields, status enum, confidence range, fingerprint length, and basic types.
+    """
+    required = ["version", "status", "question", "confidence", "suggestions", "audit_trail", "created_at", "analyzed_at", "fingerprint"]
+    for key in required:
+        if key not in report:
+            raise ValueError(f"report missing required field: {key}")
+
+    status = report["status"]
+    if status not in ("PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE", "INSUFFICIENT_EVIDENCE"):
+        raise ValueError(f"invalid status: {status}")
+
+    conf = report["confidence"]
+    if not isinstance(conf, (int, float)) or not (0.0 <= conf <= 1.0):
+        raise ValueError(f"confidence must be number in [0, 1], got {conf}")
+
+    fp = report["fingerprint"]
+    if not isinstance(fp, str) or len(fp) != 64:
+        raise ValueError(f"fingerprint must be 64-char hex string, got length {len(fp) if isinstance(fp, str) else type(fp)}")
+
+    if not isinstance(report["suggestions"], list):
+        raise ValueError("suggestions must be a list")
+    if not isinstance(report["audit_trail"], list):
+        raise ValueError("audit_trail must be a list")
+    if not isinstance(report["question"], str) or not report["question"].strip():
+        raise ValueError("question must be non-empty string")
+
+    # Optional but expected type checks when present
+    if "conclusion" in report and report["conclusion"] is not None and not isinstance(report["conclusion"], str):
+        raise ValueError("conclusion must be string or null")
+    if "alternatives" in report and not isinstance(report["alternatives"], list):
+        raise ValueError("alternatives must be a list")
 
 
 def _strength(ev: Evidence) -> float:
