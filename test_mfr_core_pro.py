@@ -209,3 +209,42 @@ def test_insufficient_evidence_decision_contract():
     assert report["stability"] == "unstable"
     assert report["decision_confidence"] == 0.3  # clamped floor
     assert report["confidence"] == 0.0
+    assert report["separation"] == 1.0
+    assert report["ci_non_overlap"] is False
+
+
+def test_empty_source_rejected():
+    with pytest.raises(ValueError, match="source must be non-empty"):
+        Evidence(claim="ok", source="   ", reliability=0.5)
+
+
+def test_transparency_fields_present():
+    rec = IntelligenceRecord(
+        question="Clear separation?",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.9, independent=True),
+            Evidence(claim="yes", source="b", reliability=0.85, independent=True),
+            Evidence(claim="no", source="c", reliability=0.4, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert "separation" in report
+    assert isinstance(report["separation"], float)
+    assert report["separation"] >= 0.0
+    assert "ci_non_overlap" in report
+    assert isinstance(report["ci_non_overlap"], bool)
+
+
+def test_coherent_evidence_default_suggestion():
+    # Large enough sample, independent, single claim, no alternatives → default suggestion
+    rec = IntelligenceRecord(
+        question="Stable?",
+        evidence=[
+            Evidence(claim="yes", source=f"s{i}", reliability=0.8, independent=True)
+            for i in range(5)
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert any("reasonably coherent" in s for s in report["suggestions"])
+    assert report["stability"] in ("stable", "provisional")

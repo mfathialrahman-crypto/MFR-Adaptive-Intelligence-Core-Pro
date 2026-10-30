@@ -34,7 +34,16 @@
     "created_at": { "type": "string", "format": "date-time" },
     "analyzed_at": { "type": "string", "format": "date-time" },
     "fingerprint": { "type": "string", "minLength": 64, "maxLength": 64 },
-    "missing": { "type": "array", "items": { "type": "string" } }
+    "missing": { "type": "array", "items": { "type": "string" } },
+    "separation": {
+      "type": "number",
+      "minimum": 0.0,
+      "description": "Posterior mean difference between top and second claim (1.0 when fewer than two claims)."
+    },
+    "ci_non_overlap": {
+      "type": "boolean",
+      "description": "True when the 95% CI of the top claim does not overlap the second claim's CI."
+    }
   },
   "additionalProperties": true
 }

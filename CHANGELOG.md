@@ -5,6 +5,17 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+## [2.1.46-pro] - 2026-10-30
+
+### Added
+- Transparency fields on every analysis report: `separation` (posterior mean difference, 1.0 when fewer than two claims) and `ci_non_overlap` (boolean).
+- Additional unit tests for empty-source rejection, transparency fields, coherent-evidence default suggestion path, and insufficient-evidence contract fields.
+- Schema documentation for the new transparency fields.
+
+### Notes
+- Bayesian core math unchanged. New fields are additive and backward-compatible.
+- Coverage remains above the 90% gate.
+
 ## [2.1.45-pro] - 2026-10-30
 
 ### Added

@@ -132,6 +132,8 @@ class IntelligenceRecord:
                 "analyzed_at": analyzed_at,
                 "fingerprint": fingerprint(self.question, [], self.prior_belief),
                 "missing": ["evidence"],
+                "separation": 1.0,
+                "ci_non_overlap": False,
             }
             return report
         # Deduplicate by source: keep the strongest evidence per source
@@ -254,6 +256,8 @@ class IntelligenceRecord:
             "created_at": self.created_at,
             "analyzed_at": analyzed_at,
             "fingerprint": fingerprint(self.question, deduped, self.prior_belief),
+            "separation": round(separation, 4),
+            "ci_non_overlap": ci_non_overlap,
         }
         return report
 
@@ -335,6 +339,8 @@ def _demo() -> None:
     print(f"Status: {report['status']}")
     print(f"Conclusion: {report['conclusion']}")
     print(f"Confidence: {report['confidence']:.3f}")
+    print(f"Separation: {report['separation']:.3f}")
+    print(f"CI non-overlap: {report['ci_non_overlap']}")
     print(f"Fingerprint: {report['fingerprint'][:16]}...")
     print("Demo complete.")
 
