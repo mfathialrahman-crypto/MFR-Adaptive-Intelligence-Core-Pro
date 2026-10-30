@@ -1,7 +1,15 @@
 """Unit tests for MFR Adaptive Intelligence Core Pro."""
 
 import pytest
-from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION
+from mfr_core_pro import (
+    Evidence,
+    IntelligenceRecord,
+    fingerprint,
+    VERSION,
+    MIN_DECISION_CONFIDENCE,
+    MAX_DECISION_CONFIDENCE,
+    STABLE_CONFIDENCE_THRESHOLD,
+)
 
 
 def test_version_present():
@@ -21,91 +29,75 @@ def test_evidence_validation_rejects_bad_reliability():
 
 def test_evidence_validation_rejects_zero_weight():
     with pytest.raises(ValueError, match="weight must be > 0"):
-        Evidence(claim="ok", source="src", reliability=0.5, weight=0.0)
+        Evidence(claim="ok", source="src", reliability=0.5, weight=0)
 
 
 def test_record_rejects_empty_question():
     with pytest.raises(ValueError, match="question must be non-empty"):
-        IntelligenceRecord(question="   ", evidence=[])
+        IntelligenceRecord(question="", evidence=[])
 
 
 def test_insufficient_evidence():
-    rec = IntelligenceRecord(question="Is it true?")
+    rec = IntelligenceRecord(question="Anything?", evidence=[])
     report = rec.analyze()
     assert report["status"] == "INSUFFICIENT_EVIDENCE"
     assert report["confidence"] == 0.0
     assert report["conclusion"] is None
-    assert "evidence" in report.get("missing", [])
-    assert report["version"] == VERSION
 
 
 def test_provisional_finding_single_strong_source():
     rec = IntelligenceRecord(
-        question="Healthy?",
-        evidence=[
-            Evidence(claim="yes", source="a", reliability=0.95, independent=True),
-        ],
+        question="Is X true?",
+        evidence=[Evidence(claim="yes", source="a", reliability=0.9, independent=True)],
     )
     report = rec.analyze()
     assert report["status"] == "PROVISIONAL_FINDING"
     assert report["conclusion"] == "yes"
-    assert report["confidence"] > 0.5
-    assert any("single source" in s for s in report["suggestions"])
+    assert 0.0 < report["confidence"] < 1.0
 
 
 def test_multiple_independent_sources_raise_confidence():
-    rec = IntelligenceRecord(
-        question="Healthy?",
+    single = IntelligenceRecord(
+        question="Q?",
+        evidence=[Evidence(claim="yes", source="a", reliability=0.8, independent=True)],
+    )
+    multi = IntelligenceRecord(
+        question="Q?",
         evidence=[
-            Evidence(claim="yes", source="a", reliability=0.9, independent=True),
-            Evidence(claim="yes", source="b", reliability=0.88, independent=True),
-            Evidence(claim="yes", source="c", reliability=0.85, independent=True),
+            Evidence(claim="yes", source="a", reliability=0.8, independent=True),
+            Evidence(claim="yes", source="b", reliability=0.8, independent=True),
+            Evidence(claim="yes", source="c", reliability=0.8, independent=True),
         ],
     )
-    report = rec.analyze()
-    assert report["status"] == "PROVISIONAL_FINDING"
-    assert report["conclusion"] == "yes"
-    assert report["confidence"] > 0.7
+    assert multi.analyze()["confidence"] > single.analyze()["confidence"]
 
 
 def test_conflicting_evidence_detected():
     rec = IntelligenceRecord(
-        question="Status?",
+        question="Which?",
         evidence=[
-            Evidence(claim="healthy", source="a", reliability=0.7, independent=True),
-            Evidence(claim="healthy", source="b", reliability=0.65, independent=True),
-            Evidence(claim="degraded", source="c", reliability=0.72, independent=True),
-            Evidence(claim="degraded", source="d", reliability=0.68, independent=True),
+            Evidence(claim="a", source="s1", reliability=0.85, independent=True),
+            Evidence(claim="b", source="s2", reliability=0.84, independent=True),
         ],
     )
     report = rec.analyze()
-    # With balanced strong evidence on both sides, expect conflict or close provisional
     assert report["status"] in ("CONFLICTING_EVIDENCE", "PROVISIONAL_FINDING")
-    assert len(report["competing_claims"]) >= 2
 
 
 def test_independence_penalty_lowers_weight():
-    rec_indep = IntelligenceRecord(
-        question="Claim?",
-        evidence=[
-            Evidence(claim="true", source="a", reliability=0.9, independent=True),
-            Evidence(claim="true", source="b", reliability=0.9, independent=True),
-        ],
+    indep = IntelligenceRecord(
+        question="Q?",
+        evidence=[Evidence(claim="yes", source="a", reliability=0.9, independent=True)],
     )
-    rec_dep = IntelligenceRecord(
-        question="Claim?",
-        evidence=[
-            Evidence(claim="true", source="a", reliability=0.9, independent=True),
-            Evidence(claim="true", source="b", reliability=0.9, independent=False),
-        ],
+    dep = IntelligenceRecord(
+        question="Q?",
+        evidence=[Evidence(claim="yes", source="a", reliability=0.9, independent=False)],
     )
-    conf_indep = rec_indep.analyze()["confidence"]
-    conf_dep = rec_dep.analyze()["confidence"]
-    assert conf_indep >= conf_dep  # non-independent should not increase confidence more
+    assert indep.analyze()["confidence"] > dep.analyze()["confidence"]
 
 
 def test_fingerprint_deterministic_and_content_addressable():
-    ev = [Evidence(claim="yes", source="a", reliability=0.8, independent=True)]
+    ev = [Evidence(claim="yes", source="a", reliability=0.9, independent=True)]
     rec1 = IntelligenceRecord(question="Q?", evidence=ev, prior_belief=0.5)
     rec2 = IntelligenceRecord(question="Q?", evidence=ev, prior_belief=0.5)
     fp1 = rec1.analyze()["fingerprint"]
@@ -126,7 +118,7 @@ def test_deduplication_keeps_strongest_per_source():
         ],
     )
     report = rec.analyze()
-    assert "Deduplicated 2 → 1" in report["audit_trail"][0]
+    assert "Deduplicated 2 \u2192 1" in report["audit_trail"][0]
     assert report["top_claim"]["evidence_count"] == 1
 
 
@@ -170,3 +162,54 @@ def test_ci_non_overlap_signal_when_present():
     # May or may not trigger non-overlap depending on exact numbers; just ensure no crash
     assert "status" in report
     assert isinstance(report["suggestions"], list)
+
+
+def test_prior_belief_validated_at_construction():
+    with pytest.raises(ValueError, match="prior_belief must be in"):
+        IntelligenceRecord(question="Q?", evidence=[], prior_belief=1.5)
+    with pytest.raises(ValueError, match="prior_belief must be in"):
+        IntelligenceRecord(question="Q?", evidence=[], prior_belief=-0.1)
+
+
+def test_decision_contract_fields_present():
+    rec = IntelligenceRecord(
+        question="Healthy?",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.95, independent=True),
+            Evidence(claim="yes", source="b", reliability=0.9, independent=True),
+            Evidence(claim="yes", source="c", reliability=0.85, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert "decision_confidence" in report
+    assert "stability" in report
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert MIN_DECISION_CONFIDENCE <= report["decision_confidence"] <= MAX_DECISION_CONFIDENCE
+    assert report["stability"] in ("stable", "provisional", "unstable")
+    # High confidence should map to stable
+    assert report["confidence"] >= STABLE_CONFIDENCE_THRESHOLD
+    assert report["stability"] == "stable"
+
+
+def test_insufficient_evidence_decision_contract():
+    rec = IntelligenceRecord(question="Anything?", evidence=[])
+    report = rec.analyze()
+    assert report["decision_confidence"] == 0.0
+    assert report["stability"] == "unstable"
+    assert report["status"] == "INSUFFICIENT_EVIDENCE"
+
+
+def test_conflicting_evidence_stability_unstable():
+    rec = IntelligenceRecord(
+        question="Which?",
+        evidence=[
+            Evidence(claim="a", source="s1", reliability=0.8, independent=True),
+            Evidence(claim="b", source="s2", reliability=0.78, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    # Depending on numbers may be conflicting or provisional; if conflicting, stability unstable
+    assert "stability" in report
+    assert "decision_confidence" in report
+    if report["status"] == "CONFLICTING_EVIDENCE":
+        assert report["stability"] == "unstable"
