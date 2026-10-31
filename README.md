@@ -1,5 +1,10 @@
 # MFR Adaptive Intelligence Core Pro
 
+[![CI](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/workflows/Run%20MFR%20Adaptive%20Intelligence%20Core%20Pro/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-2.1.45--pro-brightgreen)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
+
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
@@ -34,6 +39,8 @@ Status: INSUFFICIENT_EVIDENCE | CONFLICTING_EVIDENCE | PROVISIONAL_FINDING
         ▼
 Suggestions + content-addressable SHA-256 fingerprint
 ```
+
+The analysis report conforms to the [JSON Schema](schemas/analysis.schema.json) (additive fields allowed).
 
 ## Quick start
 
@@ -81,6 +88,7 @@ Requires Python ≥ 3.10. No third-party runtime dependencies.
 - Unit tests: `python -m pytest test_mfr_core_pro.py -v`
 - Type check: `mypy mfr_core_pro.py --strict`
 - GitHub Actions matrix: Python 3.10–3.13 + version consistency between `version.py` and `pyproject.toml`.
+- Coverage gate ≥ 90% on the core module.
 
 ## Security
 
