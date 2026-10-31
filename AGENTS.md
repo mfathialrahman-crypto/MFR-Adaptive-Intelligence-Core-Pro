@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-31T11:20Z (cycle: local clone + pytest 19/19 + coverage 90.56% + mypy --strict clean; AGENTS.md constitution with long-horizon confirmed and stamp refreshed; continuous improvement active).*
+*Last reviewed and confirmed in repository: 2026-10-31T12:25Z (cycle: local clone + pytest 19/19 + coverage 91% module / 94% total + mypy --strict clean; AGENTS.md constitution with long-horizon confirmed and stamp refreshed; continuous improvement active).*

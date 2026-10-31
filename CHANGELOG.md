@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Refreshed AGENTS.md review timestamp after local verification (pytest 19/19 passed, mypy --strict clean, coverage ~91% on core). No behavioral changes.
 - Updated AGENTS.md review timestamp after full local verification cycle (pytest 19/19, mypy --strict clean). No behavioral changes to core logic.
 - Synced AGENTS.md Project Engineering Constitution with HQ: cleaned formatting, confirmed long-horizon section, updated review timestamp (2026-10-31 cycle). No behavioral changes to core logic.
 
