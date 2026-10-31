@@ -14,6 +14,11 @@ def test_evidence_validation_rejects_empty_claim():
         Evidence(claim="", source="src", reliability=0.5)
 
 
+def test_evidence_validation_rejects_empty_source():
+    with pytest.raises(ValueError, match="source must be non-empty"):
+        Evidence(claim="ok", source="   ", reliability=0.5)
+
+
 def test_evidence_validation_rejects_bad_reliability():
     with pytest.raises(ValueError, match="reliability must be in"):
         Evidence(claim="ok", source="src", reliability=1.5)
@@ -156,20 +161,20 @@ def test_alternatives_appear_in_suggestions():
 
 
 def test_ci_non_overlap_signal_when_present():
-    # Strong separation case
+    # Strong separation that produces non-overlapping 95% CIs
     rec = IntelligenceRecord(
         question="Clear?",
         evidence=[
-            Evidence(claim="yes", source="a", reliability=0.95, independent=True),
-            Evidence(claim="yes", source="b", reliability=0.95, independent=True),
-            Evidence(claim="yes", source="c", reliability=0.95, independent=True),
-            Evidence(claim="no", source="d", reliability=0.3, independent=True),
+            Evidence(claim="yes", source="a", reliability=0.99, independent=True, weight=5.0),
+            Evidence(claim="yes", source="b", reliability=0.98, independent=True, weight=5.0),
+            Evidence(claim="yes", source="c", reliability=0.97, independent=True, weight=5.0),
+            Evidence(claim="no", source="d", reliability=0.1, independent=True, weight=0.1),
         ],
     )
     report = rec.analyze()
-    # May or may not trigger non-overlap depending on exact numbers; just ensure no crash
-    assert "status" in report
-    assert isinstance(report["suggestions"], list)
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert any("do not overlap" in s for s in report["suggestions"])
+    assert any("CI does not overlap" in a for a in report["audit_trail"])
 
 
 def test_prior_belief_validated_on_construction():
@@ -209,3 +214,12 @@ def test_insufficient_evidence_decision_contract():
     assert report["stability"] == "unstable"
     assert report["decision_confidence"] == 0.3  # clamped floor
     assert report["confidence"] == 0.0
+
+
+def test_demo_runs_without_error(capsys):
+    from mfr_core_pro import _demo
+    _demo()
+    captured = capsys.readouterr()
+    assert "MFR Adaptive Intelligence Core Pro — Demo" in captured.out
+    assert "Demo complete." in captured.out
+    assert "Version:" in captured.out
