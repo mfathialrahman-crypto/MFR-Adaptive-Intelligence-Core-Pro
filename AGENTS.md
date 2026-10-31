@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-10-31T10:20Z (cycle: local clone + pytest 19/19 + mypy --strict clean on Core Pro; setup-python action bumped to v7.1.0 (SHA 6d4fd22) for Dependabot alignment and minor enhancements; private MFR-Cognition local tests pass; no critical issues; continuous improvement active).*
+*Last reviewed and confirmed in repository: 2026-10-31T11:20Z (cycle: local clone + pytest 19/19 + coverage 90.56% + mypy --strict clean; AGENTS.md constitution with long-horizon confirmed and stamp refreshed; continuous improvement active).*
