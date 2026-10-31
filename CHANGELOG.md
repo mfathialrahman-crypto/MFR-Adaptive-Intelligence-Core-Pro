@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.46-pro] - 2026-10-31
+
+### Added
+- Fail-fast length bounds on untrusted input: claim ≤ 500, source ≤ 200, question ≤ 1000 characters.
+- Explicit unit tests for the CI non-overlap suggestion and audit path.
+
+### Security
+- Hardened against memory amplification from oversized claim/source/question strings (DoS surface reduction). Existing MAX_EVIDENCE_ITEMS remains in force.
+
+### Notes
+- Bayesian update math unchanged. Length checks are additive and fail closed.
+
 ### Changed
 - Updated AGENTS.md review timestamp after full local verification cycle (pytest 19/19, mypy --strict clean). No behavioral changes to core logic.
 - Synced AGENTS.md Project Engineering Constitution with HQ: cleaned formatting, confirmed long-horizon section, updated review timestamp (2026-10-31 cycle). No behavioral changes to core logic.

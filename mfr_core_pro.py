@@ -63,6 +63,11 @@ MAX_DECISION_CONFIDENCE = 0.98
 # Maximum evidence items accepted to bound memory and CPU (reliability / DoS hardening)
 MAX_EVIDENCE_ITEMS = 1000
 
+# Bound string lengths to prevent memory amplification / DoS on untrusted input
+MAX_CLAIM_LENGTH = 500
+MAX_SOURCE_LENGTH = 200
+MAX_QUESTION_LENGTH = 1000
+
 
 @dataclass
 class Evidence:
@@ -83,6 +88,10 @@ class Evidence:
             raise ValueError(f"reliability must be in [0, 1], got {self.reliability}")
         if self.weight <= 0:
             raise ValueError(f"weight must be > 0, got {self.weight}")
+        if len(claim) > MAX_CLAIM_LENGTH:
+            raise ValueError(f"claim exceeds maximum length of {MAX_CLAIM_LENGTH}")
+        if len(source) > MAX_SOURCE_LENGTH:
+            raise ValueError(f"source exceeds maximum length of {MAX_SOURCE_LENGTH}")
         self.claim = claim
         self.source = source
 
@@ -100,6 +109,8 @@ class IntelligenceRecord:
         q = (self.question or "").strip()
         if not q:
             raise ValueError("question must be non-empty")
+        if len(q) > MAX_QUESTION_LENGTH:
+            raise ValueError(f"question exceeds maximum length of {MAX_QUESTION_LENGTH}")
         self.question = q
         if not (0.0 <= self.prior_belief <= 1.0):
             raise ValueError(f"prior_belief must be in [0, 1], got {self.prior_belief}")

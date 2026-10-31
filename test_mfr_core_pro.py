@@ -209,3 +209,37 @@ def test_insufficient_evidence_decision_contract():
     assert report["stability"] == "unstable"
     assert report["decision_confidence"] == 0.3  # clamped floor
     assert report["confidence"] == 0.0
+
+def test_claim_length_limit_enforced():
+    long_claim = "x" * 501
+    with pytest.raises(ValueError, match="claim exceeds maximum length"):
+        Evidence(claim=long_claim, source="src", reliability=0.5)
+
+
+def test_source_length_limit_enforced():
+    long_source = "s" * 201
+    with pytest.raises(ValueError, match="source exceeds maximum length"):
+        Evidence(claim="ok", source=long_source, reliability=0.5)
+
+
+def test_question_length_limit_enforced():
+    long_q = "q" * 1001
+    with pytest.raises(ValueError, match="question exceeds maximum length"):
+        IntelligenceRecord(question=long_q)
+
+
+def test_ci_non_overlap_suggestion_triggered():
+    rec = IntelligenceRecord(
+        question="Clear separation?",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="yes", source="b", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="yes", source="c", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="no", source="d", reliability=0.2, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert any("do not overlap" in s for s in report["suggestions"])
+    assert any("does not overlap" in a for a in report["audit_trail"])
+
