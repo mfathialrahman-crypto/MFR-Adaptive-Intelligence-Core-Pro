@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -52,7 +52,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
           cache: pip
@@ -75,10 +75,10 @@ jobs:
         run: |
           echo "Checking version consistency between version.py and pyproject.toml"
           PY_VER=$(python -c "from version import VERSION; print(VERSION.split('-')[0])")
-          TOML_VER=$(grep -E '^version =' pyproject.toml | sed -E 's/.*"(.*)".*/\1/')
+          TOML_VER=$(grep -E '^version =' pyproject.toml | sed -E 's/.*\"(.*)\" .*/\\1/')
           echo "version.py base: $PY_VER"
           echo "pyproject.toml: $TOML_VER"
-          if [ "$PY_VER" != "$TOML_VER" ]; then
+          if [ \"$PY_VER\" != \"$TOML_VER\" ]; then
             echo "ERROR: Version mismatch between version.py and pyproject.toml"
             exit 1
           fi
