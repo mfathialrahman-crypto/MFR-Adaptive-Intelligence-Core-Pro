@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Unit test for empty/whitespace source validation on Evidence (raises ValueError). Improves coverage of input contract.
+
 ### Changed
 - Refreshed AGENTS.md verification stamp after fresh local clone verification (pytest 19/19 passed, coverage 91%, mypy --strict clean). No behavioral changes.
 - Refreshed AGENTS.md review timestamp after local verification (pytest 19/19 passed, mypy --strict clean, coverage ~91% on core). No behavioral changes.
