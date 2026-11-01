@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Documented
+- Coverage hardening cycle (2026-11-01T21:13Z): 22/22 pytest passed, coverage raised from 91% to 98%, mypy --strict clean. Added tests for non-overlapping credible intervals and demo entrypoint. No behavioral changes to core logic.
 - Independent verification cycle (2026-11-01T12:18Z): Fresh local clone, pytest 20/20 passed, coverage 91%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 
 ### Added

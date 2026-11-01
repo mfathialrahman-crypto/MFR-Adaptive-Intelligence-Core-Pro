@@ -216,3 +216,28 @@ def test_evidence_validation_rejects_empty_source():
         Evidence(claim="ok", source="   ", reliability=0.5)
     with pytest.raises(ValueError, match="source must be non-empty"):
         Evidence(claim="ok", source="", reliability=0.5)
+
+
+def test_ci_non_overlap_stronger_separation():
+    rec = IntelligenceRecord(
+        question="Status?",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.99, independent=True, weight=2.0),
+            Evidence(claim="yes", source="b", reliability=0.98, independent=True, weight=2.0),
+            Evidence(claim="yes", source="c", reliability=0.97, independent=True, weight=2.0),
+            Evidence(claim="no", source="d", reliability=0.4, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert any("do not overlap" in s for s in report["suggestions"])
+    assert report["stability"] == "stable"
+
+
+def test_demo_runs_without_error(capsys):
+    from mfr_core_pro import _demo
+    _demo()
+    captured = capsys.readouterr()
+    assert "MFR Adaptive Intelligence Core Pro — Demo" in captured.out
+    assert "Demo complete." in captured.out
+    assert "PROVISIONAL_FINDING" in captured.out
