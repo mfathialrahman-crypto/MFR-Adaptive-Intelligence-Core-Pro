@@ -216,3 +216,29 @@ def test_evidence_validation_rejects_empty_source():
         Evidence(claim="ok", source="   ", reliability=0.5)
     with pytest.raises(ValueError, match="source must be non-empty"):
         Evidence(claim="ok", source="", reliability=0.5)
+
+
+def test_demo_runs_without_error(capsys):
+    """Cover the built-in demo path used by CI and local verification."""
+    from mfr_core_pro import _demo
+    _demo()
+    captured = capsys.readouterr()
+    assert "MFR Adaptive Intelligence Core Pro — Demo" in captured.out
+    assert "Demo complete." in captured.out
+    assert "Status:" in captured.out
+
+
+def test_coherent_evidence_default_suggestion():
+    """When evidence is sufficient and coherent, the default monitoring suggestion appears."""
+    rec = IntelligenceRecord(
+        question="Stable?",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.95, independent=True),
+            Evidence(claim="yes", source="b", reliability=0.92, independent=True),
+            Evidence(claim="yes", source="c", reliability=0.90, independent=True),
+            Evidence(claim="yes", source="d", reliability=0.88, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert any("reasonably coherent" in s for s in report["suggestions"])

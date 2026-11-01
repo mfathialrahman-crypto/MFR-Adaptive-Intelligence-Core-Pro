@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Tests covering the built-in `_demo()` path and the default coherent-evidence suggestion branch. Coverage raised from 91% to 96% on Python 3.10.
+
+### Changed
+- AGENTS.md last-reviewed stamp refreshed after independent local verification (22/22 pytest passed, 96% coverage, mypy --strict clean).
+
+
 ### Documented
 - Independent verification cycle (2026-11-01T12:18Z): Fresh local clone, pytest 20/20 passed, coverage 91%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 
