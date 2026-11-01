@@ -7,13 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Stronger regression test for non-overlapping 95% credible intervals (`test_ci_non_overlap_stronger_separation_signal`). Confirms the audit-trail note and the stronger-separation suggestion. Coverage on `mfr_core_pro.py` rises from 91% to 93%.
+
 ### Documented
+- Independent verification cycle (2026-11-01T20:15Z): Fresh local clone, pytest 21/21 passed, coverage 93%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 - Independent verification cycle (2026-11-01T12:18Z): Fresh local clone, pytest 20/20 passed, coverage 91%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 
-### Added
-- Unit test for empty/whitespace source validation on Evidence (raises ValueError). Improves coverage of input contract.
-
 ### Changed
+- Refreshed AGENTS.md verification stamp after fresh local clone verification (pytest 21/21 passed, coverage 93%, mypy --strict clean). No behavioral changes.
 - Refreshed AGENTS.md verification stamp after fresh local clone verification (pytest 20/20 passed, coverage 91%, mypy --strict clean). No behavioral changes.
 - Refreshed AGENTS.md review timestamp after local verification (pytest 19/19 passed, mypy --strict clean, coverage ~91% on core). No behavioral changes.
 - Updated AGENTS.md review timestamp after full local verification cycle (pytest 19/19, mypy --strict clean). No behavioral changes to core logic.
