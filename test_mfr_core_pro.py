@@ -209,3 +209,10 @@ def test_insufficient_evidence_decision_contract():
     assert report["stability"] == "unstable"
     assert report["decision_confidence"] == 0.3  # clamped floor
     assert report["confidence"] == 0.0
+
+
+def test_evidence_validation_rejects_empty_source():
+    with pytest.raises(ValueError, match="source must be non-empty"):
+        Evidence(claim="ok", source="   ", reliability=0.5)
+    with pytest.raises(ValueError, match="source must be non-empty"):
+        Evidence(claim="ok", source="", reliability=0.5)
