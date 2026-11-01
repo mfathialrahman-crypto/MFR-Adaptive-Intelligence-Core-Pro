@@ -216,3 +216,23 @@ def test_evidence_validation_rejects_empty_source():
         Evidence(claim="ok", source="   ", reliability=0.5)
     with pytest.raises(ValueError, match="source must be non-empty"):
         Evidence(claim="ok", source="", reliability=0.5)
+
+
+def test_ci_non_overlap_stronger_separation_signal():
+    """Strong independent evidence on one claim, weak on another, produces non-overlapping CIs and the stronger-separation suggestion."""
+    rec = IntelligenceRecord(
+        question="Which is dominant?",
+        evidence=[
+            Evidence(claim="alpha", source="strong-a", reliability=0.95, independent=True, weight=2.0),
+            Evidence(claim="alpha", source="strong-b", reliability=0.92, independent=True, weight=2.0),
+            Evidence(claim="alpha", source="strong-c", reliability=0.90, independent=True, weight=1.5),
+            Evidence(claim="beta", source="weak", reliability=0.3, independent=True, weight=0.5),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert report["conclusion"] == "alpha"
+    # Check audit trail contains the non-overlap note
+    assert any("does not overlap" in line for line in report["audit_trail"])
+    # Check suggestions contain the stronger separation message
+    assert any("credible intervals of top and second claims do not overlap" in s for s in report["suggestions"])
