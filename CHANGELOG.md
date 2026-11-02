@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- String length bound on IntelligenceRecord.question (max 1000) for reliability and basic DoS hardening.
+- Unit tests covering question length validation (27 total tests).
+
+### Changed
+- Version bumped to 2.1.47-pro to reflect the new question length bound and public-surface synchronization.
+
+### Added
 - String length bounds on Evidence claim (max 500) and source (max 200) for reliability and basic DoS hardening.
 - Unit tests covering the new length validation (25 total tests).
 

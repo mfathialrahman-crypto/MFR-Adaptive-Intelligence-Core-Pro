@@ -63,9 +63,10 @@ MAX_DECISION_CONFIDENCE = 0.98
 # Maximum evidence items accepted to bound memory and CPU (reliability / DoS hardening)
 MAX_EVIDENCE_ITEMS = 1000
 
-# String length bounds to prevent memory abuse on claim/source fields
+# String length bounds to prevent memory abuse on claim/source/question fields
 MAX_CLAIM_LENGTH = 500
 MAX_SOURCE_LENGTH = 200
+MAX_QUESTION_LENGTH = 1000
 
 
 @dataclass
@@ -108,6 +109,8 @@ class IntelligenceRecord:
         q = (self.question or "").strip()
         if not q:
             raise ValueError("question must be non-empty")
+        if len(q) > MAX_QUESTION_LENGTH:
+            raise ValueError(f"question exceeds max length {MAX_QUESTION_LENGTH}")
         self.question = q
         if not (0.0 <= self.prior_belief <= 1.0):
             raise ValueError(f"prior_belief must be in [0, 1], got {self.prior_belief}")
