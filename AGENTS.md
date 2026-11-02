@@ -43,6 +43,7 @@ Accuracy is more important than appearing successful.
 ## 3. DEVELOPMENT LOOP
 
 For every meaningful task use this cycle:
+
 DISCOVER → ANALYZE → PRIORITIZE → IMPLEMENT → TEST → REVIEW → FIX → VERIFY → DOCUMENT → IMPROVE
 
 After completing the requested work, look for the next highest-value improvement that can safely be implemented.
@@ -51,12 +52,12 @@ Do not create meaningless changes just to appear active.
 ## 4. PRIORITY ORDER
 
 Always prioritize:
-- P0 — Security, data loss, corruption, critical failures
-- P1 — Broken core functionality, build failures, severe bugs
-- P2 — Reliability, performance, architecture, maintainability
-- P3 — User experience and important product capabilities
-- P4 — Competitive improvements and valuable new features
-- P5 — Minor cleanup and cosmetic improvements
+P0 — Security, data loss, corruption, critical failures
+P1 — Broken core functionality, build failures, severe bugs
+P2 — Reliability, performance, architecture, maintainability
+P3 — User experience and important product capabilities
+P4 — Competitive improvements and valuable new features
+P5 — Minor cleanup and cosmetic improvements
 
 Never spend significant effort on P5 while P0-P2 problems remain.
 
@@ -300,15 +301,15 @@ A clean stopping point is better than unnecessary modifications.
 ## 21. FINAL VERIFICATION
 
 Before declaring work complete, verify:
-- [ ] Requested functionality works
-- [ ] Relevant tests pass
-- [ ] Build succeeds when applicable
-- [ ] Type/lint checks pass when applicable
-- [ ] No obvious regression was introduced
-- [ ] Security implications were considered
-- [ ] Documentation was updated when necessary
-- [ ] Changes are actually present in the repository
-- [ ] No claim is being made without verification
+[ ] Requested functionality works
+[ ] Relevant tests pass
+[ ] Build succeeds when applicable
+[ ] Type/lint checks pass when applicable
+[ ] No obvious regression was introduced
+[ ] Security implications were considered
+[ ] Documentation was updated when necessary
+[ ] Changes are actually present in the repository
+[ ] No claim is being made without verification
 
 ## 22. FINAL PRINCIPLE
 
@@ -345,4 +346,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-02T03:20Z (cycle: local verification — 22/22 pytest passed, 96% coverage, mypy --strict clean; added demo and coherent-evidence tests). Continuous improvement active).*
+*Last reviewed and confirmed in repository: 2026-11-02T01:25Z (cycle: string-length DoS hardening MAX_STRING_LENGTH=4096, __all__, fingerprint regression test; 27/27 pytest passed; version 2.1.46-pro). Continuous improvement active).*
