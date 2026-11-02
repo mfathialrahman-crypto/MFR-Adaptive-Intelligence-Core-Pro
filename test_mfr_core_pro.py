@@ -156,20 +156,20 @@ def test_alternatives_appear_in_suggestions():
 
 
 def test_ci_non_overlap_signal_when_present():
-    # Strong separation case
+    # Strong separation case engineered to produce non-overlapping 95% CIs
     rec = IntelligenceRecord(
         question="Clear?",
         evidence=[
-            Evidence(claim="yes", source="a", reliability=0.95, independent=True),
-            Evidence(claim="yes", source="b", reliability=0.95, independent=True),
-            Evidence(claim="yes", source="c", reliability=0.95, independent=True),
-            Evidence(claim="no", source="d", reliability=0.3, independent=True),
+            Evidence(claim="yes", source="a", reliability=0.99, weight=2.0, independent=True),
+            Evidence(claim="yes", source="b", reliability=0.99, weight=2.0, independent=True),
+            Evidence(claim="yes", source="c", reliability=0.99, weight=2.0, independent=True),
+            Evidence(claim="no", source="d", reliability=0.05, weight=0.1, independent=True),
         ],
     )
     report = rec.analyze()
-    # May or may not trigger non-overlap depending on exact numbers; just ensure no crash
-    assert "status" in report
-    assert isinstance(report["suggestions"], list)
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert any("do not overlap" in s for s in report["suggestions"])
+    assert any("does not overlap second-claim CI" in a for a in report["audit_trail"])
 
 
 def test_prior_belief_validated_on_construction():
