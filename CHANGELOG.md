@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- String length bounds on Evidence claim (max 500) and source (max 200) for reliability and basic DoS hardening.
+- Unit tests covering the new length validation (25 total tests).
+
+### Changed
+- AGENTS.md last-reviewed stamp refreshed after local verification (25/25 pytest passed, coverage still ~98%, mypy --strict clean).
+
+### Added
 - Strengthened `test_ci_non_overlap_signal_when_present` to deterministically trigger non-overlapping 95% CIs and assert the stronger-separation audit and suggestion. Coverage raised from 96% to 98%.
 
 ### Changed

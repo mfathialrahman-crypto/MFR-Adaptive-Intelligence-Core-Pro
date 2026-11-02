@@ -242,3 +242,19 @@ def test_coherent_evidence_default_suggestion():
     report = rec.analyze()
     assert report["status"] == "PROVISIONAL_FINDING"
     assert any("reasonably coherent" in s for s in report["suggestions"])
+
+
+def test_evidence_rejects_too_long_claim():
+    with pytest.raises(ValueError, match="claim exceeds max length"):
+        Evidence(claim="a" * 501, source="ok", reliability=0.5)
+
+
+def test_evidence_rejects_too_long_source():
+    with pytest.raises(ValueError, match="source exceeds max length"):
+        Evidence(claim="ok", source="b" * 201, reliability=0.5)
+
+
+def test_evidence_accepts_max_lengths():
+    e = Evidence(claim="a" * 500, source="b" * 200, reliability=0.5)
+    assert len(e.claim) == 500
+    assert len(e.source) == 200
