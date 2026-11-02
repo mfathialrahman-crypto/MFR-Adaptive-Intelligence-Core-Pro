@@ -63,6 +63,10 @@ MAX_DECISION_CONFIDENCE = 0.98
 # Maximum evidence items accepted to bound memory and CPU (reliability / DoS hardening)
 MAX_EVIDENCE_ITEMS = 1000
 
+# String length bounds to prevent memory abuse on claim/source fields
+MAX_CLAIM_LENGTH = 500
+MAX_SOURCE_LENGTH = 200
+
 
 @dataclass
 class Evidence:
@@ -77,8 +81,12 @@ class Evidence:
         source = (self.source or "").strip()
         if not claim:
             raise ValueError("claim must be non-empty")
+        if len(claim) > MAX_CLAIM_LENGTH:
+            raise ValueError(f"claim exceeds max length {MAX_CLAIM_LENGTH}")
         if not source:
             raise ValueError("source must be non-empty")
+        if len(source) > MAX_SOURCE_LENGTH:
+            raise ValueError(f"source exceeds max length {MAX_SOURCE_LENGTH}")
         if not (0.0 <= self.reliability <= 1.0):
             raise ValueError(f"reliability must be in [0, 1], got {self.reliability}")
         if self.weight <= 0:
