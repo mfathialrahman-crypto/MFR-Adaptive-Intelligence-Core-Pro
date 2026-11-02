@@ -5,7 +5,7 @@
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.45-pro` (see `version.py`)
+**Current version:** `2.1.46-pro` (see `version.py`)
 
 ## Doctrine
 
@@ -57,41 +57,21 @@ record = IntelligenceRecord(
     evidence=[
         Evidence(claim="healthy", source="monitor-a", reliability=0.9, independent=True),
         Evidence(claim="healthy", source="monitor-b", reliability=0.85, independent=True),
-        Evidence(claim="degraded", source="alert-c", reliability=0.4, independent=False),
     ],
-    alternatives=["healthy", "degraded", "failed"],
+    alternatives=["healthy", "degraded"],
 )
 report = record.analyze()
 print(report["status"], report["conclusion"], report["confidence"])
 print(report["fingerprint"])
 ```
 
-## Installation
+## Hardening notes (2.1.46-pro)
 
-```bash
-pip install -e .
-# or
-pip install pytest && python -m pytest
-```
-
-Requires Python ≥ 3.10. No third-party runtime dependencies.
-
-## Testing & CI
-
-- Unit tests: `python -m pytest test_mfr_core_pro.py -v`
-- Type check: `mypy mfr_core_pro.py --strict`
-- GitHub Actions matrix: Python 3.10–3.13 + version consistency between `version.py` and `pyproject.toml`.
-
-## Security
-
-See [SECURITY.md](SECURITY.md). Pure analysis library — no network, no secrets, no external calls.  
-Always treat confidence scores as relative evidence strength, not absolute certainty. Verify fingerprints for critical decisions.
+- `MAX_EVIDENCE_ITEMS = 1000` — rejects oversized evidence lists.
+- `MAX_STRING_LENGTH = 4096` — rejects pathological claim/source/question strings.
+- Content-addressable SHA-256 fingerprints independent of timestamps and record IDs.
+- Decision-contract fields: `decision_confidence`, `stability`.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
----
-
-Part of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) cognitive engineering operating system.  
-Topics: `fathimind`, `cognitive-systems`, `engineering-os`, `bayesian`, `evidence`.
+MIT — see `LICENSE`.
