@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Tests covering the built-in `_demo()` path and the default coherent-evidence suggestion branch. Coverage raised from 91% to 96% on Python 3.10.
+- Strengthened `test_ci_non_overlap_signal_when_present` to deterministically trigger non-overlapping 95% CIs and assert the stronger-separation audit and suggestion. Coverage raised from 96% to 98%.
 
 ### Changed
-- AGENTS.md last-reviewed stamp refreshed after independent local verification (22/22 pytest passed, 96% coverage, mypy --strict clean).
+- AGENTS.md last-reviewed stamp refreshed after independent local verification (22/22 pytest passed, 98% coverage, mypy --strict clean).
 
 
 ### Documented
