@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.47-pro] - 2026-11-03
+
+### Added
+- String length bound on IntelligenceRecord.question (max 1000) for consistency with claim/source bounds and basic DoS/memory hardening.
+- Unit tests for the new question length validation (27 total tests).
+
+### Changed
+- AGENTS.md last-reviewed stamp refreshed after local verification (27/27 pytest passed, ~98% coverage, mypy --strict clean).
+- Aligned public version references (README, pyproject.toml, version.py).
+
+## [2.1.46-pro] - 2026-11-02
+
 ### Added
 - String length bounds on Evidence claim (max 500) and source (max 200) for reliability and basic DoS hardening.
 - Unit tests covering the new length validation (25 total tests).

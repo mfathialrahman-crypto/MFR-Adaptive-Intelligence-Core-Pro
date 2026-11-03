@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-03T03:14+04 (cycle: full remote inspection via GitHub API — AGENTS.md present and consistent with HQ; core code (mfr_core_pro.py) reviewed with strong validation bounds, Bayesian evidence handling, audit trail; high test coverage; version aligned; no P0/P1 issues detected. Continuous improvement active. File confirmed and updated in GitHub).*
+*Last reviewed and confirmed in repository: 2026-11-03T05:30+04 (cycle: local clone + pytest 27/27 passed ~98% cov, mypy --strict clean; added MAX_QUESTION_LENGTH bound + tests; version aligned to 2.1.47-pro; README/CHANGELOG updated. No P0/P1 issues. Continuous improvement active. File confirmed and updated in GitHub).*

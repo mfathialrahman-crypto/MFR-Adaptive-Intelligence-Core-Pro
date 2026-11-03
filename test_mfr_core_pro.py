@@ -258,3 +258,13 @@ def test_evidence_accepts_max_lengths():
     e = Evidence(claim="a" * 500, source="b" * 200, reliability=0.5)
     assert len(e.claim) == 500
     assert len(e.source) == 200
+
+
+def test_record_rejects_too_long_question():
+    with pytest.raises(ValueError, match="question exceeds max length"):
+        IntelligenceRecord(question="q" * 1001)
+
+
+def test_record_accepts_max_question_length():
+    rec = IntelligenceRecord(question="q" * 1000)
+    assert len(rec.question) == 1000
