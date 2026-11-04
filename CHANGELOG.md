@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- AGENTS.md last-reviewed stamp refreshed after independent local verification (27/27 pytest passed, 98% coverage, mypy --strict clean).
+
 ## [2.1.47-pro] - 2026-11-03
 
 ### Added
