@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
 ## [Unreleased]
+### Added
+- Re-enforced MAX_EVIDENCE_ITEMS bound inside IntelligenceRecord.analyze() to protect against post-construction mutation of the evidence list (reliability / DoS hardening).
+- Unit test for the analyze-time evidence limit.
+
 ### Documented
+- Independent verification cycle (2026-11-04T17:22+04): local clone pytest 28/28 passed (after new test), 98% coverage, mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub.
 - Independent verification cycle (2026-11-04T15:16+04): local clone pytest 27/27 passed, 98% coverage, mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub.
 - Independent verification cycle (2026-11-04T13:17+04): pytest 27/27 passed, 98% coverage, mypy --strict clean. AGENTS.md review timestamp refreshed and saved.
 
