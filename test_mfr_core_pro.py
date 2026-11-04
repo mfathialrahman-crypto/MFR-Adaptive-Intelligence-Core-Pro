@@ -1,7 +1,7 @@
 """Unit tests for MFR Adaptive Intelligence Core Pro."""
 
 import pytest
-from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION
+from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION, MAX_EVIDENCE_ITEMS
 
 
 def test_version_present():
@@ -268,3 +268,12 @@ def test_record_rejects_too_long_question():
 def test_record_accepts_max_question_length():
     rec = IntelligenceRecord(question="q" * 1000)
     assert len(rec.question) == 1000
+
+
+def test_analyze_enforces_evidence_limit_after_mutation():
+    """Evidence bound is re-checked in analyze() to protect against post-construction mutation."""
+    rec = IntelligenceRecord(question="Q?", evidence=[Evidence(claim="x", source="s0", reliability=0.5)])
+    # Mutate beyond limit
+    rec.evidence = [Evidence(claim="x", source=f"s{i}", reliability=0.5) for i in range(MAX_EVIDENCE_ITEMS + 1)]
+    with pytest.raises(ValueError, match="evidence list exceeds maximum"):
+        rec.analyze()
