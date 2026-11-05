@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
 ## [Unreleased]
+### Added
+- Serialization support: `Evidence.to_dict()` / `Evidence.from_dict()` and `IntelligenceRecord.to_dict()` / `IntelligenceRecord.from_dict()` with full validation re-applied on reconstruction. Round-trip preserves content-addressable fingerprint.
+- Suggestion for wide 95% credible intervals (width > 0.35) on provisional findings to signal residual uncertainty.
+
+### Documented
+- Independent verification cycle (2026-11-05): local pytest after serialization addition.
+
+## [Unreleased]
 ### Documented
 - Independent verification cycle (2026-11-05T12:19+04): local clone pytest 28/28 passed in 0.06s, coverage 98% (191 stmts, 4 miss), mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub. No P0/P1 issues.
 

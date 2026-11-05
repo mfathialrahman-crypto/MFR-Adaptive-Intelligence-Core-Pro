@@ -277,3 +277,43 @@ def test_analyze_enforces_evidence_limit_after_mutation():
     rec.evidence = [Evidence(claim="x", source=f"s{i}", reliability=0.5) for i in range(MAX_EVIDENCE_ITEMS + 1)]
     with pytest.raises(ValueError, match="evidence list exceeds maximum"):
         rec.analyze()
+
+
+def test_evidence_serialization_roundtrip():
+    e = Evidence(claim="healthy", source="monitor", reliability=0.85, independent=False, weight=1.5)
+    d = e.to_dict()
+    e2 = Evidence.from_dict(d)
+    assert e2.claim == e.claim
+    assert e2.source == e.source
+    assert e2.reliability == e.reliability
+    assert e2.independent == e.independent
+    assert e2.weight == e.weight
+
+
+def test_evidence_from_dict_rejects_invalid():
+    with pytest.raises(ValueError):
+        Evidence.from_dict({"claim": "", "source": "s", "reliability": 0.5})
+
+
+def test_record_serialization_roundtrip():
+    ev = [Evidence(claim="yes", source="a", reliability=0.9), Evidence(claim="no", source="b", reliability=0.4, independent=False)]
+    rec = IntelligenceRecord(question="Status?", evidence=ev, alternatives=["yes", "no"], prior_belief=0.6)
+    d = rec.to_dict()
+    rec2 = IntelligenceRecord.from_dict(d)
+    assert rec2.question == rec.question
+    assert rec2.prior_belief == rec.prior_belief
+    assert rec2.record_id == rec.record_id
+    assert len(rec2.evidence) == len(rec.evidence)
+    assert rec2.evidence[0].claim == "yes"
+    # Fingerprint of content should match after roundtrip (timestamps preserved)
+    assert rec.analyze()["fingerprint"] == rec2.analyze()["fingerprint"]
+
+
+def test_wide_ci_suggestion_present():
+    # Single weak evidence produces wide CI
+    rec = IntelligenceRecord(
+        question="Uncertain?",
+        evidence=[Evidence(claim="maybe", source="weak", reliability=0.3, independent=True)],
+    )
+    report = rec.analyze()
+    assert any("wide" in s.lower() or "narrow" in s.lower() for s in report["suggestions"])

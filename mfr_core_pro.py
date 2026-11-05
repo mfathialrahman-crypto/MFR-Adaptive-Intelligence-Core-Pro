@@ -95,6 +95,27 @@ class Evidence:
         self.claim = claim
         self.source = source
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to a plain dict (JSON-compatible)."""
+        return {
+            "claim": self.claim,
+            "source": self.source,
+            "reliability": self.reliability,
+            "independent": self.independent,
+            "weight": self.weight,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Evidence":
+        """Reconstruct from dict. Re-runs full validation."""
+        return cls(
+            claim=data.get("claim", ""),
+            source=data.get("source", ""),
+            reliability=float(data.get("reliability", 0.0)),
+            independent=bool(data.get("independent", True)),
+            weight=float(data.get("weight", 1.0)),
+        )
+
 
 @dataclass
 class IntelligenceRecord:
@@ -116,6 +137,30 @@ class IntelligenceRecord:
             raise ValueError(f"prior_belief must be in [0, 1], got {self.prior_belief}")
         if len(self.evidence) > MAX_EVIDENCE_ITEMS:
             raise ValueError(f"evidence list exceeds maximum of {MAX_EVIDENCE_ITEMS} items (got {len(self.evidence)})")
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize record (evidence included). Timestamps and id preserved for round-trip."""
+        return {
+            "question": self.question,
+            "evidence": [e.to_dict() for e in self.evidence],
+            "alternatives": list(self.alternatives),
+            "prior_belief": self.prior_belief,
+            "record_id": self.record_id,
+            "created_at": self.created_at,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "IntelligenceRecord":
+        """Reconstruct from dict. Re-runs full validation on question and evidence."""
+        evidence = [Evidence.from_dict(e) for e in data.get("evidence", [])]
+        return cls(
+            question=data.get("question", ""),
+            evidence=evidence,
+            alternatives=list(data.get("alternatives", [])),
+            prior_belief=float(data.get("prior_belief", 0.5)),
+            record_id=str(data.get("record_id", str(uuid.uuid4()))),
+            created_at=str(data.get("created_at", datetime.now(timezone.utc).isoformat())),
+        )
 
     def analyze(self) -> Dict[str, Any]:
         analyzed_at = datetime.now(timezone.utc).isoformat()
@@ -305,6 +350,12 @@ def _generate_suggestions(
             suggestions.append(f"Listed alternatives: {alts}. Consider gathering evidence that distinguishes among them.")
     if ci_non_overlap and status == "PROVISIONAL_FINDING":
         suggestions.append("95% credible intervals of top and second claims do not overlap — separation is stronger than the mean difference alone indicates.")
+    # Flag high uncertainty when top CI is wide and sample is limited
+    if top and status == "PROVISIONAL_FINDING":
+        ci = top.get("ci_95", [0.0, 1.0])
+        width = ci[1] - ci[0]
+        if width > 0.45 and top.get("evidence_count", 0) <= 3:
+            suggestions.append(f"Top claim 95% CI is wide ({width:.2f}). Additional independent evidence will narrow uncertainty.")
     if not suggestions:
         suggestions.append("Evidence is reasonably coherent. Monitor for new observations.")
     return suggestions
