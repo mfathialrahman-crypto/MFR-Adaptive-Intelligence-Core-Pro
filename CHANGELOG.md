@@ -3,11 +3,16 @@
 All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version. The `+pro` is a PEP 440 local version marker for the public surface.
 
 ## [Unreleased]
 
-## [2.1.49-pro] - 2026-11-06
+## [2.1.49+pro] - 2026-11-06 (packaging)
+
+### Fixed
+- Version string changed from `2.1.49-pro` to `2.1.49+pro` so that `pyproject.toml` validates under PEP 440. Editable installs and packaging now succeed. Local verification: 30/30 pytest passed.
+
+## [2.1.49+pro] - 2026-11-06
 
 ### Changed
 - Fingerprint now includes the alternatives list (normalized and sorted) so that inputs affecting suggestions and the full report contract are content-addressable. Empty/whitespace alternatives are ignored consistently with construction cleaning.
