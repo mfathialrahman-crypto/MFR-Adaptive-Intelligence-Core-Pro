@@ -68,6 +68,10 @@ MAX_CLAIM_LENGTH = 500
 MAX_SOURCE_LENGTH = 200
 MAX_QUESTION_LENGTH = 1000
 
+# Bounds on alternatives list (reliability / DoS hardening, consistent with other inputs)
+MAX_ALTERNATIVES = 50
+MAX_ALTERNATIVE_LENGTH = 200
+
 
 @dataclass
 class Evidence:
@@ -116,6 +120,17 @@ class IntelligenceRecord:
             raise ValueError(f"prior_belief must be in [0, 1], got {self.prior_belief}")
         if len(self.evidence) > MAX_EVIDENCE_ITEMS:
             raise ValueError(f"evidence list exceeds maximum of {MAX_EVIDENCE_ITEMS} items (got {len(self.evidence)})")
+        if len(self.alternatives) > MAX_ALTERNATIVES:
+            raise ValueError(f"alternatives list exceeds maximum of {MAX_ALTERNATIVES} items (got {len(self.alternatives)})")
+        cleaned_alts: List[str] = []
+        for a in self.alternatives:
+            s = (a or "").strip()
+            if not s:
+                continue
+            if len(s) > MAX_ALTERNATIVE_LENGTH:
+                raise ValueError(f"alternative exceeds max length {MAX_ALTERNATIVE_LENGTH}")
+            cleaned_alts.append(s)
+        self.alternatives = cleaned_alts
 
     def analyze(self) -> Dict[str, Any]:
         analyzed_at = datetime.now(timezone.utc).isoformat()
