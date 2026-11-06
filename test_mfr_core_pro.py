@@ -277,3 +277,31 @@ def test_analyze_enforces_evidence_limit_after_mutation():
     rec.evidence = [Evidence(claim="x", source=f"s{i}", reliability=0.5) for i in range(MAX_EVIDENCE_ITEMS + 1)]
     with pytest.raises(ValueError, match="evidence list exceeds maximum"):
         rec.analyze()
+
+
+def test_alternatives_length_and_count_bounds():
+    from mfr_core_pro import MAX_ALTERNATIVES, MAX_ALTERNATIVE_LENGTH
+    # Too many alternatives
+    with pytest.raises(ValueError, match="alternatives list exceeds maximum"):
+        IntelligenceRecord(
+            question="Q?",
+            alternatives=["a"] * (MAX_ALTERNATIVES + 1),
+        )
+    # Single alternative too long
+    with pytest.raises(ValueError, match="alternative exceeds max length"):
+        IntelligenceRecord(
+            question="Q?",
+            alternatives=["x" * (MAX_ALTERNATIVE_LENGTH + 1)],
+        )
+    # Empty / whitespace alternatives are stripped
+    rec = IntelligenceRecord(
+        question="Q?",
+        alternatives=["  ", "", "valid", "  another  "],
+    )
+    assert rec.alternatives == ["valid", "another"]
+    # Max length accepted
+    rec2 = IntelligenceRecord(
+        question="Q?",
+        alternatives=["y" * MAX_ALTERNATIVE_LENGTH],
+    )
+    assert len(rec2.alternatives[0]) == MAX_ALTERNATIVE_LENGTH
