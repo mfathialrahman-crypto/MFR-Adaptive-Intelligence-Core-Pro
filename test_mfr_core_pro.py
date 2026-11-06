@@ -320,3 +320,14 @@ def test_alternatives_length_and_count_bounds():
         alternatives=["y" * MAX_ALTERNATIVE_LENGTH],
     )
     assert len(rec2.alternatives[0]) == MAX_ALTERNATIVE_LENGTH
+
+
+def test_version_aligned_with_pyproject():
+    """Ensure version.py VERSION matches pyproject.toml (CI gate)."""
+    import re
+    from version import VERSION
+    with open("pyproject.toml") as f:
+        content = f.read()
+    m = re.search(r'version\s*=\s*"([^"]+)"', content)
+    assert m is not None, "version not found in pyproject.toml"
+    assert VERSION == m.group(1), f"Mismatch: version.py={VERSION} vs pyproject={m.group(1)}"
