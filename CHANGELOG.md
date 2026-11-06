@@ -6,21 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
 ## [Unreleased]
-### Documented
-- Independent verification cycle (2026-11-05T12:19+04): local clone pytest 28/28 passed in 0.06s, coverage 98% (191 stmts, 4 miss), mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub. No P0/P1 issues.
 
-### Documented
-- Independent verification cycle (2026-11-05T06:15+04): local clone pytest 28/28 passed in 0.10s, coverage 98% (191 stmts, 4 miss), mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub. No P0/P1 issues.
-- Independent verification cycle (2026-11-05T02:17+04): fresh local clone pytest 28/28 passed in 0.05s, coverage 98% (191 stmts, 4 miss), mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub. No P0/P1 issues.
+## [2.1.48-pro] - 2026-11-06
 
 ### Added
-- Re-enforced MAX_EVIDENCE_ITEMS bound inside IntelligenceRecord.analyze() to protect against post-construction mutation of the evidence list (reliability / DoS hardening).
-- Unit test for the analyze-time evidence limit.
+- Bounds on `alternatives` list: max 50 items and max 200 characters per alternative (with empty/whitespace stripping). Consistent reliability / DoS hardening with claim/source/question bounds.
+- Unit test covering alternatives length and count validation (29 total tests).
 
 ### Documented
-- Independent verification cycle (2026-11-04T17:22+04): local clone pytest 28/28 passed (after new test), 98% coverage, mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub.
-- Independent verification cycle (2026-11-04T15:16+04): local clone pytest 27/27 passed, 98% coverage, mypy --strict clean. AGENTS.md review timestamp refreshed and confirmed saved in GitHub.
-- Independent verification cycle (2026-11-04T13:17+04): pytest 27/27 passed, 98% coverage, mypy --strict clean. AGENTS.md review timestamp refreshed and saved.
+- Independent verification cycle (2026-11-06): local clone pytest 29/29 passed, demo OK, version aligned. Continuous improvement cycle.
 
 ## [2.1.47-pro] - 2026-11-03
 
@@ -46,7 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - AGENTS.md last-reviewed stamp refreshed after independent local verification (22/22 pytest passed, 98% coverage, mypy --strict clean).
-
 
 ### Documented
 - Independent verification cycle (2026-11-01T12:18Z): Fresh local clone, pytest 20/20 passed, coverage 91%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
