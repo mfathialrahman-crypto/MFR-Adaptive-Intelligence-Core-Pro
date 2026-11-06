@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.1.49-pro] - 2026-11-06
+## [2.1.50-pro] - 2026-11-06
+
+### Fixed
+- Version consistency check in GitHub Actions now compares full version strings (including `-pro` suffix) between `version.py` and `pyproject.toml`. Previous logic incorrectly stripped the suffix.
+
+### Added
+- Minimal zero-dependency CLI (`python mfr_core_pro.py --demo` or `--json path.json`) for practical analysis without writing code. Outputs full JSON report.
+- CLI supports `--version` and falls back to demo when no arguments given.
+
+### Documented
+- Independent verification: local pytest 30/30 passed, CLI demo and JSON path functional, mypy --strict clean.
 
 ### Changed
 - Fingerprint now includes the alternatives list (normalized and sorted) so that inputs affecting suggestions and the full report contract are content-addressable. Empty/whitespace alternatives are ignored consistently with construction cleaning.

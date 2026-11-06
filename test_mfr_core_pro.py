@@ -320,3 +320,44 @@ def test_alternatives_length_and_count_bounds():
         alternatives=["y" * MAX_ALTERNATIVE_LENGTH],
     )
     assert len(rec2.alternatives[0]) == MAX_ALTERNATIVE_LENGTH
+
+
+def test_cli_demo_runs(capsys):
+    """CLI demo path produces expected output without error."""
+    from mfr_core_pro import _cli
+    import sys
+    old_argv = sys.argv
+    try:
+        sys.argv = ["mfr_core_pro", "--demo"]
+        _cli()
+        captured = capsys.readouterr()
+        assert "Demo" in captured.out
+        assert "PROVISIONAL_FINDING" in captured.out or "Status" in captured.out
+    finally:
+        sys.argv = old_argv
+
+
+def test_cli_json_path(tmp_path, capsys):
+    """CLI can consume a minimal JSON file and emit a report."""
+    import json
+    from mfr_core_pro import _cli
+    import sys
+    data = {
+        "question": "Test question?",
+        "evidence": [
+            {"claim": "positive", "source": "unit", "reliability": 0.8, "independent": True}
+        ],
+        "alternatives": ["positive", "negative"],
+    }
+    json_path = tmp_path / "input.json"
+    json_path.write_text(json.dumps(data), encoding="utf-8")
+    old_argv = sys.argv
+    try:
+        sys.argv = ["mfr_core_pro", "--json", str(json_path)]
+        _cli()
+        captured = capsys.readouterr()
+        assert "positive" in captured.out
+        assert "fingerprint" in captured.out
+        assert "PROVISIONAL_FINDING" in captured.out or "status" in captured.out.lower()
+    finally:
+        sys.argv = old_argv

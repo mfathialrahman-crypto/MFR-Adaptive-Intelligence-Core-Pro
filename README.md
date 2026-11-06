@@ -5,7 +5,7 @@
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.49-pro` (see `version.py`)
+**Current version:** `2.1.50-pro` (see `version.py`)
 
 ## Doctrine
 
@@ -43,8 +43,10 @@ git clone https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Cor
 cd MFR-Adaptive-Intelligence-Core-Pro
 python -m pytest test_mfr_core_pro.py -v
 
-# Or run the built-in demo
+# Or run the built-in demo / CLI
 python mfr_core_pro.py
+python mfr_core_pro.py --demo
+python mfr_core_pro.py --json example.json   # see schema for input shape
 ```
 
 ### Programmatic use

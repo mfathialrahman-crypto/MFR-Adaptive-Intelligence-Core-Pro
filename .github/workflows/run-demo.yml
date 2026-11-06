@@ -74,11 +74,17 @@ jobs:
       - name: Check version alignment
         run: |
           echo "Checking version consistency between version.py and pyproject.toml"
-          PY_VER=$(python -c "from version import VERSION; print(VERSION.split('-')[0])")
-          TOML_VER=$(grep -E '^version =' pyproject.toml | sed -E 's/.*\"(.*)\" .*/\\1/')
-          echo "version.py base: $PY_VER"
+          PY_VER=$(python -c "from version import VERSION; print(VERSION)")
+          TOML_VER=$(python -c "
+import re
+with open('pyproject.toml') as f:
+    content = f.read()
+m = re.search(r'^version\\s*=\\s*\"([^\"]+)\"', content, re.MULTILINE)
+print(m.group(1) if m else '')
+")
+          echo "version.py: $PY_VER"
           echo "pyproject.toml: $TOML_VER"
-          if [ \"$PY_VER\" != \"$TOML_VER\" ]; then
+          if [ "$PY_VER" != "$TOML_VER" ]; then
             echo "ERROR: Version mismatch between version.py and pyproject.toml"
             exit 1
           fi

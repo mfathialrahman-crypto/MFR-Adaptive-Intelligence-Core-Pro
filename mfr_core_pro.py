@@ -372,5 +372,53 @@ def _demo() -> None:
     print("Demo complete.")
 
 
+def _cli() -> None:
+    """Minimal zero-dependency CLI for practical use."""
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="MFR Adaptive Intelligence Core Pro — analyze evidence from JSON or demo",
+        prog="mfr_core_pro",
+    )
+    parser.add_argument("--demo", action="store_true", help="Run the built-in demo")
+    parser.add_argument("--json", type=str, help="Path to JSON file with question, evidence, alternatives")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
+    args = parser.parse_args()
+
+    if args.demo or (not args.json and len(sys.argv) == 1):
+        _demo()
+        return
+
+    if args.json:
+        try:
+            with open(args.json, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            evidence = [
+                Evidence(
+                    claim=e["claim"],
+                    source=e["source"],
+                    reliability=float(e.get("reliability", 1.0)),
+                    independent=bool(e.get("independent", True)),
+                    weight=float(e.get("weight", 1.0)),
+                )
+                for e in data.get("evidence", [])
+            ]
+            record = IntelligenceRecord(
+                question=data["question"],
+                evidence=evidence,
+                alternatives=data.get("alternatives", []),
+                prior_belief=float(data.get("prior_belief", 0.5)),
+            )
+            report = record.analyze()
+            print(json.dumps(report, indent=2, ensure_ascii=False))
+        except Exception as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            sys.exit(1)
+        return
+
+    parser.print_help()
+
+
 if __name__ == "__main__":
-    _demo()
+    _cli()
