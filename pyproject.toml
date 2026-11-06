@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mfr-adaptive-intelligence-core-pro"
-version = "2.1.48-pro"
+version = "2.1.49-pro"
 description = "MFR Adaptive Intelligence Core Pro — Evidence → Bayesian Reasoning → Verification → Self-Improvement. Transparent adaptive intelligence core of the FathiMind ecosystem. Zero-dependency public MIT package."
 readme = "README.md"
 requires-python = ">=3.10"

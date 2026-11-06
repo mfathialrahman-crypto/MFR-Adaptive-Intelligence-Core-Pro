@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.49-pro] - 2026-11-06
+
+### Changed
+- Fingerprint now includes the alternatives list (normalized and sorted) so that inputs affecting suggestions and the full report contract are content-addressable. Empty/whitespace alternatives are ignored consistently with construction cleaning.
+
+### Added
+- Regression test confirming alternatives change the fingerprint and that order/whitespace is normalized.
+
+### Documented
+- Independent verification: local clone pytest 30/30 passed after change.
+
 ## [2.1.48-pro] - 2026-11-06
 
 ### Added

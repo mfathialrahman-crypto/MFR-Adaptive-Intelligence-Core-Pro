@@ -117,6 +117,21 @@ def test_fingerprint_deterministic_and_content_addressable():
     assert rec3.analyze()["fingerprint"] != fp1
 
 
+def test_fingerprint_includes_alternatives():
+    """Alternatives affect suggestions; fingerprint must change when they change."""
+    ev = [Evidence(claim="yes", source="a", reliability=0.8, independent=True)]
+    rec_no = IntelligenceRecord(question="Q?", evidence=ev, alternatives=[])
+    rec_with = IntelligenceRecord(question="Q?", evidence=ev, alternatives=["option-a", "option-b"])
+    fp_no = rec_no.analyze()["fingerprint"]
+    fp_with = rec_with.analyze()["fingerprint"]
+    assert fp_no != fp_with
+    # Order and whitespace normalized
+    rec_reordered = IntelligenceRecord(
+        question="Q?", evidence=ev, alternatives=["  option-b  ", "option-a", ""]
+    )
+    assert rec_reordered.analyze()["fingerprint"] == fp_with
+
+
 def test_deduplication_keeps_strongest_per_source():
     rec = IntelligenceRecord(
         question="Q?",

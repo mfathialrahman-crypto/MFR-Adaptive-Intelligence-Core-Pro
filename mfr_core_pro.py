@@ -160,7 +160,7 @@ class IntelligenceRecord:
                 "audit_trail": ["No evidence available."],
                 "created_at": self.created_at,
                 "analyzed_at": analyzed_at,
-                "fingerprint": fingerprint(self.question, [], self.prior_belief),
+                "fingerprint": fingerprint(self.question, [], self.prior_belief, self.alternatives),
                 "missing": ["evidence"],
             }
             return report
@@ -283,7 +283,7 @@ class IntelligenceRecord:
             "audit_trail": audit,
             "created_at": self.created_at,
             "analyzed_at": analyzed_at,
-            "fingerprint": fingerprint(self.question, deduped, self.prior_belief),
+            "fingerprint": fingerprint(self.question, deduped, self.prior_belief, self.alternatives),
         }
         return report
 
@@ -325,11 +325,14 @@ def _generate_suggestions(
     return suggestions
 
 
-def fingerprint(question: str, evidence: List[Evidence], prior: float) -> str:
-    """Content-addressable SHA-256 fingerprint. Independent of timestamps and record_id."""
+def fingerprint(question: str, evidence: List[Evidence], prior: float, alternatives: Optional[List[str]] = None) -> str:
+    """Content-addressable SHA-256 fingerprint. Independent of timestamps and record_id.
+    Includes alternatives because they affect suggestions and thus the full report contract.
+    """
     canonical = {
         "question": question.strip(),
         "prior_belief": round(prior, 6),
+        "alternatives": sorted(a.strip() for a in (alternatives or []) if a and a.strip()),
         "evidence": sorted(
             [
                 {
