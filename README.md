@@ -5,7 +5,7 @@
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.49-pro` (see `version.py`)
+**Current version:** `2.1.50-pro` (see `version.py`)
 
 ## Doctrine
 
