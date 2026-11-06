@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.50-pro] - 2026-11-07
+
+### Fixed
+- Version consistency CI job now correctly compares full VERSION strings from version.py and pyproject.toml using reliable extraction (previously split base incorrectly and had fragile sed escaping, causing false mismatch).
+
+### Added
+- Unit test `test_version_aligned_with_pyproject` that parses pyproject.toml and asserts equality with VERSION. Prevents regression of the alignment gate.
+
+### Documented
+- Independent verification: local clone pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md refreshed.
+
 ## [2.1.49-pro] - 2026-11-06
 
 ### Changed
