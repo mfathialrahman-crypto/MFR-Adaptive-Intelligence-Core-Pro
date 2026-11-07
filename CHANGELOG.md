@@ -3,9 +3,12 @@
 All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version identifier is a public surface marker).
 
 ## [Unreleased]
+
+### Fixed
+- Made version string PEP 440 compliant by changing suffix from `-pro` to `+pro` (local version identifier). Enables `pip install -e .` and standard packaging validation while preserving the public surface marker. Version consistency between version.py and pyproject.toml maintained.
 
 ### Documented
 - Independent verification cycle (2026-11-07T18:32+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
@@ -13,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Independent verification cycle (2026-11-07T15:22+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 - Independent verification cycle (2026-11-07T12:20+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 
-## [2.1.50-pro] - 2026-11-07
+## [2.1.50+pro] - 2026-11-07
 
 ### Fixed
 - Version consistency CI job now correctly compares full VERSION strings from version.py and pyproject.toml using reliable extraction (previously split base incorrectly and had fragile sed escaping, causing false mismatch).
