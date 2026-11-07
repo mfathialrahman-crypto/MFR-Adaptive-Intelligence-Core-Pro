@@ -87,6 +87,13 @@ Requires Python ≥ 3.10. No third-party runtime dependencies.
 See [SECURITY.md](SECURITY.md). Pure analysis library — no network, no secrets, no external calls.  
 Always treat confidence scores as relative evidence strength, not absolute certainty. Verify fingerprints for critical decisions.
 
+## Documentation
+
+- [AGENTS.md](AGENTS.md) — Project Engineering Constitution (mission, priorities, verification rules, continuous improvement).
+- [SECURITY.md](SECURITY.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
