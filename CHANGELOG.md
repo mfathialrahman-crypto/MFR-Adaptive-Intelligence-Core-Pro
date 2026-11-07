@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Documented
+- Aligned AGENTS.md with full Project Engineering Constitution (replaced PLACEHOLDER). Includes long-horizon continuous improvement rules, priority order, verification checklist, and safe autonomy. Linked from README Documentation section. Local verification: 31/31 pytest passed, mypy --strict clean. No functional changes to core logic.
 - Independent verification cycle (2026-11-07T15:22+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 - Independent verification cycle (2026-11-07T12:20+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 
