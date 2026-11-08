@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Documented
+- Version coherence: GitHub repository description updated from stale v2.1.47-pro to current 2.1.50-pro. CI badges (tests workflow, Python 3.10–3.13, MIT, version) added to README. AGENTS.md review stamp refreshed after local verification (31/31 pytest, 98% coverage, mypy --strict clean).
+
+### Documented
 - Independent verification cycle (2026-11-07T18:32+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
 - Aligned AGENTS.md with full Project Engineering Constitution (replaced PLACEHOLDER). Includes long-horizon continuous improvement rules, priority order, verification checklist, and safe autonomy. Linked from README Documentation section. Local verification: 31/31 pytest passed, mypy --strict clean. No functional changes to core logic.
 - Independent verification cycle (2026-11-07T15:22+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
