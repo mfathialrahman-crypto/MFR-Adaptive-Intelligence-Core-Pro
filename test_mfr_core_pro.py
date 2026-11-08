@@ -1,7 +1,7 @@
 """Unit tests for MFR Adaptive Intelligence Core Pro."""
 
 import pytest
-from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION, MAX_EVIDENCE_ITEMS
+from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION, MAX_EVIDENCE_ITEMS, validate_analysis_report
 
 
 def test_version_present():
@@ -331,3 +331,42 @@ def test_version_aligned_with_pyproject():
     m = re.search(r'version\s*=\s*"([^"]+)"', content)
     assert m is not None, "version not found in pyproject.toml"
     assert VERSION == m.group(1), f"Mismatch: version.py={VERSION} vs pyproject={m.group(1)}"
+
+
+def test_every_analyze_path_passes_validator():
+    """Every analyze() result must satisfy the public contract validator."""
+    cases = [
+        IntelligenceRecord(question="No evidence?"),
+        IntelligenceRecord(
+            question="Single?",
+            evidence=[Evidence(claim="yes", source="a", reliability=0.9)],
+        ),
+        IntelligenceRecord(
+            question="Conflict?",
+            evidence=[
+                Evidence(claim="a", source="s1", reliability=0.7),
+                Evidence(claim="b", source="s2", reliability=0.72),
+            ],
+        ),
+        IntelligenceRecord(
+            question="Strong?",
+            evidence=[
+                Evidence(claim="yes", source="a", reliability=0.95, independent=True),
+                Evidence(claim="yes", source="b", reliability=0.93, independent=True),
+                Evidence(claim="yes", source="c", reliability=0.91, independent=True),
+            ],
+            alternatives=["yes", "no"],
+        ),
+    ]
+    for rec in cases:
+        report = rec.analyze()
+        violations = validate_analysis_report(report)
+        assert violations == [], f"violations for {rec.question}: {violations}"
+
+
+def test_validator_rejects_bad_report():
+    bad = {"status": "UNKNOWN", "confidence": 1.5}
+    violations = validate_analysis_report(bad)
+    assert len(violations) > 0
+    assert any("missing required" in v for v in violations)
+    assert any("invalid status" in v for v in violations)

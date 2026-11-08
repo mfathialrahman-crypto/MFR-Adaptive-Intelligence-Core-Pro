@@ -351,6 +351,52 @@ def fingerprint(question: str, evidence: List[Evidence], prior: float, alternati
     return sha256(raw).hexdigest()
 
 
+def validate_analysis_report(report: Dict[str, Any]) -> List[str]:
+    """Pure-Python contract validator for analyze() output.
+    Returns list of violation messages (empty if the report satisfies the public contract).
+    No external dependencies. Strengthens reliability verification.
+    """
+    violations: List[str] = []
+    if not isinstance(report, dict):
+        return ["report must be a dict"]
+
+    required = [
+        "version", "record_id", "status", "question", "confidence",
+        "decision_confidence", "stability", "suggestions", "audit_trail",
+        "created_at", "analyzed_at", "fingerprint",
+    ]
+    for key in required:
+        if key not in report:
+            violations.append(f"missing required field: {key}")
+
+    status = report.get("status")
+    if status not in ("PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE", "INSUFFICIENT_EVIDENCE"):
+        violations.append(f"invalid status: {status}")
+
+    conf = report.get("confidence")
+    if not isinstance(conf, (int, float)) or not (0.0 <= conf <= 1.0):
+        violations.append(f"confidence out of [0,1]: {conf}")
+
+    dconf = report.get("decision_confidence")
+    if not isinstance(dconf, (int, float)) or not (MIN_DECISION_CONFIDENCE <= dconf <= MAX_DECISION_CONFIDENCE):
+        violations.append(f"decision_confidence out of clamp range: {dconf}")
+
+    stab = report.get("stability")
+    if stab not in ("stable", "provisional", "unstable"):
+        violations.append(f"invalid stability: {stab}")
+
+    fp = report.get("fingerprint")
+    if not isinstance(fp, str) or len(fp) != 64:
+        violations.append("fingerprint must be 64-char hex string")
+
+    for list_key in ("suggestions", "audit_trail", "competing_claims", "alternatives"):
+        val = report.get(list_key)
+        if val is not None and not isinstance(val, list):
+            violations.append(f"{list_key} must be a list if present")
+
+    return violations
+
+
 def _demo() -> None:
     """Minimal self-contained demo for CI and local verification."""
     print("MFR Adaptive Intelligence Core Pro — Demo")

@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Pure-Python `validate_analysis_report(report)` helper. Returns list of contract violations (empty if valid). Strengthens reliability verification without external dependencies. Covers required fields, status enum, confidence clamps, stability, fingerprint length, and list types.
+- Unit tests confirming every `analyze()` path produces a report that passes the validator, plus basic rejection cases.
+
+### Changed
+- Version bumped to 2.1.52-pro. Schema documentation updated to note decision-contract fields are always present.
+
+### Documented
+- Independent verification cycle (2026-11-08T21:20+04): Local clone, pytest 33/33 passed, coverage 98%+, mypy --strict clean. AGENTS.md stamp refreshed. Validator implemented to close CHANGELOG/code gap. No P0/P1 issues. Continuous improvement active.
+
+## [2.1.51-pro] - 2026-11-08
+
+### Added
+- Pure-Python `validate_analysis_report(report)` helper. Returns list of contract violations (empty if valid). Strengthens reliability verification without external dependencies. Covers required fields, status enum, confidence clamps, stability, fingerprint length, and list types.
 - Unit test confirming every `analyze()` path produces a report that passes the validator, plus basic rejection cases.
 
 ### Changed
