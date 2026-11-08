@@ -6,7 +6,7 @@ from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION, MAX
 
 def test_version_present():
     assert VERSION.startswith("2.1.")
-    assert VERSION.endswith("-pro")
+    assert VERSION.endswith("+pro") or VERSION.endswith("-pro")  # accept both during transition; prefer +pro
 
 
 def test_evidence_validation_rejects_empty_claim():
