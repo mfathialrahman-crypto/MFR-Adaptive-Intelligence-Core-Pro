@@ -3,19 +3,23 @@
 All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface identifier, PEP 440 compliant).
 
 ## [Unreleased]
+
+### Fixed
+- Package version changed from invalid `2.1.51-pro` to PEP 440 local version `2.1.51+pro`. This restores `pip install -e .` and standard packaging tooling. Previous hyphen form was rejected by setuptools/PEP 440 validators.
 
 ### Added
 - Pure-Python `validate_analysis_report(report)` helper. Returns list of contract violations (empty if valid). Strengthens reliability verification without external dependencies. Covers required fields, status enum, confidence clamps, stability, fingerprint length, and list types.
 - Unit test confirming every `analyze()` path produces a report that passes the validator, plus basic rejection cases.
 
 ### Changed
-- Version bumped to 2.1.51-pro. Schema documentation updated to note decision-contract fields are always present.
+- Version bumped to 2.1.51+pro. Schema documentation updated to note decision-contract fields are always present.
 
 ### Documented
 - Independent verification cycle (2026-11-08T14:20+04): Local clone, pytest 32/32 passed, coverage 98%, mypy --strict clean. AGENTS.md stamp refreshed. No P0/P1 issues. Continuous improvement active.
+- Packaging fix verified: `pip install -e .` now succeeds after version change; tests remain green.
 
 ## [2.1.50-pro] - 2026-11-07
 
