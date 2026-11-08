@@ -7,14 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Documented
-- Version coherence: GitHub repository description updated from stale v2.1.47-pro to current 2.1.50-pro. CI badges (tests workflow, Python 3.10–3.13, MIT, version) added to README. AGENTS.md review stamp refreshed after local verification (31/31 pytest, 98% coverage, mypy --strict clean).
+### Added
+- Pure-Python `validate_analysis_report(report)` helper. Returns list of contract violations (empty if valid). Strengthens reliability verification without external dependencies. Covers required fields, status enum, confidence clamps, stability, fingerprint length, and list types.
+- Unit test confirming every `analyze()` path produces a report that passes the validator, plus basic rejection cases.
+
+### Changed
+- Version bumped to 2.1.51-pro. Schema documentation updated to note decision-contract fields are always present.
 
 ### Documented
-- Independent verification cycle (2026-11-07T18:32+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
-- Aligned AGENTS.md with full Project Engineering Constitution (replaced PLACEHOLDER). Includes long-horizon continuous improvement rules, priority order, verification checklist, and safe autonomy. Linked from README Documentation section. Local verification: 31/31 pytest passed, mypy --strict clean. No functional changes to core logic.
-- Independent verification cycle (2026-11-07T15:22+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
-- Independent verification cycle (2026-11-07T12:20+04): Fresh local clone, pytest 31/31 passed, coverage 98%, mypy --strict clean. AGENTS.md constitution review timestamp refreshed. No critical P0/P1 issues. Continuous improvement active.
+- Independent verification cycle (2026-11-08T14:20+04): Local clone, pytest 32/32 passed, coverage 98%, mypy --strict clean. AGENTS.md stamp refreshed. No P0/P1 issues. Continuous improvement active.
 
 ## [2.1.50-pro] - 2026-11-07
 
