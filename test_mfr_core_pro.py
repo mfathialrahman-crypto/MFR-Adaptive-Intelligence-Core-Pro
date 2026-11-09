@@ -440,3 +440,23 @@ def test_zero_reliability_evidence_handled():
     report = record.analyze()
     assert report["status"] in ("PROVISIONAL_FINDING", "INSUFFICIENT_EVIDENCE")
     assert not validate_analysis_report(report)
+
+
+def test_evidence_json_roundtrip():
+    """Evidence to_json / from_json preserves all fields and validates."""
+    original = Evidence(
+        claim="test-claim",
+        source="test-source",
+        reliability=0.75,
+        independent=False,
+        weight=1.5,
+    )
+    raw = original.to_json()
+    restored = Evidence.from_json(raw)
+    assert restored.claim == original.claim
+    assert restored.source == original.source
+    assert restored.reliability == original.reliability
+    assert restored.independent == original.independent
+    assert restored.weight == original.weight
+    # Round-trip again must be identical
+    assert restored.to_json() == raw

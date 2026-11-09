@@ -8,11 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Regression test for Evidence.to_json / from_json round-trip (covers serialization path previously at 94% coverage).
+
+## [2.1.55-pro] - 2026-11-09
+
+### Added
 - Zero-dependency CLI (`python mfr_core_pro.py --json record.json`) and `analyze_json()` helper for easy programmatic and script use. Improves public package usability while preserving zero-deps and determinism.
 - Edge-case tests for zero-reliability evidence and CLI/JSON path.
+- JSON serialization (`to_dict` / `from_dict` / `to_json` / `from_json`) on `Evidence` and `IntelligenceRecord`. Zero-dependency persistence and replay of decision inputs. Round-trip preserves analysis fingerprints.
 
-### Changed
-- Version bumped to 2.1.54-pro. All version sources aligned.
+### Fixed
+- Restored complete `mfr_core_pro.py` after accidental placeholder overwrite on main. Core Bayesian analysis, validation, fingerprinting, and decision-contract fields are fully operational again.
+
+### Documented
+- Independent verification (2026-11-09T19:20+04): Local clone, pytest 38/38 passed, coverage 94%, mypy --strict clean. AGENTS.md stamp refreshed. No P0/P1. Continuous improvement active.
 
 ## [2.1.53-pro] - 2026-11-09
 

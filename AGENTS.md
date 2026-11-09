@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-09T19:20Z (cycle: local re-verification of restored core; pytest 38/38 passed, coverage 94%, mypy --strict clean. Version 2.1.55-pro. No P0/P1. Continuous improvement active.)*
+*Last reviewed and confirmed in repository: 2026-11-10T00:20+04 (cycle: added Evidence JSON round-trip regression test; pytest 39/39 passed, coverage 95%, mypy --strict clean. Version 2.1.55-pro. CHANGELOG cleaned. No P0/P1. Continuous improvement active.)*
