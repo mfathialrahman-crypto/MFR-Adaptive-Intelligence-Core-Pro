@@ -1,7 +1,7 @@
 """Unit tests for MFR Adaptive Intelligence Core Pro."""
 
 import pytest
-from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION, MAX_EVIDENCE_ITEMS, validate_analysis_report
+from mfr_core_pro import Evidence, IntelligenceRecord, fingerprint, VERSION, MAX_EVIDENCE_ITEMS, validate_analysis_report, analyze_json
 
 
 def test_version_present():
@@ -420,3 +420,23 @@ def test_validator_rejects_bad_fingerprint_and_non_list():
     violations = validate_analysis_report(bad)
     assert any("fingerprint must be 64-char" in v for v in violations)
     assert any("suggestions must be a list" in v for v in violations)
+
+
+def test_analyze_json_roundtrip():
+    record = IntelligenceRecord(
+        question="CLI path",
+        evidence=[Evidence(claim="works", source="test", reliability=0.8)],
+    )
+    raw = record.to_json()
+    report = analyze_json(raw)
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert report["fingerprint"] == record.analyze()["fingerprint"]
+    assert not validate_analysis_report(report)
+
+
+def test_zero_reliability_evidence_handled():
+    ev = Evidence(claim="weak", source="zero", reliability=0.0, weight=1.0)
+    record = IntelligenceRecord(question="zero rel", evidence=[ev])
+    report = record.analyze()
+    assert report["status"] in ("PROVISIONAL_FINDING", "INSUFFICIENT_EVIDENCE")
+    assert not validate_analysis_report(report)

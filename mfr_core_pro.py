@@ -456,6 +456,16 @@ def validate_analysis_report(report: Dict[str, Any]) -> List[str]:
     return violations
 
 
+
+def analyze_json(raw: str) -> Dict[str, Any]:
+    """Convenience: parse a JSON IntelligenceRecord and return its analysis report.
+    Zero-dependency. Validates on construction.
+    """
+    data = json.loads(raw)
+    record = IntelligenceRecord.from_dict(data)
+    return record.analyze()
+
+
 def _demo() -> None:
     """Minimal self-contained demo for CI and local verification."""
     print("MFR Adaptive Intelligence Core Pro — Demo")
@@ -477,5 +487,22 @@ def _demo() -> None:
     print("Demo complete.")
 
 
+def _cli() -> None:
+    """Zero-dependency CLI. Default: demo. --json FILE analyzes a record."""
+    import argparse
+    parser = argparse.ArgumentParser(
+        description="MFR Adaptive Intelligence Core Pro — analyze evidence (zero-dependency)."
+    )
+    parser.add_argument("--json", type=str, help="Path to JSON file containing an IntelligenceRecord")
+    parser.add_argument("--demo", action="store_true", help="Run the built-in demo (default)")
+    args = parser.parse_args()
+    if args.json:
+        with open(args.json, "r", encoding="utf-8") as f:
+            report = analyze_json(f.read())
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        _demo()
+
+
 if __name__ == "__main__":
-    _demo()
+    _cli()

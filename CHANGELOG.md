@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Zero-dependency CLI (`python mfr_core_pro.py --json record.json`) and `analyze_json()` helper for easy programmatic and script use. Improves public package usability while preserving zero-deps and determinism.
+- Edge-case tests for zero-reliability evidence and CLI/JSON path.
+
+### Changed
+- Version bumped to 2.1.54-pro. All version sources aligned.
+
+## [2.1.53-pro] - 2026-11-09
+
+### Notes
+- Previous cycle confirmed stable.
+
+## [Unreleased]
+
 ### Fixed
 - Restored complete `mfr_core_pro.py` after accidental placeholder overwrite on main. Core Bayesian analysis, validation, fingerprinting, and decision-contract fields are fully operational again.
 
