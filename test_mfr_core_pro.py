@@ -420,3 +420,15 @@ def test_validator_rejects_bad_fingerprint_and_non_list():
     violations = validate_analysis_report(bad)
     assert any("fingerprint must be 64-char" in v for v in violations)
     assert any("suggestions must be a list" in v for v in violations)
+
+def test_evidence_json_round_trip():
+    """Evidence to_json / from_json preserves all fields."""
+    ev = Evidence(claim="healthy", source="monitor", reliability=0.9, independent=True, weight=1.5)
+    raw = ev.to_json()
+    restored = Evidence.from_json(raw)
+    assert restored.claim == ev.claim
+    assert restored.source == ev.source
+    assert restored.reliability == ev.reliability
+    assert restored.independent == ev.independent
+    assert restored.weight == ev.weight
+    assert restored.to_json() == raw
