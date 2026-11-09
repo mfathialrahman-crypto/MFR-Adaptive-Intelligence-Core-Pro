@@ -370,3 +370,30 @@ def test_validator_rejects_bad_report():
     assert len(violations) > 0
     assert any("missing required" in v for v in violations)
     assert any("invalid status" in v for v in violations)
+
+
+def test_validator_rejects_non_dict():
+    violations = validate_analysis_report(None)
+    assert violations == ["report must be a dict"]
+    violations2 = validate_analysis_report("not a dict")
+    assert "report must be a dict" in violations2
+
+
+def test_validator_rejects_bad_fingerprint_and_non_list():
+    bad = {
+        "version": "2.1.52-pro",
+        "record_id": "x",
+        "status": "PROVISIONAL_FINDING",
+        "question": "Q?",
+        "confidence": 0.8,
+        "decision_confidence": 0.8,
+        "stability": "stable",
+        "suggestions": "not a list",
+        "audit_trail": [],
+        "created_at": "t",
+        "analyzed_at": "t",
+        "fingerprint": "short",
+    }
+    violations = validate_analysis_report(bad)
+    assert any("fingerprint must be 64-char" in v for v in violations)
+    assert any("suggestions must be a list" in v for v in violations)
