@@ -81,7 +81,38 @@ def test_conflicting_evidence_detected():
     report = rec.analyze()
     # With balanced strong evidence on both sides, expect conflict or close provisional
     assert report["status"] in ("CONFLICTING_EVIDENCE", "PROVISIONAL_FINDING")
-    assert len(report["competing_claims"]) >= 2
+    # competing_claims excludes the top claim (semantic contract)
+    assert report["top_claim"] is not None
+    top_claim = report["top_claim"]["claim"]
+    competing_claims = [c["claim"] for c in report["competing_claims"]]
+    assert top_claim not in competing_claims
+    assert len(report["competing_claims"]) >= 1
+
+
+def test_competing_claims_excludes_top():
+    """competing_claims must never include the top_claim itself."""
+    rec = IntelligenceRecord(
+        question="Q?",
+        evidence=[
+            Evidence(claim="alpha", source="s1", reliability=0.9, independent=True),
+            Evidence(claim="beta", source="s2", reliability=0.7, independent=True),
+            Evidence(claim="gamma", source="s3", reliability=0.5, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert report["top_claim"] is not None
+    top = report["top_claim"]["claim"]
+    competing = [c["claim"] for c in report["competing_claims"]]
+    assert top not in competing
+    assert "beta" in competing or "gamma" in competing
+    # Single-claim case → empty competitors
+    rec_single = IntelligenceRecord(
+        question="Q?",
+        evidence=[Evidence(claim="only", source="s1", reliability=0.95)],
+    )
+    rep_single = rec_single.analyze()
+    assert rep_single["top_claim"]["claim"] == "only"
+    assert rep_single["competing_claims"] == []
 
 
 def test_independence_penalty_lowers_weight():
