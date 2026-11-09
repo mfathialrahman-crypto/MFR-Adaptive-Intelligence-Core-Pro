@@ -3,14 +3,14 @@
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.1.52--pro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
+[![Version](https://img.shields.io/badge/version-2.1.52+pro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.52-pro` (see `version.py`)
+**Current version:** `2.1.52+pro` (see `version.py`)
 
 ## Doctrine
 
@@ -19,92 +19,50 @@ Zero-dependency public MIT package. Deterministic, auditable, and evidence-first
 - Layers stay separate: this core measures and verifies evidence; it does not invent facts.
 - Public surface is accurate, tested, and competitive. No performance or security claims beyond what the tests demonstrate.
 
-## Architecture
-
-```
-Evidence (claim, source, reliability, independent, weight)
-        │
-        ▼
-Deduplicate by source → Group by claim
-        │
-        ▼
-Beta prior (strength 2.0) + soft positive / opposition updates
-        │
-        ▼
-Posterior mean + approximate 95% CI
-        │
-        ▼
-Status: INSUFFICIENT_EVIDENCE | CONFLICTING_EVIDENCE | PROVISIONAL_FINDING
-        │
-        ▼
-Suggestions + content-addressable SHA-256 fingerprint
-```
-
 ## Quick start
 
 ```bash
-# Clone and run tests (no install required for local use)
-git clone https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro.git
-cd MFR-Adaptive-Intelligence-Core-Pro
-python -m pytest test_mfr_core_pro.py -v
+pip install -e git+https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro.git#egg=mfr-adaptive-intelligence-core-pro
+python -c "from mfr_core_pro import IntelligenceRecord, Evidence; print('Core ready')"
+```
 
-# Or run the built-in demo
+Or clone and run the self-contained demo:
+
+```bash
 python mfr_core_pro.py
 ```
 
-### Programmatic use
+## Architecture (public core)
 
-```python
-from mfr_core_pro import Evidence, IntelligenceRecord
-
-record = IntelligenceRecord(
-    question="Is the system healthy?",
-    evidence=[
-        Evidence(claim="healthy", source="monitor-a", reliability=0.9, independent=True),
-        Evidence(claim="healthy", source="monitor-b", reliability=0.85, independent=True),
-        Evidence(claim="degraded", source="alert-c", reliability=0.4, independent=False),
-    ],
-    alternatives=["healthy", "degraded", "failed"],
-)
-report = record.analyze()
-print(report["status"], report["conclusion"], report["confidence"])
-print(report["fingerprint"])
+```
+Evidence (claim, source, reliability, independent, weight)
+    ↓
+IntelligenceRecord.analyze()
+    ↓
+Bayesian update (Beta prior + soft observations + independence penalty + residual opposition)
+    ↓
+Status: PROVISIONAL_FINDING | CONFLICTING_EVIDENCE | INSUFFICIENT_EVIDENCE
+    + confidence, 95% CI, suggestions, full audit trail, deterministic fingerprint
 ```
 
-## Installation
+## Public contract
+
+`IntelligenceRecord.analyze()` returns a dict containing at least:
+
+- `version`, `record_id`, `status`, `question`, `confidence`, `decision_confidence`, `stability`
+- `conclusion`, `top_claim`, `competing_claims`, `alternatives`, `suggestions`, `audit_trail`
+- `created_at`, `analyzed_at`, `fingerprint` (SHA-256 content address)
+
+See `schemas/analysis.schema.json` for the full machine-readable contract.
+
+## Tests
 
 ```bash
-pip install -e .
-# or
-pip install pytest && python -m pytest
+pytest
 ```
 
-Requires Python ≥ 3.10. No third-party runtime dependencies.
-
-## Testing & CI
-
-- Unit tests: `python -m pytest test_mfr_core_pro.py -v`
-- Contract validation: `validate_analysis_report(report)` (pure Python, zero deps)
-- Type check: `mypy mfr_core_pro.py --strict`
-- GitHub Actions matrix: Python 3.10–3.13 + version consistency between `version.py` and `pyproject.toml`.
-
-## Security
-
-See [SECURITY.md](SECURITY.md). Pure analysis library — no network, no secrets, no external calls.  
-Always treat confidence scores as relative evidence strength, not absolute certainty. Verify fingerprints for critical decisions.
-
-## Documentation
-
-- [AGENTS.md](AGENTS.md) — Project Engineering Constitution (mission, priorities, verification rules, continuous improvement).
-- [SECURITY.md](SECURITY.md)
-- [CHANGELOG.md](CHANGELOG.md)
-- [CONTRIBUTING.md](CONTRIBUTING.md)
+35 tests covering validation, Bayesian updates, conflict detection, fingerprint stability, bounds, and the pure-Python report validator.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
----
-
-Part of the [FathiMind](https://github.com/mfathialrahman-crypto/FathiMind) cognitive engineering operating system.  
-Topics: `fathimind`, `cognitive-systems`, `engineering-os`, `bayesian`, `evidence`.
+MIT — see LICENSE.
