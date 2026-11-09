@@ -5,6 +5,18 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+## [2.1.56-pro] - 2026-11-09
+
+### Fixed
+- `competing_claims` previously included the top claim itself (semantic bug in report contract). It now correctly excludes the top claim and returns the next up to 3 competitors (`claim_stats[1:4]`). Single-claim analyses now correctly yield an empty competitors list.
+
+### Added
+- Regression test `test_competing_claims_excludes_top` covering multi-claim and single-claim cases.
+- Strengthened `test_conflicting_evidence_detected` to assert top claim is never present in `competing_claims`.
+
+### Notes
+- Pure correctness fix; Bayesian math, fingerprints, and decision-contract fields unchanged. Backward-compatible for consumers that already treated competitors as the remainder of ranked claims.
+
 ## [Unreleased]
 
 ### Added
@@ -110,7 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Strengthened `test_ci_non_overlap_signal_when_present` to deterministically trigger non-overlapping 95% CIs and assert the stronger-separation audit and suggestion. Coverage raised from 96% to 98%.
 
-### Changed
+###
 - AGENTS.md last-reviewed stamp refreshed after independent local verification (22/22 pytest passed, 98% coverage, mypy --strict clean).
 
 ### Documented
