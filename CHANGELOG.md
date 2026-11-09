@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Restored complete `mfr_core_pro.py` after accidental placeholder overwrite on main. Core Bayesian analysis, validation, fingerprinting, and decision-contract fields are fully operational again.
+
+### Added
+- JSON serialization (`to_dict` / `from_dict` / `to_json` / `from_json`) on `Evidence` and `IntelligenceRecord`. Zero-dependency persistence and replay of decision inputs. Round-trip preserves analysis fingerprints. New regression test.
+
+### Changed
+- Version remains 2.1.53-pro (already aligned in version.py and pyproject.toml). README badge and text updated to match.
+
+### Documented
+- Independent verification (2026-11-09T08:20+04): Local clone, restored core, pytest 36/36 passed, mypy --strict clean. AGENTS.md stamp refreshed. No P0/P1 remaining. Continuous cycle active.
+
+## [2.1.52-pro] - 2026-11-08
+
 ### Added
 - Pure-Python `validate_analysis_report(report)` helper. Returns list of contract violations (empty if valid). Strengthens reliability verification without external dependencies. Covers required fields, status enum, confidence clamps, stability, fingerprint length, and list types.
 - Unit tests confirming every `analyze()` path produces a report that passes the validator, plus basic rejection cases.

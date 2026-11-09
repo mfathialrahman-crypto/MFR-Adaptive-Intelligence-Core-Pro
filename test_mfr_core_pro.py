@@ -322,6 +322,29 @@ def test_alternatives_length_and_count_bounds():
     assert len(rec2.alternatives[0]) == MAX_ALTERNATIVE_LENGTH
 
 
+def test_serialization_round_trip_preserves_fingerprint():
+    """JSON round-trip of inputs must preserve the analysis fingerprint."""
+    original = IntelligenceRecord(
+        question="Round-trip?",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.9, independent=True, weight=1.2),
+            Evidence(claim="no", source="b", reliability=0.4, independent=False),
+        ],
+        alternatives=["yes", "no", "maybe"],
+        prior_belief=0.6,
+    )
+    fp_before = original.analyze()["fingerprint"]
+    restored = IntelligenceRecord.from_json(original.to_json())
+    fp_after = restored.analyze()["fingerprint"]
+    assert fp_before == fp_after
+    assert restored.question == original.question
+    assert len(restored.evidence) == len(original.evidence)
+    assert restored.prior_belief == original.prior_belief
+    # Evidence fields match
+    assert restored.evidence[0].claim == original.evidence[0].claim
+    assert restored.evidence[0].weight == original.evidence[0].weight
+
+
 def test_version_aligned_with_pyproject():
     """Ensure version.py VERSION matches pyproject.toml (CI gate)."""
     import re
