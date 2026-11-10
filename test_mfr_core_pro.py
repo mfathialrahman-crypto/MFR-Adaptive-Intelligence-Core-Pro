@@ -471,3 +471,88 @@ def test_zero_reliability_evidence_handled():
     report = record.analyze()
     assert report["status"] in ("PROVISIONAL_FINDING", "INSUFFICIENT_EVIDENCE")
     assert not validate_analysis_report(report)
+
+
+def test_public_fingerprint_helper():
+    """Covers the standalone fingerprint() function."""
+    record = IntelligenceRecord(
+        question="fp helper",
+        evidence=[Evidence(claim="ok", source="src", reliability=0.7)],
+    )
+    fp = fingerprint(record)
+    assert isinstance(fp, str)
+    assert len(fp) == 64
+    assert fp == record.analyze()["fingerprint"]
+
+
+def test_multi_claim_low_mean_branch():
+    """Hits the mean < 0.55 branch inside multi-claim path (line 213)."""
+    record = IntelligenceRecord(
+        question="multi low mean",
+        evidence=[
+            Evidence(claim="weakA", source="s1", reliability=0.3),
+            Evidence(claim="weakB", source="s2", reliability=0.35),
+        ],
+    )
+    report = record.analyze()
+    # Final status is PROVISIONAL due to single-count override, but branch was taken
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert report["top_claim"]["evidence_count"] == 1
+    assert report["top_claim"]["mean"] < 0.55
+    assert not validate_analysis_report(report)
+
+
+def test_public_fingerprint_helper():
+    """Covers the standalone fingerprint() function (lines 312-316)."""
+    record = IntelligenceRecord(
+        question="fp helper",
+        evidence=[Evidence(claim="ok", source="src", reliability=0.7)],
+    )
+    fp = fingerprint(record)
+    assert isinstance(fp, str)
+    assert len(fp) == 64
+    assert fp == record.analyze()["fingerprint"]
+
+
+def test_no_suggestions_fallback():
+    """Covers the empty-suggestions fallback (line 239)."""
+    record = IntelligenceRecord(
+        question="medium coherent",
+        evidence=[
+            Evidence(claim="yes", source="a", reliability=0.55, independent=True),
+            Evidence(claim="yes", source="b", reliability=0.5, independent=True),
+            Evidence(claim="yes", source="c", reliability=0.52, independent=True),
+        ],
+        alternatives=[],
+    )
+    report = record.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert "No specific improvement suggestions at this time." in report["suggestions"]
+    assert not validate_analysis_report(report)
+
+
+def test_multi_claim_low_mean_branch():
+    """Hits the mean < 0.55 branch inside multi-claim path."""
+    record = IntelligenceRecord(
+        question="multi low mean",
+        evidence=[
+            Evidence(claim="weakA", source="s1", reliability=0.3),
+            Evidence(claim="weakB", source="s2", reliability=0.35),
+        ],
+    )
+    report = record.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert report["top_claim"]["mean"] < 0.55
+    assert not validate_analysis_report(report)
+
+
+def test_public_fingerprint_helper():
+    """Covers the standalone fingerprint() function."""
+    record = IntelligenceRecord(
+        question="fp helper",
+        evidence=[Evidence(claim="ok", source="src", reliability=0.7)],
+    )
+    fp = fingerprint(record)
+    assert isinstance(fp, str)
+    assert len(fp) == 64
+    assert fp == record.analyze()["fingerprint"]

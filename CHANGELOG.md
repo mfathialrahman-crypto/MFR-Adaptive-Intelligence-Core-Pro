@@ -5,6 +5,16 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+
+## [2.1.60-pro] - 2026-11-10
+
+### Added
+- Regression tests covering multi-claim low-mean status branch, empty-suggestions fallback path, and public `fingerprint()` helper.
+- Coverage improved from 93% to 96% on the core module while keeping zero-dependency and full backward compatibility.
+
+### Notes
+- Pure test and documentation alignment. All existing behavior preserved. 42 tests pass.
+
 ## [2.1.59-pro] - 2026-11-10
 
 ### Fixed
