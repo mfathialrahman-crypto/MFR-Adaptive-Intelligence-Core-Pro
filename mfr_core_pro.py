@@ -18,13 +18,24 @@ from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from hashlib import sha256
-from typing import Any, Optional, List, Dict
+from typing import Any, Optional, List, Dict, TypedDict
 import json
 import math
 import uuid
 from collections import defaultdict
 
 from version import VERSION
+
+class ClaimStat(TypedDict):
+    claim: str
+    mean: float
+    ci_low: float
+    ci_high: float
+    evidence_count: int
+    total_weight: float
+    alpha: float
+    beta: float
+
 
 # Limits
 MAX_EVIDENCE_ITEMS = 1000
@@ -157,7 +168,7 @@ class IntelligenceRecord:
         for ev in deduped:
             claim_groups[ev.claim].append(ev)
 
-        claim_stats = []
+        claim_stats: List[ClaimStat] = []
         for claim, evids in claim_groups.items():
             alpha = PRIOR_STRENGTH * self.prior_belief
             beta = PRIOR_STRENGTH * (1 - self.prior_belief)
@@ -298,7 +309,10 @@ class IntelligenceRecord:
 
 
 def fingerprint(record: IntelligenceRecord) -> str:
-    return record.analyze()["fingerprint"]
+    fp = record.analyze()["fingerprint"]
+    if not isinstance(fp, str):
+        raise TypeError("fingerprint must be str")
+    return fp
 
 
 def validate_analysis_report(report: Any) -> List[str]:
