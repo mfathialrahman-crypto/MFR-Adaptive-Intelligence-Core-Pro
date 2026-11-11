@@ -7,8 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.60-pro] - 2026-11-11
+
 ### Added
-- Additional unit tests covering CLI --json entry point and fallback suggestion path. Coverage remains ≥93%. All 42 tests pass.
+- `generate_html_report(report)`: zero-dependency self-contained HTML evidence card.
+  - Status-colored badge, conclusion, confidence, 95% CI, competing claims table, suggestions, audit trail, and full content-addressable fingerprint.
+  - CLI entry: `python mfr_core_pro.py --html <file.json>` emits the report to stdout.
+  - Pure Python; no external libraries. Makes the replayable trace visually shareable.
+
+### Notes
+- Bayesian core, fingerprinting contract, and existing tests remain unchanged.
+- Public surface improvement: evidence is now inspectable without custom rendering.
 
 ## [2.1.59-pro] - 2026-11-10
 
