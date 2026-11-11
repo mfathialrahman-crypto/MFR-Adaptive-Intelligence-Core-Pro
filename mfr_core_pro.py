@@ -11,6 +11,7 @@ Superior implementation over the original:
 - Confidence intervals (approximate)
 - Actionable improvement suggestions
 - Deterministic fingerprinting + versioning
+- Self-contained HTML evidence report (zero dependencies)
 """
 
 from __future__ import annotations
@@ -346,6 +347,114 @@ def analyze_json(raw: str) -> Dict[str, Any]:
     return rec.analyze()
 
 
+def generate_html_report(report: Dict[str, Any]) -> str:
+    """Generate a self-contained, zero-dependency HTML evidence report.
+
+    Makes the replayable trace shareable and visually inspectable.
+    Status colors: green (stable), amber (provisional/conflict), red (insufficient).
+    """
+    status = report.get("status", "UNKNOWN")
+    confidence = report.get("confidence", 0.0)
+    conclusion = report.get("conclusion") or "—"
+    fingerprint = report.get("fingerprint", "")
+    question = report.get("question", "")
+    version = report.get("version", VERSION)
+    stability = report.get("stability", "")
+    suggestions = report.get("suggestions", [])
+    audit = report.get("audit_trail", [])
+    top = report.get("top_claim") or {}
+    competitors = report.get("competing_claims", [])
+    record_id = report.get("record_id", "")
+    analyzed_at = report.get("analyzed_at", "")
+
+    status_color = {
+        "PROVISIONAL_FINDING": "#16a34a" if stability == "stable" else "#d97706",
+        "CONFLICTING_EVIDENCE": "#d97706",
+        "INSUFFICIENT_EVIDENCE": "#dc2626",
+    }.get(status, "#6b7280")
+
+    def esc(s: Any) -> str:
+        if s is None:
+            return ""
+        return str(s).replace("&", "&").replace("<", "<").replace(">", ">").replace('"', """)
+
+    competitors_html = ""
+    for c in competitors:
+        competitors_html += f"""
+        <tr>
+          <td>{esc(c.get('claim'))}</td>
+          <td>{c.get('mean', 0):.3f}</td>
+          <td>[{c.get('ci_low', 0):.3f}, {c.get('ci_high', 0):.3f}]</td>
+          <td>{c.get('evidence_count', 0)}</td>
+        </tr>"""
+
+    suggestions_html = "".join(f"<li>{esc(s)}</li>" for s in suggestions) or "<li>None</li>"
+    audit_html = "".join(f"<li>{esc(a)}</li>" for a in audit) or "<li>None</li>"
+
+    top_claim_html = ""
+    if top:
+        top_claim_html = f"""
+        <div class="card">
+          <strong>Top claim:</strong> {esc(top.get('claim'))}<br>
+          Mean: {top.get('mean', 0):.3f} &nbsp; 95% CI: [{top.get('ci_low', 0):.3f}, {top.get('ci_high', 0):.3f}] &nbsp;
+          Evidence: {top.get('evidence_count', 0)}
+        </div>"""
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MFR Evidence Report — {esc(status)}</title>
+<style>
+  body {{ font-family: system-ui, -apple-system, sans-serif; margin: 2rem; background: #f8fafc; color: #0f172a; }}
+  .container {{ max-width: 760px; margin: 0 auto; background: white; padding: 1.75rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }}
+  h1 {{ margin-top: 0; font-size: 1.4rem; }}
+  .status {{ display: inline-block; padding: .35rem .9rem; border-radius: 999px; color: white; font-weight: 600; background: {status_color}; }}
+  .meta {{ color: #64748b; font-size: .85rem; margin: .5rem 0 1.25rem; }}
+  .card {{ background: #f1f5f9; padding: 1rem; border-radius: 8px; margin: .75rem 0; }}
+  table {{ width: 100%; border-collapse: collapse; margin: .75rem 0; }}
+  th, td {{ text-align: left; padding: .5rem .6rem; border-bottom: 1px solid #e2e8f0; }}
+  th {{ background: #f8fafc; font-weight: 600; }}
+  .fp {{ font-family: ui-monospace, SFMono-Regular, monospace; font-size: .75rem; word-break: break-all; background: #0f172a; color: #e2e8f0; padding: .75rem; border-radius: 6px; }}
+  ul {{ margin: .4rem 0; padding-left: 1.2rem; }}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>MFR Adaptive Intelligence Core Pro</h1>
+  <div class="status">{esc(status)}</div>
+  <div class="meta">v{esc(version)} · {esc(stability)} · analyzed {esc(analyzed_at)}</div>
+
+  <div class="card">
+    <strong>Question:</strong> {esc(question)}
+  </div>
+
+  <div class="card">
+    <strong>Conclusion:</strong> {esc(conclusion)}<br>
+    <strong>Confidence:</strong> {confidence:.3f}
+  </div>
+
+  {top_claim_html}
+
+  {"<h3>Competing claims</h3><table><thead><tr><th>Claim</th><th>Mean</th><th>95% CI</th><th>N</th></tr></thead><tbody>" + competitors_html + "</tbody></table>" if competitors else ""}
+
+  <h3>Suggestions</h3>
+  <ul>{suggestions_html}</ul>
+
+  <h3>Audit trail</h3>
+  <ul>{audit_html}</ul>
+
+  <h3>Fingerprint (content-addressable)</h3>
+  <div class="fp">{esc(fingerprint)}</div>
+
+  <div class="meta">Record ID: {esc(record_id)} · Zero-dependency pure analysis. Verify fingerprint for critical decisions.</div>
+</div>
+</body>
+</html>"""
+    return html
+
+
 def _demo() -> None:
     print("MFR Adaptive Intelligence Core Pro — Demo")
     rec = IntelligenceRecord(
@@ -374,5 +483,13 @@ if __name__ == "__main__":
             print(json.dumps(analyze_json(raw), indent=2))
         else:
             print("Usage: python mfr_core_pro.py --json <file.json>")
+    elif len(sys.argv) > 1 and sys.argv[1] == "--html":
+        if len(sys.argv) > 2:
+            with open(sys.argv[2]) as f:
+                raw = f.read()
+            report = analyze_json(raw)
+            print(generate_html_report(report))
+        else:
+            print("Usage: python mfr_core_pro.py --html <file.json>")
     else:
         _demo()
