@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Strengthened `IntelligenceRecord.from_json` to raise clear `ValueError` on invalid JSON, non-object root, or missing/invalid question field. Non-dict evidence items are skipped. Valid inputs unchanged.
 - Restored CHANGELOG.md content that was accidentally truncated in a documentation commit. Public history for 2.1.56-pro and 2.1.59-pro is again present.
 
 ### Added
-- Additional unit tests covering CLI --json entry point and fallback suggestion path. Coverage remains ≥93%. All 42 tests pass.
+- Three regression tests for the new from_json error paths. Coverage remains ≥93%. All 45 tests pass.
 
 ## [2.1.59-pro] - 2026-11-10
 
