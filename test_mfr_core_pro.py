@@ -408,8 +408,9 @@ def test_cli_usage_when_no_file():
         capture_output=True,
         text=True,
     )
-    assert "Usage:" in result.stdout
-    assert result.returncode == 0
+    assert "Usage:" in result.stderr
+    assert result.returncode == 1
+    assert result.stdout == ""
 
 
 def test_cli_missing_file():

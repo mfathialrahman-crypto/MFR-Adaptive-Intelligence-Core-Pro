@@ -372,7 +372,9 @@ def _demo() -> None:
     print("Demo complete.")
 
 
-if __name__ == "__main__":
+
+def main() -> None:
+    """Entry point for CLI (console script and python -m)."""
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
         if len(sys.argv) > 2:
@@ -390,6 +392,10 @@ if __name__ == "__main__":
                 print(f"Error: {e}", file=sys.stderr)
                 sys.exit(1)
         else:
-            print("Usage: python mfr_core_pro.py --json <file.json>")
+            print("Usage: python mfr_core_pro.py --json <file.json>", file=sys.stderr)
+            sys.exit(1)
     else:
         _demo()
+
+if __name__ == "__main__":
+    main()
