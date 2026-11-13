@@ -7,13 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- CLI `--json` now handles missing files and permission errors with clear stderr messages and non-zero exit. Invalid JSON and other ValueError/OSError paths also exit cleanly. Previous silent crash on FileNotFoundError is resolved.
-- Strengthened `IntelligenceRecord.from_json` to raise clear `ValueError` on invalid JSON, non-object root, or missing/invalid question field. Non-dict evidence items are skipped. Valid inputs unchanged.
-- Restored CHANGELOG.md content that was accidentally truncated in a documentation commit. Public history for 2.1.56-pro and 2.1.59-pro is again present.
+## [2.1.61-pro] - 2026-11-14
 
 ### Added
-- Regression test `test_cli_missing_file` for the new CLI error path. Coverage remains ≥95%. All 46 tests pass.
+- Console script entry point `mfr-core` (via `pyproject.toml` `[project.scripts]`). After `pip install -e .` the command `mfr-core` runs the demo or accepts `--json <file>`.
+- Extracted `main()` function so the CLI is reusable and importable. Behavior of `python mfr_core_pro.py` unchanged for valid inputs; usage path now exits non-zero with message on stderr for consistency with other error paths.
+
+### Notes
+- All 46 tests pass. mypy --strict clean. Coverage remains ≥90%. Version sources aligned.
 
 ## [2.1.60-pro] - 2026-11-13
 
@@ -38,7 +39,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Regression test `test_competing_claims_excludes_top` covering multi-claim and single-claim cases.
-- Strengthened `test_conflicting_evidence_detected` to assert top claim is never present in `competing_claims`.
-
-### Notes
-- Pure correctness fix; Bayesian math, fingerprints, and decision-contract fields unchanged. Backward-compatible for consumers that already treated competitors as the remainder of ranked claims.
