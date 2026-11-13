@@ -93,50 +93,13 @@ class IntelligenceRecord:
             raise ValueError("question exceeds max length")
         if not (0.0 <= self.prior_belief <= 1.0):
             raise ValueError("prior_belief must be in [0.0, 1.0]")
+        if len(self.alternatives) > MAX_ALTERNATIVES:
+            raise ValueError("too many alternatives")
+        for alt in self.alternatives:
+            if len(alt) > MAX_ALTERNATIVE_LENGTH:
+                raise ValueError("alternative exceeds max length")
         if len(self.evidence) > MAX_EVIDENCE_ITEMS:
             raise ValueError("evidence list exceeds maximum")
-        # Normalize alternatives
-        cleaned = []
-        for alt in self.alternatives:
-            a = alt.strip()
-            if a:
-                if len(a) > MAX_ALTERNATIVE_LENGTH:
-                    raise ValueError("alternative exceeds max length")
-                cleaned.append(a)
-        if len(cleaned) > MAX_ALTERNATIVES:
-            raise ValueError("alternatives list exceeds maximum")
-        self.alternatives = cleaned
-
-    def to_json(self) -> str:
-        data = {
-            "question": self.question,
-            "evidence": [asdict(e) for e in self.evidence],
-            "alternatives": self.alternatives,
-            "prior_belief": self.prior_belief,
-            "record_id": self.record_id,
-            "created_at": self.created_at,
-        }
-        return json.dumps(data, sort_keys=True, separators=(",", ":"))
-
-    @classmethod
-    def from_json(cls, raw: str) -> "IntelligenceRecord":
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"invalid JSON: {e}") from e
-        if not isinstance(data, dict):
-            raise ValueError("JSON root must be an object")
-        if "question" not in data or not isinstance(data.get("question"), str):
-            raise ValueError("missing or invalid 'question' field")
-        evidence = [Evidence(**e) for e in data.get("evidence", []) if isinstance(e, dict)]
-        return cls(
-            question=data["question"],
-            evidence=evidence,
-            alternatives=data.get("alternatives", []),
-            prior_belief=data.get("prior_belief", 0.5),
-            record_id=data.get("record_id", str(uuid.uuid4())),
-            created_at=data.get("created_at", datetime.now(timezone.utc).isoformat()),
-        )
 
     def analyze(self) -> Dict[str, Any]:
         if len(self.evidence) > MAX_EVIDENCE_ITEMS:
@@ -246,89 +209,86 @@ class IntelligenceRecord:
             suggestions.append("No specific improvement suggestions at this time.")
 
         decision_conf = max(MIN_DECISION_CONFIDENCE, min(MAX_DECISION_CONFIDENCE, confidence))
-        if status == "INSUFFICIENT_EVIDENCE":
-            stability = "unstable"
-        elif status == "CONFLICTING_EVIDENCE" or confidence < 0.75:
-            stability = "provisional"
-        else:
-            stability = "stable"
 
         report = self._base_report(analyzed_at, audit)
         report.update({
             "status": status,
-            "confidence": round(confidence, 6),
+            "confidence": round(confidence, 4),
             "conclusion": top["claim"] if status != "INSUFFICIENT_EVIDENCE" else None,
-            "top_claim": {
-                "claim": top["claim"],
-                "mean": round(top["mean"], 6),
-                "ci_low": round(top["ci_low"], 6),
-                "ci_high": round(top["ci_high"], 6),
-                "evidence_count": top["evidence_count"],
-            },
-            "competing_claims": [
-                {
-                    "claim": c["claim"],
-                    "mean": round(c["mean"], 6),
-                    "ci_low": round(c["ci_low"], 6),
-                    "ci_high": round(c["ci_high"], 6),
-                    "evidence_count": c["evidence_count"],
-                }
-                for c in competitors
-            ],
+            "top_claim": top["claim"],
+            "competing_claims": [c["claim"] for c in competitors],
+            "claim_stats": claim_stats,
             "suggestions": suggestions,
-            "stability": stability,
-            "decision_confidence": round(decision_conf, 6),
+            "stability": "stable" if top["evidence_count"] >= 3 and confidence >= 0.7 else "unstable",
+            "decision_confidence": round(decision_conf, 4),
+            "missing": [],
         })
         report["fingerprint"] = self._fingerprint(report)
         return report
 
     def _base_report(self, analyzed_at: str, audit: List[str]) -> Dict[str, Any]:
         return {
-            "version": VERSION,
             "record_id": self.record_id,
             "question": self.question,
-            "alternatives": self.alternatives,
-            "suggestions": [],
-            "audit_trail": audit,
-            "created_at": self.created_at,
+            "version": VERSION,
             "analyzed_at": analyzed_at,
-            "fingerprint": "",  # filled later
+            "audit_trail": audit,
+            "evidence_count": len(self.evidence),
+            "alternatives": list(self.alternatives),
+            "prior_belief": self.prior_belief,
         }
 
     def _fingerprint(self, report: Dict[str, Any]) -> str:
-        # Content-addressable: exclude timestamps and fingerprint itself
+        # Content-addressable fingerprint excluding volatile fields
         payload = {
-            "question": self.question,
-            "prior_belief": self.prior_belief,
+            "question": report["question"],
+            "version": report["version"],
+            "evidence": [
+                {"claim": e.claim, "source": e.source, "reliability": e.reliability, "independent": e.independent, "weight": e.weight}
+                for e in self.evidence
+            ],
             "alternatives": sorted(self.alternatives),
-            "evidence": sorted(
-                [{"claim": e.claim, "source": e.source, "reliability": e.reliability,
-                  "independent": e.independent, "weight": e.weight} for e in self.evidence],
-                key=lambda x: (x["source"], x["claim"])
-            ),
+            "prior_belief": self.prior_belief,
             "status": report.get("status"),
             "conclusion": report.get("conclusion"),
-            "top_claim": report.get("top_claim"),
-            "competing_claims": report.get("competing_claims"),
+            "confidence": report.get("confidence"),
         }
         raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return sha256(raw.encode()).hexdigest()
 
+    def to_json(self) -> str:
+        return json.dumps(asdict(self), default=str, indent=2)
 
-def fingerprint(record: IntelligenceRecord) -> str:
-    report = record.analyze()
-    fp = report.get("fingerprint", "")
-    if not isinstance(fp, str):
-        raise TypeError("fingerprint must be str")
-    return fp
+    @classmethod
+    def from_json(cls, raw: str) -> "IntelligenceRecord":
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"invalid JSON: {e}") from e
+        if not isinstance(data, dict):
+            raise ValueError("root must be object")
+        if "question" not in data or not isinstance(data["question"], str):
+            raise ValueError("missing or invalid question")
+        evidence = []
+        for item in data.get("evidence", []):
+            if isinstance(item, dict):
+                evidence.append(Evidence(**item))
+        return cls(
+            question=data["question"],
+            evidence=evidence,
+            alternatives=data.get("alternatives", []),
+            prior_belief=data.get("prior_belief", 0.5),
+            record_id=data.get("record_id", str(uuid.uuid4())),
+            created_at=data.get("created_at", datetime.now(timezone.utc).isoformat()),
+        )
 
 
 def validate_analysis_report(report: Any) -> List[str]:
-    violations = []
+    """Pure-Python contract validator. Returns list of violations (empty = valid)."""
+    violations: List[str] = []
     if not isinstance(report, dict):
         return ["report must be a dict"]
-    required = ["version", "record_id", "status", "question", "confidence", "decision_confidence",
-                "stability", "suggestions", "audit_trail", "created_at", "analyzed_at", "fingerprint"]
+    required = ["record_id", "question", "version", "status", "confidence", "fingerprint", "suggestions", "audit_trail"]
     for f in required:
         if f not in report:
             violations.append(f"missing required field: {f}")
@@ -372,7 +332,8 @@ def _demo() -> None:
     print("Demo complete.")
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Entry point for CLI (console script and python -m)."""
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
         if len(sys.argv) > 2:
@@ -390,6 +351,11 @@ if __name__ == "__main__":
                 print(f"Error: {e}", file=sys.stderr)
                 sys.exit(1)
         else:
-            print("Usage: python mfr_core_pro.py --json <file.json>")
+            print("Usage: python mfr_core_pro.py --json <file.json>", file=sys.stderr)
+            sys.exit(1)
     else:
         _demo()
+
+
+if __name__ == "__main__":
+    main()
