@@ -8,11 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- CLI `--json` now handles missing files and permission errors with clear stderr messages and non-zero exit. Invalid JSON and other ValueError/OSError paths also exit cleanly. Previous silent crash on FileNotFoundError is resolved.
 - Strengthened `IntelligenceRecord.from_json` to raise clear `ValueError` on invalid JSON, non-object root, or missing/invalid question field. Non-dict evidence items are skipped. Valid inputs unchanged.
 - Restored CHANGELOG.md content that was accidentally truncated in a documentation commit. Public history for 2.1.56-pro and 2.1.59-pro is again present.
 
 ### Added
-- Three regression tests for the new from_json error paths. Coverage remains ≥93%. All 45 tests pass.
+- Regression test `test_cli_missing_file` for the new CLI error path. Coverage remains ≥95%. All 46 tests pass.
+
+## [2.1.60-pro] - 2026-11-13
+
+### Fixed
+- CLI `--json` robustness: FileNotFoundError, PermissionError, and other I/O/JSON errors now produce clear messages and exit code 1 instead of unhandled exceptions.
+
+### Added
+- `test_cli_missing_file` regression test.
 
 ## [2.1.59-pro] - 2026-11-10
 

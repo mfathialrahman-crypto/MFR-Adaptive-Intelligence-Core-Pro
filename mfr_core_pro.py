@@ -376,9 +376,19 @@ if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
         if len(sys.argv) > 2:
-            with open(sys.argv[2]) as f:
-                raw = f.read()
-            print(json.dumps(analyze_json(raw), indent=2))
+            try:
+                with open(sys.argv[2]) as f:
+                    raw = f.read()
+                print(json.dumps(analyze_json(raw), indent=2))
+            except FileNotFoundError:
+                print(f"Error: file not found: {sys.argv[2]}", file=sys.stderr)
+                sys.exit(1)
+            except PermissionError:
+                print(f"Error: permission denied: {sys.argv[2]}", file=sys.stderr)
+                sys.exit(1)
+            except (ValueError, OSError) as e:
+                print(f"Error: {e}", file=sys.stderr)
+                sys.exit(1)
         else:
             print("Usage: python mfr_core_pro.py --json <file.json>")
     else:

@@ -412,6 +412,19 @@ def test_cli_usage_when_no_file():
     assert result.returncode == 0
 
 
+def test_cli_missing_file():
+    """CLI exits non-zero with clear message when file does not exist."""
+    import subprocess
+    import sys
+    result = subprocess.run(
+        [sys.executable, "mfr_core_pro.py", "--json", "/nonexistent/path/input.json"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1
+    assert "file not found" in result.stderr.lower()
+
+
 def test_default_suggestion_when_no_specific():
     """Hit the fallback suggestion path."""
     rec = IntelligenceRecord(
