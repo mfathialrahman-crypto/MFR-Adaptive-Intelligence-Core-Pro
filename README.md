@@ -3,14 +3,14 @@
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.1.60--pro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
+[![Version](https://img.shields.io/badge/version-2.1.61--pro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.60-pro` (see `version.py`)
+**Current version:** `2.1.61-pro` (see `version.py`)
 
 ## Doctrine
 
@@ -50,7 +50,7 @@ python -m pytest test_mfr_core_pro.py -v
 
 # Or run the built-in demo
 python mfr_core_pro.py  # or --json file.json
-# CLI: python mfr_core_pro.py  # or --json file.json --json record.json
+# After install: mfr-core  or  mfr-core --json file.json
 ```
 
 ### Programmatic use
