@@ -453,3 +453,34 @@ def test_from_json_rejects_missing_question():
 def test_from_json_rejects_non_object():
     with pytest.raises(ValueError, match='object'):
         IntelligenceRecord.from_json('[]')
+
+
+def test_ci_non_overlap_suggestion():
+    """Strong separation triggers non-overlap suggestion and audit note."""
+    rec = IntelligenceRecord(
+        question="Clear winner?",
+        evidence=[
+            Evidence(claim="winner", source="a", reliability=0.95, independent=True),
+            Evidence(claim="winner", source="b", reliability=0.92, independent=True),
+            Evidence(claim="winner", source="c", reliability=0.90, independent=True),
+            Evidence(claim="loser", source="d", reliability=0.2, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert any("do not overlap" in s.lower() or "ci" in s.lower() for s in report["suggestions"])
+    assert any("overlap" in a.lower() for a in report["audit_trail"])
+    assert not validate_analysis_report(report)
+
+
+def test_insufficient_evidence_low_mean():
+    """Low mean with few sources yields INSUFFICIENT_EVIDENCE and unstable."""
+    rec = IntelligenceRecord(
+        question="Weak signal",
+        evidence=[
+            Evidence(claim="maybe", source="x", reliability=0.3, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] in ("INSUFFICIENT_EVIDENCE", "PROVISIONAL_FINDING")
+    assert report["stability"] in ("unstable", "provisional")
+    assert not validate_analysis_report(report)

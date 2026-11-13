@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI usage message for missing `--json` argument now goes to stderr and the process exits with code 1 (consistent with other error paths). Previously printed to stdout and exited 0.
 
 ### Notes
-- All 46 tests pass. mypy --strict clean. Coverage remains ≥90%. Version sources (version.py, pyproject.toml, README) aligned.
+- All 48 tests pass. mypy --strict clean. Coverage remains ≥90%. Version sources (version.py, pyproject.toml, README) aligned.
 
 ## [2.1.60-pro] - 2026-11-13
 
