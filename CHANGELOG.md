@@ -9,10 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - CLI `--version` / `-V` flag prints the current package version and exits 0.
-- Regression test `test_cli_version`.
+- Direct-coverage tests for `--version` / `-V` and default demo path (`test_cli_version_flag`, `test_cli_default_demo_runs`) so coverage stays ≥90%.
 
 ### Notes
-- All tests pass (49/49). mypy --strict clean. Coverage remains ≥90%. Version sources aligned.
+- 50 tests pass. mypy --strict clean. Coverage 91.9% (≥90% gate). Version sources aligned. CI expected green after this fix.
 
 ## [2.1.61-pro] - 2026-11-14
 
