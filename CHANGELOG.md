@@ -5,6 +5,14 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+## [2.1.63-pro] - 2026-11-14
+
+### Added
+- Regression tests for low-mean single-source and multi-source paths (`test_low_mean_single_source_stays_provisional`, `test_low_mean_two_sources_insufficient`).
+
+### Notes
+- 52 tests pass. mypy --strict clean. Coverage remains ≥90%. Continuous improvement cycle active.
+
 ## [2.1.62-pro] - 2026-11-14
 
 ### Added
