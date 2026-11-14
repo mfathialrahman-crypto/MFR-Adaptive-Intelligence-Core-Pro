@@ -190,7 +190,7 @@ class IntelligenceRecord:
             # Approximate 95% CI — tighter with more evidence
             var = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1)) if (alpha + beta) > 0 else 0.25
             n_eff = max(len(evids), 1)
-            std = math.sqrt(max(var, 1e-12)) / math.sqrt(n_eff)
+            std = math.sqrt(max(var, 1e-12))  # conservative beta variance; no extra /sqrt(n)
             ci_low = max(0.0, mean - 1.96 * std)
             ci_high = min(1.0, mean + 1.96 * std)
             claim_stats.append({

@@ -1,3 +1,7 @@
+## [2.1.64-pro] - 2026-11-14
+- More conservative approximate 95% CI (removed extra /sqrt(n_eff) tightening on beta variance). Improves reliability for small samples; no change to means or status logic.
+- All 52 tests pass; mypy --strict clean.
+
 # Changelog
 
 All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
