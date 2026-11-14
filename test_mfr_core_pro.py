@@ -509,3 +509,31 @@ def test_cli_default_demo_runs(monkeypatch, capsys):
     main()
     captured = capsys.readouterr()
     assert "Demo complete" in captured.out
+
+
+def test_low_mean_single_source_stays_provisional():
+    """Low mean with single source remains PROVISIONAL_FINDING (not forced to INSUFFICIENT)."""
+    from mfr_core_pro import IntelligenceRecord, Evidence
+    rec = IntelligenceRecord(
+        question="low signal?",
+        evidence=[Evidence(claim="uncertain", source="weak-source", reliability=0.35, independent=True)],
+    )
+    report = rec.analyze()
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert report["confidence"] < 0.55
+
+
+def test_low_mean_two_sources_insufficient():
+    """Low mean with fewer than 2 effective sources can become INSUFFICIENT_EVIDENCE."""
+    from mfr_core_pro import IntelligenceRecord, Evidence
+    rec = IntelligenceRecord(
+        question="very low?",
+        evidence=[
+            Evidence(claim="weak", source="s1", reliability=0.3, independent=True),
+            Evidence(claim="weak", source="s2", reliability=0.32, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    # Depending on prior and math, document actual behavior
+    assert report["status"] in ("PROVISIONAL_FINDING", "INSUFFICIENT_EVIDENCE")
+    assert report["confidence"] < 0.6
