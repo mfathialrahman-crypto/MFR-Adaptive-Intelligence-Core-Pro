@@ -376,6 +376,9 @@ def _demo() -> None:
 def main() -> None:
     """Entry point for CLI (console script and python -m)."""
     import sys
+    if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-V"):
+        print(VERSION)
+        return
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
         if len(sys.argv) > 2:
             try:
