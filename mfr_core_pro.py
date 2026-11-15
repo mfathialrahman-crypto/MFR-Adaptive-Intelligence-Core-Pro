@@ -376,6 +376,14 @@ def _demo() -> None:
 def main() -> None:
     """Entry point for CLI (console script and python -m)."""
     import sys
+    if len(sys.argv) > 1 and sys.argv[1] in ("--help", "-h"):
+        print("MFR Adaptive Intelligence Core Pro")
+        print("Usage:")
+        print("  python mfr_core_pro.py                 # run built-in demo")
+        print("  python mfr_core_pro.py --version|-V    # print version and exit")
+        print("  python mfr_core_pro.py --json <file>   # analyze JSON record and print report")
+        print("  python mfr_core_pro.py --help|-h       # show this help")
+        return
     if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-V"):
         print(VERSION)
         return
