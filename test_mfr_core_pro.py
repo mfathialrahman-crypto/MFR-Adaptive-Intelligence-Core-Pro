@@ -520,20 +520,34 @@ def test_low_mean_single_source_stays_provisional():
     )
     report = rec.analyze()
     assert report["status"] == "PROVISIONAL_FINDING"
-    assert report["confidence"] < 0.55
+    assert report["conclusion"] == "uncertain"
 
 
 def test_low_mean_two_sources_insufficient():
-    """Low mean with fewer than 2 effective sources can become INSUFFICIENT_EVIDENCE."""
-    from mfr_core_pro import IntelligenceRecord, Evidence
+    """Two sources with low mean can yield INSUFFICIENT_EVIDENCE."""
     rec = IntelligenceRecord(
-        question="very low?",
+        question="weak multi",
         evidence=[
-            Evidence(claim="weak", source="s1", reliability=0.3, independent=True),
-            Evidence(claim="weak", source="s2", reliability=0.32, independent=True),
+            Evidence(claim="maybe", source="a", reliability=0.4),
+            Evidence(claim="maybe", source="b", reliability=0.35),
         ],
     )
     report = rec.analyze()
     # Depending on prior and math, document actual behavior
     assert report["status"] in ("PROVISIONAL_FINDING", "INSUFFICIENT_EVIDENCE")
     assert report["confidence"] < 0.6
+
+
+def test_cli_help_flag(monkeypatch, capsys):
+    """Cover --help / -h CLI path."""
+    import sys
+    from mfr_core_pro import main
+    monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--help"])
+    main()
+    captured = capsys.readouterr()
+    assert "Usage:" in captured.out
+    assert "--json" in captured.out
+    monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "-h"])
+    main()
+    captured = capsys.readouterr()
+    assert "Usage:" in captured.out
