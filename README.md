@@ -3,14 +3,14 @@
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.1.66--pro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
+[![Version](https://img.shields.io/badge/version-2.1.66%2Bpro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.66-pro` (see `version.py`)
+**Current version:** `2.1.66+pro` (see `version.py`)
 
 ## Doctrine
 
@@ -23,31 +23,10 @@ Zero-dependency public MIT package. Deterministic, auditable, and evidence-first
 
 ```bash
 pip install -e .
-mfr-core --help
-mfr-core --version
-python mfr_core_pro.py          # demo
+# or just run the demo
+python mfr_core_pro.py
+# or the installed command
+mfr-core
 ```
 
-## Analysis
-
-See `schemas/analysis.schema.json` for the report contract.
-
-```bash
-python mfr_core_pro.py --json record.json
-```
-
-## Development
-
-```bash
-pip install -e ".[dev]"
-pytest
-mypy --strict mfr_core_pro.py version.py
-```
-
-Coverage gate ≥90% is enforced in CI.
-
-## Architecture note
-
-This is the public transparent core. Private engines (HelixMind, MFR-Cognition, AetherMind, SovereignEvolution) remain proprietary.
-
-Full handbook: [FathiMind HQ](https://github.com/mfathialrahman-crypto/FathiMind).
+See `test_mfr_core_pro.py` for the full verification suite (53 tests, ≥90% coverage, mypy --strict clean).
