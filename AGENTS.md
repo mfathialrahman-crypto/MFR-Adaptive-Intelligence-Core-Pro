@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-17T17:30Z (cycle: local clone + remote inspection of MFR-Adaptive-Intelligence-Core-Pro v2.1.66+pro; 53/53 pytest passed, mypy --strict clean; AGENTS.md present with section 23; version aligned; CI green on main; no P0/P1. Standing priority maintained. File confirmed present and saved.)*
+*Last reviewed and confirmed in repository: 2026-11-17T19:30Z (cycle: local verification + added 3 direct CLI coverage tests; 56/56 pytest passed, coverage 96%; mypy --strict clean; version 2.1.66+pro aligned; no P0/P1. Standing priority maintained.)*

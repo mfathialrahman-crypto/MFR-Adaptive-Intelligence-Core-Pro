@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Restored full analysis implementation (fingerprint, validate_analysis_report, suggestions, decision_confidence, stability, audit trail) that had been accidentally replaced by a simplified placeholder in the previous "restore" commit. Tests now collect and pass again.
 
+### Improved
+- Added three direct unit tests for CLI --json success, missing-file, and no-file paths to raise coverage from 92% to 96% without changing production behavior.
+
 ### Notes
 - Critical regression fixed. 53/53 pytest passed, coverage 92% (≥90%), mypy --strict clean. Version sources aligned.
 
@@ -21,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - CLI --help output now lists both the installed `mfr-core` command and the direct `python mfr_core_pro.py` form, with cleaner formatting.
+
+### Improved
+- Added three direct unit tests for CLI --json success, missing-file, and no-file paths to raise coverage from 92% to 96% without changing production behavior.
 
 ### Notes
 - No change to analysis logic. 53 tests continue to pass. mypy --strict clean. Continuous improvement cycle active.
