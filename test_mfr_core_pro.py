@@ -153,16 +153,21 @@ def test_fingerprint_includes_alternatives():
     assert fingerprint(rec_a) != fingerprint(rec_b)
 
 
-def test_deduplication_keeps_strongest_per_source():
+def test_deduplication_keeps_strongest_per_source_and_claim():
     rec = IntelligenceRecord(
         question="Q",
         evidence=[
             Evidence(claim="weak", source="same", reliability=0.3),
-            Evidence(claim="strong", source="same", reliability=0.9),
+            Evidence(claim="strong", source="same", reliability=0.4),
+            Evidence(claim="strong", source="same", reliability=0.9),  # stronger duplicate
+            Evidence(claim="other", source="same", reliability=0.7),
         ],
     )
     report = rec.analyze()
-    assert report["top_claim"]["claim"] == "strong"
+    claims = {report["top_claim"]["claim"]} | {c["claim"] for c in report["competing_claims"]}
+    assert "strong" in claims
+    assert "other" in claims
+    assert any("source+claim" in a for a in report["audit_trail"])
 
 
 def test_max_evidence_items_enforced():
@@ -377,6 +382,48 @@ def test_zero_reliability_evidence_handled():
 
 
 def test_cli_json_path(tmp_path):
+    """Cover the --json CLI entry point with a file."""
+    import subprocess
+    import sys
+    rec = IntelligenceRecord(
+        question="CLI test",
+        evidence=[Evidence(claim="ok", source="cli", reliability=0.85)],
+    )
+    json_file = tmp_path / "input.json"
+    json_file.write_text(rec.to_json())
+    result = subprocess.run(
+        [sys.executable, "mfr_core_pro.py", "--json", str(json_file)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    import json
+    out = json.loads(result.stdout)
+    assert out["status"] == "PROVISIONAL_FINDING"
+    assert out["conclusion"] == "ok"
+    assert not validate_analysis_report(out)
+
+
+def test_cli_json_stdin(tmp_path, monkeypatch):
+    """Cover --json reading from stdin."""
+    import subprocess
+    import sys
+    rec = IntelligenceRecord(
+        question="stdin test",
+        evidence=[Evidence(claim="ok", source="stdin", reliability=0.8)],
+    )
+    result = subprocess.run(
+        [sys.executable, "mfr_core_pro.py", "--json", "-"],
+        input=rec.to_json(),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    import json
+    out = json.loads(result.stdout)
+    assert out["status"] == "PROVISIONAL_FINDING"
+    assert out["conclusion"] == "ok"
+    assert not validate_analysis_report(out)
     """Cover the --json CLI entry point."""
     import subprocess
     import sys
@@ -400,7 +447,7 @@ def test_cli_json_path(tmp_path):
 
 
 def test_cli_usage_when_no_file():
-    """Cover usage message when --json without file."""
+    """--json with no path reads stdin; empty stdin is an error."""
     import subprocess
     import sys
     result = subprocess.run(
@@ -408,8 +455,8 @@ def test_cli_usage_when_no_file():
         capture_output=True,
         text=True,
     )
-    assert "Usage:" in result.stderr
     assert result.returncode == 1
+    assert "empty input" in result.stderr.lower()
     assert result.stdout == ""
 
 

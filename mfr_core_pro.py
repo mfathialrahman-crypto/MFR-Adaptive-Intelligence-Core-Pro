@@ -145,15 +145,15 @@ class IntelligenceRecord:
         analyzed_at = datetime.now(timezone.utc).isoformat()
         audit: List[str] = []
 
-        # Deduplicate by source, keep strongest (highest reliability * weight)
-        by_source: Dict[str, Evidence] = {}
+        # Deduplicate by (source, claim), keep strongest (highest reliability * weight)
+        by_key: Dict[tuple[str, str], Evidence] = {}
         for ev in self.evidence:
-            key = ev.source
-            if key not in by_source or (ev.reliability * ev.weight) > (by_source[key].reliability * by_source[key].weight):
-                by_source[key] = ev
-        deduped = list(by_source.values())
+            key = (ev.source, ev.claim)
+            if key not in by_key or (ev.reliability * ev.weight) > (by_key[key].reliability * by_key[key].weight):
+                by_key[key] = ev
+        deduped = list(by_key.values())
         if len(self.evidence) != len(deduped):
-            audit.append(f"Deduplicated {len(self.evidence)} → {len(deduped)}")
+            audit.append(f"Deduplicated {len(self.evidence)} → {len(deduped)} (by source+claim)")
 
         if not deduped:
             report = self._base_report(analyzed_at, audit)
@@ -381,29 +381,31 @@ def main() -> None:
         print("Usage:")
         print("  python mfr_core_pro.py                 # run built-in demo")
         print("  python mfr_core_pro.py --version|-V    # print version and exit")
-        print("  python mfr_core_pro.py --json <file>   # analyze JSON record and print report")
+        print("  python mfr_core_pro.py --json <file|->  # analyze JSON record (file or stdin) and print report")
         print("  python mfr_core_pro.py --help|-h       # show this help")
         return
     if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-V"):
         print(VERSION)
         return
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
-        if len(sys.argv) > 2:
-            try:
+        try:
+            if len(sys.argv) > 2 and sys.argv[2] != "-":
                 with open(sys.argv[2]) as f:
                     raw = f.read()
-                print(json.dumps(analyze_json(raw), indent=2))
-            except FileNotFoundError:
-                print(f"Error: file not found: {sys.argv[2]}", file=sys.stderr)
+            else:
+                raw = sys.stdin.read()
+            if not raw.strip():
+                print("Error: empty input", file=sys.stderr)
                 sys.exit(1)
-            except PermissionError:
-                print(f"Error: permission denied: {sys.argv[2]}", file=sys.stderr)
-                sys.exit(1)
-            except (ValueError, OSError) as e:
-                print(f"Error: {e}", file=sys.stderr)
-                sys.exit(1)
-        else:
-            print("Usage: python mfr_core_pro.py --json <file.json>", file=sys.stderr)
+            print(json.dumps(analyze_json(raw), indent=2))
+        except FileNotFoundError:
+            print(f"Error: file not found: {sys.argv[2]}", file=sys.stderr)
+            sys.exit(1)
+        except PermissionError:
+            print(f"Error: permission denied: {sys.argv[2]}", file=sys.stderr)
+            sys.exit(1)
+        except (ValueError, OSError) as e:
+            print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
     else:
         _demo()
