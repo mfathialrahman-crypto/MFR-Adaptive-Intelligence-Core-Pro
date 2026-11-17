@@ -187,10 +187,10 @@ class IntelligenceRecord:
                 alpha += w * ev.reliability
                 beta += w * (1 - ev.reliability)
             mean = alpha / (alpha + beta) if (alpha + beta) > 0 else 0.5
-            # Approximate 95% CI — tighter with more evidence
+            # Approximate 95% CI from Beta posterior variance (normal approximation)
+            # Variance already shrinks with more evidence via larger alpha/beta; no extra n-factor.
             var = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1)) if (alpha + beta) > 0 else 0.25
-            n_eff = max(len(evids), 1)
-            std = math.sqrt(max(var, 1e-12)) / math.sqrt(n_eff)
+            std = math.sqrt(max(var, 1e-12))
             ci_low = max(0.0, mean - 1.96 * std)
             ci_high = min(1.0, mean + 1.96 * std)
             claim_stats.append({

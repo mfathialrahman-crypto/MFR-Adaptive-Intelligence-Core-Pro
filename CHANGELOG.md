@@ -5,6 +5,14 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `-pro` suffix is a public surface marker).
 
+## [2.1.65-pro] - 2026-11-17
+
+### Fixed
+- Approximate 95% confidence interval now uses the Beta posterior variance directly (normal approximation). Previous extra division by sqrt(evidence_count) incorrectly narrowed intervals. The posterior variance already shrinks correctly as evidence accumulates via alpha/beta.
+
+### Notes
+- All 53 tests still pass. mypy --strict clean. Coverage remains ≥90%. Status logic (conflict detection via CI overlap) unchanged in existing test cases. Improves accuracy of reported intervals for multi-source claims.
+
 ## [2.1.64-pro] - 2026-11-16
 
 ### Added
