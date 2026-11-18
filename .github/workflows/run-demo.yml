@@ -61,7 +61,7 @@ jobs:
         run: pip install mypy
 
       - name: Strict type check
-        run: mypy mfr_core_pro.py --strict --ignore-missing-imports
+        run: mypy mfr_core_pro.py version.py --strict --ignore-missing-imports
 
   version-consistency:
     runs-on: ubuntu-latest
