@@ -10,9 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Version string changed from 2.1.66-pro to 2.1.66+pro to satisfy PEP 440. Editable installs and packaging now succeed. Tests updated accordingly.
 
-
 ### Fixed
 - Restored full analysis implementation (fingerprint, validate_analysis_report, suggestions, decision_confidence, stability, audit trail) that had been accidentally replaced by a simplified placeholder in the previous "restore" commit. Tests now collect and pass again.
+
+### Changed
+- CI type-check job now runs mypy --strict on both mfr_core_pro.py and version.py.
+- AGENTS.md review footer refreshed after local verification (53/53 pytest, 92% coverage, mypy clean).
 
 ### Notes
 - Critical regression fixed. 53/53 pytest passed, coverage 92% (≥90%), mypy --strict clean. Version sources aligned.
