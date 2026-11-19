@@ -5,6 +5,17 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.67+pro] - 2026-11-19
+
+### Fixed
+- `IntelligenceRecord.from_json` now raises clear `ValueError` (with index) for incomplete or invalid evidence items and non-numeric `prior_belief`, instead of raw `TypeError`.
+
+### Added
+- Four regression tests covering incomplete evidence fields, non-object evidence items, bad prior type, and reliability out-of-range via JSON path.
+
+### Notes
+- Verified locally: 33/33 pytest passed. Analysis logic unchanged. Version sources aligned at 2.1.67+pro.
+
 ## [2.1.66+pro] - 2026-11-19
 
 ### Added
