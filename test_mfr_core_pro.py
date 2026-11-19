@@ -235,3 +235,30 @@ def test_independence_penalty_applied():
     report = rec.analyze()
     assert any("Non-independent" in s for s in report["suggestions"])
     assert validate_analysis_report(report) == []
+
+
+def test_from_json_incomplete_evidence_raises_valueerror():
+    raw = json.dumps({"question": "q?", "evidence": [{"claim": "only-claim"}]})
+    with pytest.raises(ValueError, match="evidence\\[0\\] invalid fields"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_non_object_evidence_item():
+    raw = json.dumps({"question": "q?", "evidence": ["not-a-dict"]})
+    with pytest.raises(ValueError, match="evidence\\[0\\] must be an object"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_bad_prior_type():
+    raw = json.dumps({"question": "q?", "prior_belief": "high"})
+    with pytest.raises(ValueError, match="prior_belief must be a number"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_evidence_value_error_propagates():
+    raw = json.dumps({
+        "question": "q?",
+        "evidence": [{"claim": "ok", "source": "s", "reliability": 2.0}],
+    })
+    with pytest.raises(ValueError, match="evidence\\[0\\]"):
+        IntelligenceRecord.from_json(raw)
