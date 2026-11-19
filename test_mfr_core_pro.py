@@ -235,3 +235,41 @@ def test_independence_penalty_applied():
     report = rec.analyze()
     assert any("Non-independent" in s for s in report["suggestions"])
     assert validate_analysis_report(report) == []
+
+
+def test_to_json_from_json_roundtrip():
+    evids = [Evidence(claim="round", source="src1", reliability=0.8, independent=True, weight=1.5)]
+    rec = IntelligenceRecord(question="roundtrip?", evidence=evids, alternatives=["a", "b"], prior_belief=0.6)
+    raw = rec.to_json()
+    rec2 = IntelligenceRecord.from_json(raw)
+    assert rec2.question == rec.question
+    assert len(rec2.evidence) == 1
+    assert rec2.evidence[0].claim == "round"
+    assert rec2.prior_belief == 0.6
+    assert rec2.alternatives == ["a", "b"]
+    report = rec2.analyze()
+    assert validate_analysis_report(report) == []
+
+
+def test_from_json_non_object():
+    with pytest.raises(ValueError, match="JSON root must be an object"):
+        IntelligenceRecord.from_json("[]")
+
+
+def test_from_json_missing_question():
+    with pytest.raises(ValueError, match="missing or invalid 'question'"):
+        IntelligenceRecord.from_json('{"evidence": []}')
+
+
+def test_cli_json_valid(tmp_path, capsys):
+    good = tmp_path / "good.json"
+    good.write_text(json.dumps({
+        "question": "cli?",
+        "evidence": [{"claim": "yes", "source": "s", "reliability": 0.8}]
+    }))
+    with patch.object(sys, "argv", ["mfr_core_pro.py", "--json", str(good)]):
+        from mfr_core_pro import main
+        main()
+    captured = capsys.readouterr()
+    assert "yes" in captured.out
+    assert "fingerprint" in captured.out

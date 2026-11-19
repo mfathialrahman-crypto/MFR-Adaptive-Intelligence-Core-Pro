@@ -5,6 +5,16 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.67+pro] - 2026-11-19
+
+### Added
+- Round-trip tests for IntelligenceRecord.to_json / from_json, plus invalid JSON root and missing question cases.
+- Successful CLI --json path test with a temporary valid record file.
+- Coverage raised from 93% to 95%.
+
+### Notes
+- Verified locally: 33/33 pytest passed, coverage 95% (≥90%), mypy --strict clean. No functional changes to analysis logic. Version sources aligned.
+
 ## [2.1.66+pro] - 2026-11-19
 
 ### Added
@@ -37,10 +47,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No change to analysis logic. 53 tests continue to pass. mypy --strict clean. Continuous improvement cycle active.
 
 ## [2.1.64-pro] - 2026-11-16
-
-### Added
-- Initial public release surface with Bayesian evidence core, full audit trail, and deterministic fingerprint.
-
-## 2026-11-18
-- tests: added CLI error-path coverage for --json (missing file, no arg, invalid content). Suite now 56 tests; coverage on core raised to 98%.
-- docs: refreshed AGENTS.md verification stamp after local confirmation.
