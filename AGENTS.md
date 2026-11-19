@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-18T23:27Z (cycle: local pytest 56/56 passed after adding CLI error-path tests, coverage 98% on mfr_core_pro.py ≥90%, mypy --strict clean; AGENTS.md section 23 present; version 2.1.66+pro aligned; file confirmed present and saved on GitHub. Standing priority maintained. No P0/P1 issues. Safe stop.)*
+*Last reviewed and confirmed in repository: 2026-11-19T00:32Z (cycle: restored full test_mfr_core_pro.py after placeholder broke CI; local pytest 23/23 passed, coverage 91% ≥90%, no regressions. AGENTS.md section 23 present; version 2.1.66+pro aligned; file confirmed present and saved on GitHub. Standing priority maintained. No P0/P1 remaining. Safe stop.)*
