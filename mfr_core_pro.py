@@ -129,11 +129,11 @@ class IntelligenceRecord:
         if "question" not in data or not isinstance(data.get("question"), str):
             raise ValueError("missing or invalid 'question' field")
         evidence: List[Evidence] = []
-        for i, e in enumerate(data.get("evidence", [])):
-            if not isinstance(e, dict):
+        for i, item in enumerate(data.get("evidence", [])):
+            if not isinstance(item, dict):
                 raise ValueError(f"evidence[{i}] must be an object")
             try:
-                evidence.append(Evidence(**e))
+                evidence.append(Evidence(**item))
             except TypeError as err:
                 raise ValueError(f"evidence[{i}] invalid fields: {err}") from err
             except ValueError as err:
