@@ -235,3 +235,23 @@ def test_independence_penalty_applied():
     report = rec.analyze()
     assert any("Non-independent" in s for s in report["suggestions"])
     assert validate_analysis_report(report) == []
+
+
+def test_from_json_non_object():
+    with pytest.raises(ValueError, match="JSON root must be an object"):
+        IntelligenceRecord.from_json("[]")
+
+
+def test_from_json_missing_question():
+    with pytest.raises(ValueError, match="missing or invalid 'question'"):
+        IntelligenceRecord.from_json('{"evidence": []}')
+
+
+def test_from_json_skips_non_dict_evidence():
+    raw = json.dumps({
+        "question": "q?",
+        "evidence": [{"claim": "ok", "source": "s", "reliability": 0.5}, "bad", 123],
+    })
+    rec = IntelligenceRecord.from_json(raw)
+    assert len(rec.evidence) == 1
+    assert rec.evidence[0].claim == "ok"
