@@ -197,3 +197,41 @@ def test_demo_runs(capsys):
         main()
     captured = capsys.readouterr()
     assert "Demo complete" in captured.out
+
+
+def test_evidence_validation_rejects_long_source():
+    with pytest.raises(ValueError, match="source exceeds max length"):
+        Evidence(claim="ok", source="x" * 201, reliability=0.5)
+
+
+def test_record_rejects_long_question():
+    with pytest.raises(ValueError, match="question exceeds max length"):
+        IntelligenceRecord(question="x" * 1001)
+
+
+def test_record_rejects_too_many_evidence():
+    evids = [Evidence(claim="c", source=f"s{i}", reliability=0.5) for i in range(MAX_EVIDENCE_ITEMS + 1)]
+    with pytest.raises(ValueError, match="evidence list exceeds maximum"):
+        IntelligenceRecord(question="q?", evidence=evids)
+
+
+def test_record_rejects_long_alternative():
+    with pytest.raises(ValueError, match="alternative exceeds max length"):
+        IntelligenceRecord(question="q?", alternatives=["x" * 201])
+
+
+def test_record_rejects_too_many_alternatives():
+    alts = [f"a{i}" for i in range(21)]
+    with pytest.raises(ValueError, match="alternatives list exceeds maximum"):
+        IntelligenceRecord(question="q?", alternatives=alts)
+
+
+def test_independence_penalty_applied():
+    evids = [
+        Evidence(claim="yes", source="a", reliability=0.9, independent=True),
+        Evidence(claim="yes", source="b", reliability=0.9, independent=False),
+    ]
+    rec = IntelligenceRecord(question="indep?", evidence=evids)
+    report = rec.analyze()
+    assert any("Non-independent" in s for s in report["suggestions"])
+    assert validate_analysis_report(report) == []
