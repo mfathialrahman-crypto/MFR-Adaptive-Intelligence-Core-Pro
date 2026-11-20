@@ -262,3 +262,20 @@ def test_from_json_evidence_value_error_propagates():
     })
     with pytest.raises(ValueError, match="evidence\\[0\\]"):
         IntelligenceRecord.from_json(raw)
+
+
+def test_ci_uses_pure_beta_posterior_std():
+    """Regression: CI must not double-count sample size via extra /sqrt(n)."""
+    evids = [
+        Evidence(claim="yes", source=f"s{i}", reliability=0.9, independent=True, weight=1.0)
+        for i in range(5)
+    ]
+    rec = IntelligenceRecord(question="ci-width?", evidence=evids, prior_belief=0.5)
+    report = rec.analyze()
+    top = report["top_claim"]
+    # Pure Beta: alpha=5.5, beta=1.5, var≈0.02105, std≈0.145, 1.96*std≈0.284
+    # Upper side clamps at 1.0, so observed width ≈ 0.50
+    width = top["ci_high"] - top["ci_low"]
+    assert 0.45 < width < 0.55, f"expected ~0.50 pure-Beta clamped width, got {width}"
+    assert top["ci_low"] < 0.55  # lower bound reflects the std, not the old narrow CI
+    assert validate_analysis_report(report) == []
