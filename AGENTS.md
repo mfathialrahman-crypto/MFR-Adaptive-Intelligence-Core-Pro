@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-20 (constitution refreshed from source; CI green on main engines).*
+*Last reviewed and confirmed in repository: 2026-11-20T05:26+04 (cycle: public surfaces inspected; Core Pro at 2.1.67+pro with CI green; version desync in public-signals corrected. AGENTS.md constitution present and saved. No P0/P1 issues. Continuous improvement active.)*
