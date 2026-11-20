@@ -22,6 +22,7 @@ from typing import Any, Optional, List, Dict, TypedDict
 import json
 import math
 import uuid
+import os
 from collections import defaultdict
 
 from version import VERSION
@@ -33,6 +34,7 @@ MAX_SOURCE_LENGTH = 200
 MAX_QUESTION_LENGTH = 1000
 MAX_ALTERNATIVES = 20
 MAX_ALTERNATIVE_LENGTH = 200
+MAX_JSON_BYTES = 1_000_000  # 1 MiB input limit for CLI --json (DoS protection)
 
 PRIOR_STRENGTH = 2.0  # Beta prior strength
 INDEPENDENCE_PENALTY = 0.6  # multiplier for non-independent evidence
@@ -403,8 +405,19 @@ def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
         if len(sys.argv) > 2:
             try:
-                with open(sys.argv[2]) as f:
-                    raw = f.read()
+                path = sys.argv[2]
+                try:
+                    size = os.path.getsize(path)
+                except OSError:
+                    size = 0
+                if size > MAX_JSON_BYTES:
+                    print(f"Error: input exceeds maximum size of {MAX_JSON_BYTES} bytes", file=sys.stderr)
+                    sys.exit(1)
+                with open(path) as f:
+                    raw = f.read(MAX_JSON_BYTES + 1)
+                if len(raw.encode("utf-8", errors="replace")) > MAX_JSON_BYTES:
+                    print(f"Error: input exceeds maximum size of {MAX_JSON_BYTES} bytes", file=sys.stderr)
+                    sys.exit(1)
                 print(json.dumps(analyze_json(raw), indent=2))
             except FileNotFoundError:
                 print(f"Error: file not found: {sys.argv[2]}", file=sys.stderr)

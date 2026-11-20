@@ -18,6 +18,7 @@ from mfr_core_pro import (
     fingerprint,
     validate_analysis_report,
     MAX_EVIDENCE_ITEMS,
+    MAX_ALTERNATIVES,
 )
 
 
@@ -306,3 +307,52 @@ def test_cli_json_permission_error(tmp_path, capsys):
             assert exc.value.code == 1
     captured = capsys.readouterr()
     assert "permission denied" in captured.err.lower()
+
+
+def test_to_json_roundtrip():
+    ev = Evidence(claim="yes", source="src", reliability=0.8, independent=True, weight=1.5)
+    rec = IntelligenceRecord(question="round?", evidence=[ev], alternatives=["yes", "no"], prior_belief=0.6)
+    raw = rec.to_json()
+    rec2 = IntelligenceRecord.from_json(raw)
+    assert rec2.question == rec.question
+    assert rec2.prior_belief == rec.prior_belief
+    assert len(rec2.evidence) == 1
+    assert rec2.evidence[0].claim == "yes"
+    assert rec2.alternatives == ["yes", "no"]
+
+
+def test_max_alternatives_rejected():
+    alts = [f"alt{i}" for i in range(MAX_ALTERNATIVES + 1)]
+    with pytest.raises(ValueError, match="alternatives list exceeds maximum"):
+        IntelligenceRecord(question="q?", alternatives=alts)
+
+
+def test_ci_non_overlap_suggestion():
+    evids = [
+        Evidence(claim="yes", source="a", reliability=0.95, weight=5),
+        Evidence(claim="yes", source="b", reliability=0.95, weight=5),
+        Evidence(claim="yes", source="c", reliability=0.95, weight=5),
+        Evidence(claim="no", source="d", reliability=0.1, weight=1),
+    ]
+    rec = IntelligenceRecord(question="strong sep?", evidence=evids)
+    report = rec.analyze()
+    suggs = " ".join(report.get("suggestions", []))
+    assert "do not overlap" in suggs.lower() or "CI does not overlap" in " ".join(report.get("audit_trail", []))
+
+
+def test_validate_non_dict():
+    viols = validate_analysis_report("not a dict")
+    assert any("must be a dict" in v for v in viols)
+
+
+def test_cli_json_too_large(tmp_path, capsys):
+    """Cover size limit path."""
+    import sys
+    big = tmp_path / "big.json"
+    big.write_text("x" * (1_000_001))
+    with patch.object(sys, "argv", ["mfr_core_pro.py", "--json", str(big)]):
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 1
+    captured = capsys.readouterr()
+    assert "exceeds maximum size" in captured.err
