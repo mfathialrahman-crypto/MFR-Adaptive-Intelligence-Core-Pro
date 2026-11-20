@@ -5,6 +5,14 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.70+pro] - 2026-11-21
+
+### Added
+- Regression tests for `to_json` round-trip, `from_json` non-object root / missing or non-string question, `validate_analysis_report` non-dict input, CI non-overlap path, and insufficient-evidence unstable stability. Coverage raised from 95% to 97%.
+
+### Notes
+- Verified locally: 43/43 pytest passed, coverage 97% (≥90%), mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.70+pro.
+
 ## [2.1.69+pro] - 2026-11-20
 
 ### Added
