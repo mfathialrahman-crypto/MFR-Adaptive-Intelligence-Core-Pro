@@ -306,3 +306,16 @@ def test_cli_json_permission_error(tmp_path, capsys):
             assert exc.value.code == 1
     captured = capsys.readouterr()
     assert "permission denied" in captured.err.lower()
+
+
+def test_cli_json_value_error(capsys):
+    """Cover CLI general ValueError/OSError path."""
+    import sys
+    from unittest.mock import patch
+    with patch.object(sys, "argv", ["mfr_core_pro.py", "--json", "dummy.json"]):
+        with patch("builtins.open", side_effect=ValueError("invalid content")):
+            with pytest.raises(SystemExit) as exc:
+                main()
+            assert exc.value.code == 1
+    captured = capsys.readouterr()
+    assert "Error:" in captured.err
