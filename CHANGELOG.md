@@ -5,6 +5,14 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.68+pro] - 2026-11-20
+
+### Fixed
+- Confidence interval calculation now uses pure Beta posterior standard deviation. Previously an extra division by sqrt(evidence_count) double-counted sample size and produced artificially narrow intervals. Weights and reliability remain correctly folded into alpha/beta.
+
+### Notes
+- More conservative (wider) CIs improve reliability of conflict detection and reported uncertainty. Verified locally with pytest and mypy.
+
 ## [2.1.67+pro] - 2026-11-19
 
 ### Fixed
