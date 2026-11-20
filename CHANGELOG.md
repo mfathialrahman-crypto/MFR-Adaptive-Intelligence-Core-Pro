@@ -5,6 +5,17 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.70+pro] - 2026-11-20
+
+### Fixed
+- `IntelligenceRecord` now rejects non-list `alternatives` and non-string items with clear `ValueError`. Previously a string was iterated as characters, producing silent incorrect data. `from_json` also validates the type before construction.
+
+### Added
+- Regression tests for non-list alternatives (constructor and JSON path) and non-string alternative items.
+
+### Notes
+- Verified locally: tests pass, mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.70+pro.
+
 ## [2.1.69+pro] - 2026-11-20
 
 ### Added
