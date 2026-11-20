@@ -5,6 +5,14 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.69+pro] - 2026-11-20
+
+### Added
+- CLI error-path unit tests for `--json` FileNotFoundError and PermissionError. Coverage raised from 94% to 95%.
+
+### Notes
+- Verified locally: 36/36 pytest passed, mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.69+pro.
+
 ## [2.1.68+pro] - 2026-11-20
 
 ### Fixed

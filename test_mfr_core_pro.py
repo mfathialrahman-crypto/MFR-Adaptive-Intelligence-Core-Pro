@@ -10,6 +10,7 @@ from unittest.mock import patch
 import pytest
 
 from mfr_core_pro import (
+    main,
     Evidence,
     IntelligenceRecord,
     VERSION,
@@ -279,3 +280,29 @@ def test_ci_uses_pure_beta_posterior_std():
     assert 0.45 < width < 0.55, f"expected ~0.50 pure-Beta clamped width, got {width}"
     assert top["ci_low"] < 0.55  # lower bound reflects the std, not the old narrow CI
     assert validate_analysis_report(report) == []
+
+
+def test_cli_json_file_not_found(capsys):
+    """Cover CLI FileNotFoundError path."""
+    import sys
+    from unittest.mock import patch
+    with patch.object(sys, "argv", ["mfr_core_pro.py", "--json", "/nonexistent/file.json"]):
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 1
+    captured = capsys.readouterr()
+    assert "file not found" in captured.err
+
+
+def test_cli_json_permission_error(tmp_path, capsys):
+    """Cover CLI PermissionError path (simulated via mock)."""
+    import sys
+    from unittest.mock import patch, mock_open
+    bad_path = str(tmp_path / "nope.json")
+    with patch.object(sys, "argv", ["mfr_core_pro.py", "--json", bad_path]):
+        with patch("builtins.open", side_effect=PermissionError("denied")):
+            with pytest.raises(SystemExit) as exc:
+                main()
+            assert exc.value.code == 1
+    captured = capsys.readouterr()
+    assert "permission denied" in captured.err.lower()
