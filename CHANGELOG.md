@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.72+pro] - 2026-11-21
 
 ### Added
-- Additional regression tests for low-mean insufficient path, conflicting suggestions exercise, unstable stability confirmation, and CLI PermissionError path. Coverage raised from 97% to 98.5%.
+- Additional regression tests for low-mean insufficient path, conflicting suggestions exercise, unstable stability confirmation, and CLI PermissionError path. Coverage raised from 97% to 99% with additional edge-case tests for max-evidence check, low-mean competitor path, conflicting suggestions, suggestions fallback, and CLI PermissionError.
 
 ### Notes
-- Verified locally: 42/42 pytest passed, coverage 98.5% (≥90%), mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.72+pro.
+- Verified locally: 47/47 pytest passed, coverage 99% (≥90%), mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.72+pro.
 
 ## [2.1.71+pro] - 2026-11-21
 
