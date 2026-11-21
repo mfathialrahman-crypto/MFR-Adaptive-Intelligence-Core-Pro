@@ -3,14 +3,14 @@
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.1.73%2Bpro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
+[![Version](https://img.shields.io/badge/version-2.1.74%2Bpro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.73+pro` (see `version.py`)
+**Current version:** `2.1.74+pro` (see `version.py`)
 
 ## Doctrine
 
@@ -27,6 +27,18 @@ mfr-core --help
 mfr-core --version
 python mfr_core_pro.py          # demo
 ```
+
+## Examples
+
+```bash
+# From file
+python mfr_core_pro.py --json examples/healthy.json
+
+# From stdin (pipeline)
+cat examples/conflicting.json | python mfr_core_pro.py --json -
+```
+
+Sample records live in `examples/`.
 
 ## Analysis
 

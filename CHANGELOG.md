@@ -5,6 +5,16 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.74+pro] - 2026-11-21
+
+### Added
+- CLI `--json` now accepts `-` or (when stdin is not a TTY) omits the file argument to read the record from stdin. Enables pipeline use.
+- Contract validation warning on CLI output (non-fatal; report still emitted).
+- `examples/` directory with sample records (`healthy.json`, `conflicting.json`).
+
+### Notes
+- Verified locally: existing 47 tests still pass; new stdin paths covered by updated tests. Coverage remains ≥99%. Zero new dependencies.
+
 ## [2.1.73+pro] - 2026-11-21
 
 ### Fixed

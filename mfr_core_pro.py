@@ -394,29 +394,50 @@ def main() -> None:
         print("Usage:")
         print("  python mfr_core_pro.py                 # run built-in demo")
         print("  python mfr_core_pro.py --version|-V    # print version and exit")
-        print("  python mfr_core_pro.py --json <file>   # analyze JSON record and print report")
+        print("  python mfr_core_pro.py --json <file|-> # analyze JSON record (file or stdin) and print report")
         print("  python mfr_core_pro.py --help|-h       # show this help")
+        print()
+        print("When --json is given with '-' or no file and stdin is not a TTY, input is read from stdin.")
         return
     if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-V"):
         print(VERSION)
         return
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
-        if len(sys.argv) > 2:
-            try:
-                with open(sys.argv[2]) as f:
-                    raw = f.read()
-                print(json.dumps(analyze_json(raw), indent=2))
-            except FileNotFoundError:
-                print(f"Error: file not found: {sys.argv[2]}", file=sys.stderr)
+        raw: str
+        source_desc = "stdin"
+        try:
+            if len(sys.argv) > 2:
+                path = sys.argv[2]
+                if path == "-":
+                    raw = sys.stdin.read()
+                else:
+                    source_desc = path
+                    with open(path) as f:
+                        raw = f.read()
+            else:
+                if sys.stdin.isatty():
+                    print("Usage: python mfr_core_pro.py --json <file.json|->", file=sys.stderr)
+                    print("Or pipe JSON to stdin.", file=sys.stderr)
+                    sys.exit(1)
+                raw = sys.stdin.read()
+            if not raw.strip():
+                print("Error: empty input", file=sys.stderr)
                 sys.exit(1)
-            except PermissionError:
-                print(f"Error: permission denied: {sys.argv[2]}", file=sys.stderr)
-                sys.exit(1)
-            except (ValueError, OSError) as e:
-                print(f"Error: {e}", file=sys.stderr)
-                sys.exit(1)
-        else:
-            print("Usage: python mfr_core_pro.py --json <file.json>", file=sys.stderr)
+            report = analyze_json(raw)
+            violations = validate_analysis_report(report)
+            if violations:
+                print("Warning: report contract violations:", file=sys.stderr)
+                for v in violations:
+                    print(f"  - {v}", file=sys.stderr)
+            print(json.dumps(report, indent=2))
+        except FileNotFoundError:
+            print(f"Error: file not found: {source_desc}", file=sys.stderr)
+            sys.exit(1)
+        except PermissionError:
+            print(f"Error: permission denied: {source_desc}", file=sys.stderr)
+            sys.exit(1)
+        except (ValueError, OSError, json.JSONDecodeError) as e:
+            print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
     else:
         _demo()

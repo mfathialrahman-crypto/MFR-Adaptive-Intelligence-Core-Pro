@@ -500,3 +500,31 @@ def test_analyze_suggestions_fallback_exact():
     )
     report = rec.analyze()
     assert report["suggestions"] == ["No specific improvement suggestions at this time."]
+
+
+def test_main_json_stdin_dash(monkeypatch, capsys, tmp_path):
+    import sys
+    from io import StringIO
+    from mfr_core_pro import main
+    sample = '{"question": "ok?", "evidence": [{"claim": "yes", "source": "s", "reliability": 0.9}]}'
+    monkeypatch.setattr(sys, "stdin", StringIO(sample))
+    monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--json", "-"])
+    main()
+    captured = capsys.readouterr()
+    assert "PROVISIONAL_FINDING" in captured.out or "yes" in captured.out
+    assert "Error" not in captured.err
+
+
+def test_main_json_stdin_no_arg(monkeypatch, capsys):
+    import sys
+    from io import StringIO
+    from mfr_core_pro import main
+    sample = '{"question": "ok?", "evidence": [{"claim": "yes", "source": "s", "reliability": 0.9}]}'
+    stdin = StringIO(sample)
+    # Force isatty False
+    stdin.isatty = lambda: False  # type: ignore
+    monkeypatch.setattr(sys, "stdin", stdin)
+    monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--json"])
+    main()
+    captured = capsys.readouterr()
+    assert "confidence" in captured.out

@@ -1,0 +1,10 @@
+{
+  "question": "Is the service stable?",
+  "prior_belief": 0.5,
+  "evidence": [
+    {"claim": "stable", "source": "probe-1", "reliability": 0.8, "independent": true},
+    {"claim": "stable", "source": "probe-2", "reliability": 0.75, "independent": true},
+    {"claim": "unstable", "source": "probe-3", "reliability": 0.78, "independent": true},
+    {"claim": "unstable", "source": "probe-4", "reliability": 0.72, "independent": true}
+  ]
+}

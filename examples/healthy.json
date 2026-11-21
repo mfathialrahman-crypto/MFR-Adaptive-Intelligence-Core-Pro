@@ -1,0 +1,11 @@
+{
+  "question": "Is the system healthy?",
+  "prior_belief": 0.5,
+  "alternatives": ["healthy", "degraded", "failed"],
+  "evidence": [
+    {"claim": "healthy", "source": "monitor-a", "reliability": 0.92, "independent": true, "weight": 1.0},
+    {"claim": "healthy", "source": "monitor-b", "reliability": 0.88, "independent": true, "weight": 1.0},
+    {"claim": "healthy", "source": "monitor-c", "reliability": 0.85, "independent": true, "weight": 1.0},
+    {"claim": "degraded", "source": "alert-d", "reliability": 0.35, "independent": false, "weight": 0.5}
+  ]
+}
