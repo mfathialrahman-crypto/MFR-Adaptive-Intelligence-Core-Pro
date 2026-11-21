@@ -365,3 +365,58 @@ def test_fingerprint_type_guard(monkeypatch):
     monkeypatch.setattr(IntelligenceRecord, "analyze", fake_analyze)
     with pytest.raises(TypeError):
         fingerprint(rec)
+
+
+def test_analyze_conflicting_evidence_suggestion():
+    # Multi-evidence claims with close means and overlapping CIs to hit CONFLICTING suggestion
+    rec = IntelligenceRecord(
+        question="status?",
+        evidence=[
+            Evidence(claim="healthy", source="a", reliability=0.7, weight=1.0),
+            Evidence(claim="healthy", source="aa", reliability=0.7, weight=1.0),
+            Evidence(claim="degraded", source="b", reliability=0.65, weight=1.0),
+            Evidence(claim="degraded", source="bb", reliability=0.65, weight=1.0),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] == "CONFLICTING_EVIDENCE"
+    assert any("Conflicting" in s for s in report["suggestions"])
+
+
+def test_analyze_low_mean_insufficient_or_keep():
+    # Low mean with enough evidence to hit the else branch on line 233
+    rec = IntelligenceRecord(
+        question="status?",
+        evidence=[
+            Evidence(claim="healthy", source="a", reliability=0.3, weight=1.0),
+            Evidence(claim="healthy", source="b", reliability=0.3, weight=1.0),
+            Evidence(claim="healthy", source="c", reliability=0.3, weight=1.0),
+        ],
+    )
+    report = rec.analyze()
+    assert report["status"] in ("INSUFFICIENT_EVIDENCE", "PROVISIONAL_FINDING", "CONFLICTING_EVIDENCE")
+    # Covers the low-mean path
+
+
+def test_analyze_insufficient_stability_unstable():
+    # Empty or weak to hit INSUFFICIENT → unstable (line 263)
+    rec = IntelligenceRecord(question="status?", evidence=[])
+    report = rec.analyze()
+    assert report["status"] == "INSUFFICIENT_EVIDENCE"
+    assert report["stability"] == "unstable"
+
+
+def test_main_json_permission_error(monkeypatch, capsys, tmp_path):
+    # Cover PermissionError path in CLI (lines 413-414)
+    import sys
+    from mfr_core_pro import main
+    f = tmp_path / "nope.json"
+    f.write_text("{}")
+    # Make it unreadable
+    f.chmod(0o000)
+    monkeypatch.setattr(sys, "argv", ["mfr_core_pro.py", "--json", str(f)])
+    with pytest.raises(SystemExit):
+        main()
+    captured = capsys.readouterr()
+    assert "permission denied" in captured.err.lower() or "Error:" in captured.err
+    f.chmod(0o644)  # cleanup
