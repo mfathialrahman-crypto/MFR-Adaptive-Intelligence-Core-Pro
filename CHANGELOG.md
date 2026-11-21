@@ -1,9 +1,18 @@
 # Changelog
 
+
 All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
+
+## [2.1.73+pro] - 2026-11-21
+
+### Added
+- Targeted regression tests covering CONFLICTING_EVIDENCE suggestion path, low-mean analysis, insufficient stability confirmation, and related edges. Coverage maintained at 98% with 42 tests.
+
+### Notes
+- Verified locally: 42/42 pytest passed, coverage 98% (≥90%), mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.73+pro.
 
 ## [2.1.72+pro] - 2026-11-21
 
