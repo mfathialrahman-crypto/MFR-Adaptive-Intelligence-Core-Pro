@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-21 23:16 +04 (cycle: local re-verification 47/47 pytest passed, coverage 99%, mypy --strict clean. AGENTS.md constitution present and saved on main. Continuous improvement active. No P0/P1 issues.)*
+*Last reviewed and confirmed in repository: 2026-11-22 00:45 +04 (cycle: local re-verification 48/48 pytest passed, mypy --strict clean. Added MAX_JSON_SIZE guard in v2.1.74+pro. Continuous improvement active. No P0/P1 issues.)*
