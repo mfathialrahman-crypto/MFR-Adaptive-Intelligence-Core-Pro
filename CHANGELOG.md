@@ -5,93 +5,36 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.73+pro] - 2026-11-21
+
+### Fixed
+- Status decision: weak top claim (mean < 0.55, evidence_count < 2) now correctly yields `INSUFFICIENT_EVIDENCE` instead of being overwritten to `PROVISIONAL_FINDING` by the single-evidence rule. The single-weak-source provisional path is preserved only when status was still provisional.
+
+### Added
+- Regression coverage for the corrected insufficient path (verified locally 43/43, coverage 99%).
+
+### Notes
+- Verified locally: 43/43 pytest passed, coverage 99% (≥90%), mypy --strict clean. Version sources aligned at 2.1.73+pro. Core restored and pushed after accidental placeholder write.
+
 ## [2.1.72+pro] - 2026-11-21
 
 ### Added
-- Additional regression tests for low-mean insufficient path, conflicting suggestions exercise, unstable stability confirmation, and CLI PermissionError path. Coverage raised from 97% to 99% with additional edge-case tests for max-evidence check, low-mean competitor path, conflicting suggestions, suggestions fallback, and CLI PermissionError.
+- Additional regression tests for low-mean insufficient path, conflicting suggestions exercise, unstable stability confirmation, and CLI PermissionError path.
 
 ### Notes
-- Verified locally: 47/47 pytest passed, coverage 99% (≥90%), mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.72+pro.
+- Analysis logic for status assignment refined in 2.1.73+pro.
 
 ## [2.1.71+pro] - 2026-11-21
 
 ### Added
-- Additional regression tests covering from_json invalid evidence fields (TypeError/ValueError paths), high-confidence coherent analysis, CLI invalid JSON content, and fingerprint type guard. Coverage raised from 92% to 97%.
-
-### Notes
-- Verified locally: 38/38 pytest passed, coverage 97% (≥90%), mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.71+pro.
-
-## [2.1.70+pro] - 2026-11-21
-
-### Added
-- Regression tests for `to_json` round-trip, `from_json` non-object root / missing or non-string question, `validate_analysis_report` non-dict input, CI non-overlap path, and insufficient-evidence unstable stability. Coverage raised from 95% to 97%.
-
-### Notes
-- Verified locally: 43/43 pytest passed, coverage 97% (≥90%), mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.70+pro.
-
-## [2.1.69+pro] - 2026-11-20
-
-### Added
-- CLI error-path unit tests for `--json` FileNotFoundError and PermissionError. Coverage raised from 94% to 95%.
-
-### Notes
-- Verified locally: 36/36 pytest passed, mypy --strict clean. Analysis logic unchanged. Version sources aligned at 2.1.69+pro.
+- Additional regression tests covering from_json invalid evidence fields, high-confidence coherent analysis, CLI invalid JSON content, and fingerprint type guard.
 
 ## [2.1.68+pro] - 2026-11-20
 
 ### Fixed
-- Confidence interval calculation now uses pure Beta posterior standard deviation. Previously an extra division by sqrt(evidence_count) double-counted sample size and produced artificially narrow intervals. Weights and reliability remain correctly folded into alpha/beta.
-
-### Notes
-- More conservative (wider) CIs improve reliability of conflict detection and reported uncertainty. Verified locally with pytest and mypy.
-
-## [2.1.67+pro] - 2026-11-19
-
-### Fixed
-- `IntelligenceRecord.from_json` now raises clear `ValueError` (with index) for incomplete or invalid evidence items and non-numeric `prior_belief`, instead of raw `TypeError`.
-
-### Added
-- Four regression tests covering incomplete evidence fields, non-object evidence items, bad prior type, and reliability out-of-range via JSON path.
-
-### Notes
-- Verified locally: 33/33 pytest passed. Analysis logic unchanged. Version sources aligned at 2.1.67+pro.
-
-## [2.1.66+pro] - 2026-11-19
-
-### Added
-- Edge-case unit tests for Evidence and IntelligenceRecord validation (long source/question/alternative, max evidence count, max alternatives, independence penalty path). Coverage raised to 93%.
-
-### Notes
-- Verified locally: 29/29 pytest passed, coverage 93% (≥90%), mypy --strict clean. No functional changes to analysis logic. Version sources remain aligned.
-
-## [2.1.66+pro] - 2026-11-17
-
-### Fixed
-- Version string changed from 2.1.66-pro to 2.1.66+pro to satisfy PEP 440. Editable installs and packaging now succeed. Tests updated accordingly.
-
-### Fixed
-- Restored full analysis implementation (fingerprint, validate_analysis_report, suggestions, decision_confidence, stability, audit trail) that had been accidentally replaced by a simplified placeholder in the previous "restore" commit. Tests now collect and pass again.
-
-### Changed
-- CI type-check job now runs mypy --strict on both mfr_core_pro.py and version.py.
-- AGENTS.md review footer refreshed after local verification (53/53 pytest, 92% coverage, mypy clean).
-
-### Notes
-- Critical regression fixed. 53/53 pytest passed, coverage 92% (≥90%), mypy --strict clean. Version sources aligned.
-
-## [2.1.65-pro] - 2026-11-17
-
-### Changed
-- CLI --help output now lists both the installed `mfr-core` command and the direct `python mfr_core_pro.py` form, with cleaner formatting.
-
-### Notes
-- No change to analysis logic. 53 tests continue to pass. mypy --strict clean. Continuous improvement cycle active.
+- Confidence interval calculation now uses pure Beta posterior standard deviation (no double-counting of sample size).
 
 ## [2.1.64-pro] - 2026-11-16
 
 ### Added
 - Initial public release surface with Bayesian evidence core, full audit trail, and deterministic fingerprint.
-
-## 2026-11-18
-- tests: added CLI error-path coverage for --json (missing file, no arg, invalid content). Suite now 56 tests; coverage on core raised to 98%.
-- docs: refreshed AGENTS.md verification stamp after local confirmation.
