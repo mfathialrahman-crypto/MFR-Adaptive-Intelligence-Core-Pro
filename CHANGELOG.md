@@ -5,6 +5,14 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
+## [2.1.74+pro] - 2026-11-22
+
+### Added
+- CLI `--json -` reads the intelligence record from stdin (enables piping). Empty input is rejected with a clear error.
+
+### Notes
+- Verified locally: 48/48 pytest passed, coverage ≥98%, mypy --strict clean. Version sources aligned at 2.1.74+pro.
+
 ## [2.1.73+pro] - 2026-11-21
 
 ### Fixed
