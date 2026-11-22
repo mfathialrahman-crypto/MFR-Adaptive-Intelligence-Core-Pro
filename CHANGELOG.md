@@ -5,16 +5,17 @@ All notable changes to the MFR Adaptive Intelligence Core Pro public package wil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
-## [2.1.73+pro] - 2026-11-21
+## [2.1.73+pro] - 2026-11-22
+
+### Added
+- `sample_record.json` example for one-command CLI demo (`python mfr_core_pro.py --json sample_record.json`).
+- README quick example pointing to the sample.
 
 ### Fixed
 - Status decision: weak top claim (mean < 0.55, evidence_count < 2) now correctly yields `INSUFFICIENT_EVIDENCE` instead of being overwritten to `PROVISIONAL_FINDING` by the single-evidence rule. The single-weak-source provisional path is preserved only when status was still provisional.
 
-### Added
-- Regression coverage for the corrected insufficient path (verified locally 43/43, coverage 99%).
-
 ### Notes
-- Verified locally: 43/43 pytest passed, coverage 99% (≥90%), mypy --strict clean. Version sources aligned at 2.1.73+pro. Core restored and pushed after accidental placeholder write.
+- Verified locally: 47/47 pytest passed, coverage 99% (≥90%), mypy --strict clean. Version sources aligned at 2.1.73+pro. AGENTS.md constitution refreshed with verification stamp.
 
 ## [2.1.72+pro] - 2026-11-21
 
