@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Status decision: weak top claim (mean < 0.55, evidence_count < 2) now correctly yields `INSUFFICIENT_EVIDENCE` instead of being overwritten to `PROVISIONAL_FINDING` by the single-evidence rule. The single-weak-source provisional path is preserved only when status was still provisional.
 
 ### Notes
-- Verified locally: 47/47 pytest passed, coverage 99% (≥90%), mypy --strict clean. Version sources aligned at 2.1.73+pro. AGENTS.md constitution refreshed with verification stamp (updated 19:20 +04 after independent re-verification).
+- Verified locally: 47/47 pytest passed, coverage 99% (≥90%), mypy --strict clean. Version sources aligned at 2.1.73+pro. AGENTS.md constitution refreshed with verification stamp (updated 2026-11-23 01:17 +04 after independent local re-verification).
 
 ## [2.1.72+pro] - 2026-11-21
 
