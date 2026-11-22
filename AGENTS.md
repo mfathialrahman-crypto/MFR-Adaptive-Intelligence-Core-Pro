@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-23 00:16 +04 (cycle re-confirmation from source constitution). Constitution present and active on main across FathiMind HQ, Core Pro, and public-signals. Core Pro at 2.1.73+pro; CI green on recent runs. No open P0/P1 observed. File saved and synchronized.*
+*Last reviewed and confirmed in repository: 2026-11-23 01:17 +04 (independent local re-verification after clone). Constitution active. Core Pro 2.1.73+pro: 47/47 pytest passed, 99% coverage, mypy --strict clean. Versions aligned. No P0/P1. File synchronized.*
