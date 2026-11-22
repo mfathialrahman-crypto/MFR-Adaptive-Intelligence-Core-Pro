@@ -1,0 +1,28 @@
+{
+  "question": "Is the public core reliable for evidence analysis?",
+  "prior_belief": 0.5,
+  "evidence": [
+    {
+      "claim": "All tests pass with high coverage",
+      "source": "local pytest",
+      "reliability": 0.95,
+      "independent": true,
+      "weight": 1.0
+    },
+    {
+      "claim": "All tests pass with high coverage",
+      "source": "CI workflow",
+      "reliability": 0.92,
+      "independent": true,
+      "weight": 1.0
+    },
+    {
+      "claim": "Type checking is clean",
+      "source": "mypy --strict",
+      "reliability": 0.9,
+      "independent": true,
+      "weight": 0.8
+    }
+  ],
+  "alternatives": ["Insufficient evidence", "Conflicting signals"]
+}

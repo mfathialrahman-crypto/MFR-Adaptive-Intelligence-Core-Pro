@@ -28,13 +28,15 @@ mfr-core --version
 python mfr_core_pro.py          # demo
 ```
 
-## Analysis
+## Analysis example
 
-See `schemas/analysis.schema.json` for the report contract.
+Use the included `sample_record.json`:
 
 ```bash
-python mfr_core_pro.py --json record.json
+python mfr_core_pro.py --json sample_record.json
 ```
+
+See `schemas/analysis.schema.json` for the full report contract.
 
 ## Development
 
