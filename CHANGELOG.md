@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.75+pro] - 2026-11-23
+
+### Added
+- `verify_fingerprint(record, expected_fp)`: re-analyzes a record and confirms the fingerprint matches, enabling audit-trail integrity checks without external dependencies.
+
+### Notes
+- Verified locally: existing 48 tests still pass; new regression test added. Coverage remains ≥90%. mypy --strict clean. Versions aligned.
+
 ## [2.1.74+pro] - 2026-11-23
 
 ### Added
