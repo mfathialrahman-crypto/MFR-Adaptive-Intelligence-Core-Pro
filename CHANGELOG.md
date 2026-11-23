@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.75+pro] - 2026-11-23
+
+### Added
+- `conflict_score` (0.0–1.0) in analysis reports: transparent measure of claim competition based on mean gap and 95% CI overlap. Additive field (backward compatible).
+- High-conflict suggestion when score > 0.6.
+
+### Notes
+- Verified locally: tests pass, coverage ≥90%, mypy --strict clean. Versions aligned.
+
+
 ## [2.1.74+pro] - 2026-11-23
 
 ### Added

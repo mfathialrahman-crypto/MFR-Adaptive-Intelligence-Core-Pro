@@ -20,7 +20,7 @@ from version import VERSION as V2
 
 def test_version_aligned():
     assert VERSION == V2
-    assert VERSION == "2.1.74+pro"
+    assert VERSION == "2.1.75+pro"
 
 
 def test_evidence_valid():
@@ -287,7 +287,7 @@ def test_main_version(capsys):
     with patch("sys.argv", ["mfr-core", "--version"]):
         main()
     captured = capsys.readouterr()
-    assert "2.1.74+pro" in captured.out
+    assert "2.1.75+pro" in captured.out
 
 
 def test_main_json_file(tmp_path, capsys):
@@ -448,3 +448,20 @@ def test_fingerprint_ignores_timestamps():
 
 
 print("Test module loaded with comprehensive cases")
+
+
+def test_conflict_score_present():
+    rec = IntelligenceRecord(question="Q", evidence=[
+        Evidence("A", "s1", 0.8),
+        Evidence("B", "s2", 0.75),
+    ])
+    report = rec.analyze()
+    assert "conflict_score" in report
+    assert 0.0 <= report["conflict_score"] <= 1.0
+    assert report["status"] == "CONFLICTING_EVIDENCE"
+    assert any("conflict score" in s.lower() for s in report["suggestions"])
+
+def test_conflict_score_no_evidence():
+    rec = IntelligenceRecord(question="Q")
+    report = rec.analyze()
+    assert report["conflict_score"] == 0.0

@@ -3,14 +3,16 @@
 [![Tests](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml/badge.svg)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/actions/workflows/run-demo.yml)
 [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.1.74%2Bpro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
+[![Version](https://img.shields.io/badge/version-2.1.75%2Bpro-green)](https://github.com/mfathialrahman-crypto/MFR-Adaptive-Intelligence-Core-Pro/blob/main/version.py)
 
 **Evidence → Bayesian Reasoning → Verification → Self-Improvement**
 
 Transparent adaptive intelligence core of the FathiMind ecosystem.  
 Zero-dependency public MIT package. Deterministic, auditable, and evidence-first.
 
-**Current version:** `2.1.74+pro` (see `version.py`)
+**Current version:** `2.1.75+pro` (see `version.py`)
+
+Analysis reports now include a transparent `conflict_score` (0–1) measuring claim competition.
 
 ## Doctrine
 
@@ -18,6 +20,21 @@ Zero-dependency public MIT package. Deterministic, auditable, and evidence-first
 - Every decision is a replayable trace (fingerprint + full audit trail).
 - Layers stay separate: this core measures and verifies evidence; it does not invent facts.
 - Public surface is accurate, tested, and competitive. No performance or security claims beyond what the tests demonstrate.
+
+
+## Architecture
+
+```mermaid
+flowchart TD
+    A[Evidence items<br/>claim · source · reliability · independent · weight] --> B[Deduplicate by source<br/>keep strongest]
+    B --> C[Group by claim]
+    C --> D[Beta prior update<br/>alpha/beta + independence penalty]
+    D --> E[Mean + 95% CI per claim]
+    E --> F[Status decision<br/>PROVISIONAL / CONFLICTING / INSUFFICIENT]
+    F --> G[Report + fingerprint<br/>conflict_score · suggestions · audit trail]
+```
+
+Transparent, zero-dependency, deterministic. Private layers stay private.
 
 ## Quick start
 
