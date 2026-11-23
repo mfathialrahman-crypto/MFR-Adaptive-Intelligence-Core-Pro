@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-23 07:14 +04 (independent review after user upload of constitution). Constitution active. This repo: Core Pro 2.1.74+pro. Versions aligned. No P0/P1. File synchronized.*
+*Last reviewed and confirmed in repository: 2026-11-23 08:15 +04 (version truth cycle). Constitution active. This repo: Core Pro 2.1.74+pro. Versions aligned. No P0/P1. File synchronized.*
