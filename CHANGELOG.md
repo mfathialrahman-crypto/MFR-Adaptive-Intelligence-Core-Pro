@@ -6,6 +6,9 @@
 - CLI: `--json` now accepts `-` or omitted file to read the record from stdin (better scripting UX).
 - Switched CLI to argparse for clearer help and option handling.
 
+### Fixed
+- CLI file reading now explicitly uses UTF-8 encoding for consistent cross-platform behavior.
+
 ### Notes
 - Verified locally: 48/48 pytest passed, coverage ≥90%, mypy --strict clean. Versions aligned at 2.1.74+pro.
 

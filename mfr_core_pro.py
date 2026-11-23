@@ -414,7 +414,7 @@ def main() -> None:
             if args.json == "-":
                 raw = sys.stdin.read()
             else:
-                with open(args.json) as f:
+                with open(args.json, encoding="utf-8") as f:
                     raw = f.read()
             print(json.dumps(analyze_json(raw), indent=2))
         except FileNotFoundError:
