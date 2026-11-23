@@ -8,6 +8,7 @@ import sys
 from unittest.mock import patch
 
 from mfr_core_pro import (
+    MAX_EVIDENCE_ITEMS,
     Evidence,
     IntelligenceRecord,
     analyze_json,
@@ -275,7 +276,7 @@ def test_ci_non_overlap_suggestion():
 
 
 def test_demo_runs(capsys):
-    from mfr_core_pro import _demo
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS, _demo
     _demo()
     captured = capsys.readouterr()
     assert "Demo" in captured.out
@@ -283,7 +284,7 @@ def test_demo_runs(capsys):
 
 
 def test_main_version(capsys):
-    from mfr_core_pro import main
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS, main
     with patch("sys.argv", ["mfr-core", "--version"]):
         main()
     captured = capsys.readouterr()
@@ -291,7 +292,7 @@ def test_main_version(capsys):
 
 
 def test_main_json_file(tmp_path, capsys):
-    from mfr_core_pro import main
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS, main
     p = tmp_path / "rec.json"
     p.write_text(json.dumps({
         "question": "File test?",
@@ -305,7 +306,7 @@ def test_main_json_file(tmp_path, capsys):
 
 
 def test_main_json_stdin(capsys):
-    from mfr_core_pro import main
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS, main
     raw = json.dumps({
         "question": "Stdin?",
         "evidence": [{"claim": "yes", "source": "in", "reliability": 0.8}],
@@ -318,7 +319,7 @@ def test_main_json_stdin(capsys):
 
 
 def test_main_file_not_found(capsys):
-    from mfr_core_pro import main
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS, main
     with patch("sys.argv", ["mfr-core", "--json", "/nonexistent/file.json"]):
         with pytest.raises(SystemExit) as exc:
             main()
@@ -328,7 +329,7 @@ def test_main_file_not_found(capsys):
 
 
 def test_main_invalid_json(capsys):
-    from mfr_core_pro import main
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS, main
     with patch("sys.argv", ["mfr-core", "--json", "-"]), \
          patch("sys.stdin", StringIO("bad")):
         with pytest.raises(SystemExit) as exc:
@@ -339,7 +340,7 @@ def test_main_invalid_json(capsys):
 
 
 def test_main_no_args_runs_demo(capsys):
-    from mfr_core_pro import main
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS, main
     with patch("sys.argv", ["mfr-core"]):
         main()
     captured = capsys.readouterr()
@@ -448,3 +449,35 @@ def test_fingerprint_ignores_timestamps():
 
 
 print("Test module loaded with comprehensive cases")
+
+
+def test_from_json_invalid_evidence_item():
+    raw = json.dumps({"question": "Q", "evidence": ["not-a-dict"]})
+    with pytest.raises(ValueError, match="must be an object"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_evidence_type_error():
+    raw = json.dumps({"question": "Q", "evidence": [{"claim": "c", "source": "s", "reliability": "bad"}]})
+    with pytest.raises(ValueError, match="invalid fields"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_evidence_value_error():
+    raw = json.dumps({"question": "Q", "evidence": [{"claim": "", "source": "s", "reliability": 0.5}]})
+    with pytest.raises(ValueError, match="claim must be non-empty"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_bad_prior():
+    raw = json.dumps({"question": "Q", "prior_belief": "not-a-number"})
+    with pytest.raises(ValueError, match="prior_belief must be a number"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_analyze_max_evidence_after_init():
+    # Bypass post_init by constructing then mutating (edge for the check in analyze)
+    rec = IntelligenceRecord(question="Q", evidence=[])
+    rec.evidence = [Evidence("c", f"s{i}", 0.5) for i in range(MAX_EVIDENCE_ITEMS + 1)]
+    with pytest.raises(ValueError, match="evidence list exceeds maximum"):
+        rec.analyze()

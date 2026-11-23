@@ -7,7 +7,7 @@
 - Switched CLI to argparse for clearer help and option handling.
 
 ### Notes
-- Verified locally: 48/48 pytest passed, coverage ≥90%, mypy --strict clean. Versions aligned at 2.1.74+pro.
+- Verified locally: 53/53 pytest passed, coverage 98%, mypy --strict clean. Versions aligned at 2.1.74+pro. Added regression tests for from_json error paths and max-evidence guard.
 
 All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
 
