@@ -20,7 +20,7 @@ from version import VERSION as V2
 
 def test_version_aligned():
     assert VERSION == V2
-    assert VERSION == "2.1.74+pro"
+    assert VERSION == "2.1.75+pro"
 
 
 def test_evidence_valid():
@@ -287,7 +287,7 @@ def test_main_version(capsys):
     with patch("sys.argv", ["mfr-core", "--version"]):
         main()
     captured = capsys.readouterr()
-    assert "2.1.74+pro" in captured.out
+    assert "2.1.75+pro" in captured.out
 
 
 def test_main_json_file(tmp_path, capsys):
