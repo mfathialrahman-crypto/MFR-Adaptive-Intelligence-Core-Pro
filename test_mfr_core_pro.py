@@ -20,7 +20,7 @@ from version import VERSION as V2
 
 def test_version_aligned():
     assert VERSION == V2
-    assert VERSION == "2.1.75+pro"
+    assert VERSION == "2.1.76+pro"
 
 
 def test_evidence_valid():
@@ -287,7 +287,7 @@ def test_main_version(capsys):
     with patch("sys.argv", ["mfr-core", "--version"]):
         main()
     captured = capsys.readouterr()
-    assert "2.1.75+pro" in captured.out
+    assert "2.1.76+pro" in captured.out
 
 
 def test_main_json_file(tmp_path, capsys):
@@ -445,6 +445,49 @@ def test_fingerprint_ignores_timestamps():
     rec.created_at = "changed"
     fp2 = fingerprint(rec)
     assert fp1 == fp2
+
+
+def test_from_json_evidence_not_object():
+    raw = json.dumps({"question": "Q", "evidence": ["not-a-dict"]})
+    with pytest.raises(ValueError, match="evidence\\[0\\] must be an object"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_evidence_invalid_fields_typeerror():
+    # Extra unexpected keyword triggers TypeError inside Evidence
+    raw = json.dumps({"question": "Q", "evidence": [{"claim": "c", "source": "s", "reliability": 0.5, "unknown_field": 1}]})
+    with pytest.raises(ValueError, match="evidence\\[0\\] invalid fields"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_evidence_value_error():
+    raw = json.dumps({"question": "Q", "evidence": [{"claim": "", "source": "s", "reliability": 0.5}]})
+    with pytest.raises(ValueError, match="evidence\\[0\\]:"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_prior_not_number():
+    raw = json.dumps({"question": "Q", "prior_belief": "high"})
+    with pytest.raises(ValueError, match="prior_belief must be a number"):
+        IntelligenceRecord.from_json(raw)
+
+
+def test_from_json_root_not_object():
+    with pytest.raises(ValueError, match="JSON root must be an object"):
+        IntelligenceRecord.from_json("[]")
+
+
+def test_main_permission_error(monkeypatch, capsys):
+    def raise_perm(*a, **k):
+        raise PermissionError("denied")
+    monkeypatch.setattr("builtins.open", raise_perm)
+    with patch("sys.argv", ["mfr_core_pro.py", "--json", "/tmp/nope.json"]):
+        with pytest.raises(SystemExit) as ei:
+            from mfr_core_pro import main
+            main()
+    assert ei.value.code == 1
+    err = capsys.readouterr().err
+    assert "permission denied" in err.lower()
 
 
 print("Test module loaded with comprehensive cases")
