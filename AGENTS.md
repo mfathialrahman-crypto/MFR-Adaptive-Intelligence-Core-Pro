@@ -345,4 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-24 18:40 +04 (continuous improvement cycle. Fixed failing tests and coverage gate: 36/36 pytest, 98% coverage, mypy --strict clean for v2.1.77+pro. CLI --version now exits cleanly. Constitution present and synchronized.)*
+*Last reviewed and confirmed in repository: 2026-11-24 19:30 +04 (continuous improvement cycle. Added post-init evidence-limit regression: 37/37 pytest, 98.48% coverage, mypy --strict clean for v2.1.78+pro. Constitution present and synchronized to GitHub.)*
