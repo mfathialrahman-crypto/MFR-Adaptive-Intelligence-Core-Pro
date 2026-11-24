@@ -385,3 +385,11 @@ def test_demo_runs(capsys):
     out = capsys.readouterr().out
     assert "Demo complete" in out
     assert "Status:" in out
+
+
+def test_analyze_evidence_limit_after_init():
+    """Regression: analyze() re-checks MAX_EVIDENCE_ITEMS if list mutated post-init."""
+    rec = IntelligenceRecord(question="Q", evidence=[Evidence("c", "s", 0.5)])
+    rec.evidence = [Evidence("c", f"s{i}", 0.5) for i in range(1001)]
+    with pytest.raises(ValueError, match="evidence list exceeds maximum"):
+        rec.analyze()
