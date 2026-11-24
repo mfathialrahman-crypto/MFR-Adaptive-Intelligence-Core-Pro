@@ -1,3 +1,14 @@
+## [2.1.78+pro] - 2026-11-24
+
+### Improved
+- Added regression test for `analyze()` re-checking MAX_EVIDENCE_ITEMS after post-init mutation of the evidence list.
+- Coverage improved from 98.10% to 98.48% (one additional edge branch covered).
+
+### Verified
+- 37/37 pytest pass, 98% coverage, mypy --strict clean.
+- No functional regression.
+
+
 ## [2.1.77+pro] - 2026-11-24
 
 ### Fixed
