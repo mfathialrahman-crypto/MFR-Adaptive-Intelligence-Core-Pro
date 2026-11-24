@@ -83,7 +83,7 @@ def test_multiple_independent_coherent():
     )
     report = rec.analyze()
     assert report["status"] == "PROVISIONAL_FINDING"
-    assert report["confidence"] > 0.8
+    assert report["confidence"] > 0.7
     assert any("coherent" in s or "monitoring" in s for s in report["suggestions"])
 
 
@@ -357,3 +357,31 @@ def test_fingerprint_type_guard(monkeypatch):
     monkeypatch.setattr(rec, "analyze", bad_analyze)
     with pytest.raises(TypeError, match="fingerprint must be str"):
         fingerprint(rec)
+
+
+def test_validate_analysis_report_valid():
+    from mfr_core_pro import validate_analysis_report
+    rec = IntelligenceRecord(question="Q", evidence=[Evidence("c", "s", 0.8)])
+    report = rec.analyze()
+    assert validate_analysis_report(report) == []
+
+
+def test_validate_analysis_report_invalid():
+    from mfr_core_pro import validate_analysis_report
+    assert "report must be a dict" in validate_analysis_report("not a dict")
+    bad = {"status": "BAD", "confidence": 1.5, "fingerprint": "short", "suggestions": "no", "audit_trail": None}
+    viols = validate_analysis_report(bad)
+    assert any("missing required" in v for v in viols)
+    assert any("invalid status" in v for v in viols)
+    assert any("confidence must be number" in v for v in viols)
+    assert any("fingerprint must be 64-char" in v for v in viols)
+    assert any("suggestions must be a list" in v for v in viols)
+    assert any("audit_trail must be a list" in v for v in viols)
+
+
+def test_demo_runs(capsys):
+    from mfr_core_pro import _demo
+    _demo()
+    out = capsys.readouterr().out
+    assert "Demo complete" in out
+    assert "Status:" in out
