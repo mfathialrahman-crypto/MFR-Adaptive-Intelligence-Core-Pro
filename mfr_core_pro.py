@@ -407,7 +407,7 @@ def main() -> None:
 
     if args.version:
         print(VERSION)
-        return
+        sys.exit(0)
 
     if args.json is not None:
         try:
