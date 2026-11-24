@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.1.76+pro] - 2026-11-24
+
+### Improved
+- Expanded test suite with 6 additional edge-case tests for `from_json` error paths (non-object evidence, TypeError/ValueError from Evidence construction, non-numeric prior, non-object root) and CLI `PermissionError` handling.
+- Coverage raised from 96% to 98% (263 statements, 4 remaining edge branches).
+
+### Notes
+- Verified: 54/54 pytest passed, coverage 98% (≥90%), mypy --strict clean. No functional regressions. Constitution stamp refreshed.
+
+All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
+
 ## [2.1.75+pro] - 2026-11-24
 
 ### Improved
@@ -8,11 +22,6 @@
 
 ### Notes
 - Verified: 48/48 pytest passed, coverage 96% (≥90%), mypy --strict clean. No functional regressions. Constitution synchronized and saved to GitHub.
-
-All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
 ## [2.1.74+pro] - 2026-11-23
 
