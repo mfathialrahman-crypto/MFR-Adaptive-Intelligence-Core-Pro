@@ -28,13 +28,18 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Install test dependencies
-        run: pip install pytest pytest-cov
+      - name: Install package with dev dependencies
+        run: pip install -e ".[dev]"
 
       - name: Run Unit Tests with Coverage
         run: |
           echo "=== Running Unit Tests with Coverage (Python ${{ matrix.python-version }}) ==="
           python -m pytest test_mfr_core_pro.py -v --tb=short --cov=mfr_core_pro --cov-fail-under=90 --cov-report=term-missing
+
+      - name: Run CLI checks
+        run: |
+          mfr-core --version
+          mfr-core --help
 
       - name: Run Adaptive Intelligence Demo
         run: |

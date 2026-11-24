@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.1.75+pro] - 2026-11-24
+
+### Improved
+- CI workflow now installs the package in editable mode with dev dependencies (`pip install -e .[dev]`) and runs CLI `--version` / `--help` checks for better fidelity to local and package use.
+- Version sources, README badge, and AGENTS.md continuous-improvement stamp updated after independent verification.
+
+### Notes
+- Verified: 48/48 pytest passed, coverage 96% (≥90%), mypy --strict clean. No functional regressions. Constitution synchronized and saved to GitHub.
+
+All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
+
 ## [2.1.74+pro] - 2026-11-23
 
 ### Added
@@ -8,11 +22,6 @@
 
 ### Notes
 - Verified locally: 48/48 pytest passed, coverage ≥90%, mypy --strict clean. Versions aligned at 2.1.74+pro.
-
-All notable changes to the MFR Adaptive Intelligence Core Pro public package will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) for the base version (the `+pro` local version marker is a public surface marker).
 
 ## [2.1.73+pro] - 2026-11-22
 
