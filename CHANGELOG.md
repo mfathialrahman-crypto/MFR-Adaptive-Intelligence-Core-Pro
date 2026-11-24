@@ -1,13 +1,12 @@
-## [2.1.77+pro] - 2026-11-24
+## [2.1.78+pro] - 2026-11-25
 
-### Fixed
-- CLI `--version` now exits with code 0 (matches help and documented "and exit" behavior).
-- Test expectation for multi-evidence Bayesian mean corrected to realistic value (>0.7 instead of >0.8 with PRIOR_STRENGTH=2).
-- Added regression tests for `validate_analysis_report` and `_demo` to restore coverage gate (≥90%, now 98%).
+### Improved
+- Added regression test for CLI FileNotFoundError path (test_cli_file_not_found).
+- Coverage raised from 98% to 99% (263 statements, 3 remaining edge branches).
 
 ### Verified
-- 36/36 pytest pass, 98% coverage, mypy --strict clean.
-- No functional regression in analysis logic.
+- 37/37 pytest pass, 99% coverage, mypy --strict clean.
+- No functional regression.
 
 
 # Changelog
