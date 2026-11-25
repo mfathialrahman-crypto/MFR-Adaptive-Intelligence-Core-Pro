@@ -10,7 +10,9 @@
 - No functional regression in analysis logic.
 
 ### Improved (2026-11-25)
-- Added CLI `FileNotFoundError` regression test. Coverage raised to 99% (37 tests). No functional change.
+- Added regression for defensive `analyze()` max-evidence check (post-init mutation).
+- Added no-arg CLI path regression (`main()` → `_demo()`). Coverage remains 99% (39 tests, only `__name__` guard uncovered).
+- Earlier: Added CLI `FileNotFoundError` regression test. Coverage raised to 99% (37 tests). No functional change.
 
 
 # Changelog
