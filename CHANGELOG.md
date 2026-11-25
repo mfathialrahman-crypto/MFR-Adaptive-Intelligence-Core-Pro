@@ -1,3 +1,12 @@
+## [2.1.77+pro] - 2026-11-25
+
+### Improved
+- Added `test_main_runs_demo` to cover the no-argument `main()` path that invokes `_demo()`. Coverage raised to 99.62% (38 tests). No functional change.
+
+### Verified
+- 38/38 pytest pass, 99.62% coverage, mypy --strict clean.
+- No P0/P1 issues. Stability preserved.
+
 ## [2.1.77+pro] - 2026-11-24
 
 ### Fixed
