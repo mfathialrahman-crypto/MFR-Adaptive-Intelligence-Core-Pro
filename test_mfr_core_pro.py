@@ -369,3 +369,30 @@ def test_main_runs_demo(capsys):
     out = capsys.readouterr().out
     assert "Demo complete" in out
     assert "Status:" in out
+
+
+def test_alternatives_filter_empty_and_whitespace():
+    """Empty or whitespace-only alternatives are dropped; valid ones kept."""
+    rec = IntelligenceRecord(
+        question="Q",
+        alternatives=["  ", "", "valid", "  also valid  "],
+        evidence=[Evidence("c", "s", 0.8)],
+    )
+    assert rec.alternatives == ["valid", "also valid"]
+    report = rec.analyze()
+    assert any("Listed alternatives" in s for s in report["suggestions"])
+
+
+def test_to_json_roundtrip():
+    rec = IntelligenceRecord(
+        question="Q?",
+        evidence=[Evidence("yes", "src", 0.7)],
+        alternatives=["a", "b"],
+        prior_belief=0.4,
+    )
+    raw = rec.to_json()
+    rec2 = IntelligenceRecord.from_json(raw)
+    assert rec2.question == rec.question
+    assert rec2.prior_belief == rec.prior_belief
+    assert len(rec2.evidence) == 1
+    assert rec2.alternatives == rec.alternatives
