@@ -385,3 +385,12 @@ def test_demo_runs(capsys):
     out = capsys.readouterr().out
     assert "Demo complete" in out
     assert "Status:" in out
+
+
+def test_cli_file_not_found(capsys):
+    with patch("sys.argv", ["mfr_core_pro.py", "--json", "/tmp/definitely-missing-record.json"]):
+        with pytest.raises(SystemExit) as ei:
+            main()
+    assert ei.value.code == 1
+    err = capsys.readouterr().err
+    assert "file not found" in err.lower()
