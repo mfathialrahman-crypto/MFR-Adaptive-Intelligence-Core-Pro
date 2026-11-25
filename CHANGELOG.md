@@ -9,6 +9,9 @@
 - 36/36 pytest pass, 98% coverage, mypy --strict clean.
 - No functional regression in analysis logic.
 
+### Improved (2026-11-25)
+- Added CLI `FileNotFoundError` regression test. Coverage raised to 99% (37 tests). No functional change.
+
 
 # Changelog
 
