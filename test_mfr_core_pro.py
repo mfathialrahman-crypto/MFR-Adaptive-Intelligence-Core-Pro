@@ -396,3 +396,36 @@ def test_to_json_roundtrip():
     assert rec2.prior_belief == rec.prior_belief
     assert len(rec2.evidence) == 1
     assert rec2.alternatives == rec.alternatives
+
+
+def test_from_json_missing_or_invalid_question():
+    with pytest.raises(ValueError, match="missing or invalid 'question' field"):
+        IntelligenceRecord.from_json("{}")
+    with pytest.raises(ValueError, match="missing or invalid 'question' field"):
+        IntelligenceRecord.from_json('{"question": 123}')
+
+
+def test_empty_suggestions_fallback_exact():
+    # Three independent sources, moderate reliability, no alternatives → no specific suggestion triggers
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[
+            Evidence(claim="healthy", source="a", reliability=0.6, independent=True),
+            Evidence(claim="healthy", source="b", reliability=0.6, independent=True),
+            Evidence(claim="healthy", source="c", reliability=0.6, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert report["suggestions"] == ["No specific improvement suggestions at this time."]
+    assert report["status"] == "PROVISIONAL_FINDING"
+    assert report["confidence"] < 0.7
+
+
+def test_main_entry_point(capsys, monkeypatch):
+    """Cover the if __name__ == '__main__' guard with clean argv."""
+    import runpy
+    monkeypatch.setattr("sys.argv", ["mfr_core_pro.py"])
+    runpy.run_path("mfr_core_pro.py", run_name="__main__")
+    captured = capsys.readouterr()
+    assert "MFR Adaptive Intelligence Core Pro" in captured.out
+    assert "Demo complete" in captured.out
