@@ -363,3 +363,4 @@ Raise the project each cycle without sacrificing what already works, and without
 
 *Last reviewed and confirmed in repository: 2026-11-26 01:19 +04 (cycle complete: local clone + pytest 42 passed, 99.62% coverage. Added four regression tests covering previously missed branches (invalid question, CI non-overlap, generic main error, empty suggestions fallback). mypy --strict clean. No P0/P1. Stability preserved. Changes pushed to GitHub.)*
 
+*Last reviewed and confirmed in repository: 2026-11-26 03:21 +04 (cycle complete: full inspection of public Core Pro. AGENTS.md constitution confirmed present, aligned, and saved to GitHub. No P0/P1. Stability preserved. File updated and confirmed on GitHub.)*
