@@ -350,3 +350,5 @@ Raise the project each cycle without sacrificing what already works, and without
 *Last reviewed and confirmed in repository: 2026-11-25 09:15 +04 (cycle complete: local clone + pytest 37 passed, 99% coverage on Python 3.10. mypy --strict clean. No P0/P1 issues. AGENTS.md review note updated. Stability preserved.)*
 
 *Last reviewed and confirmed in repository: 2026-11-25 14:20 +04 (cycle complete: local clone + pytest 38 passed, 99.62% coverage. Added main() demo path coverage test. No P0/P1. Stability preserved.)*
+
+*Last reviewed and confirmed in repository: 2026-11-25 14:30 +04 (cycle complete: local clone + pytest passed, coverage ≥98%. Made permission error test root-safe via mock. No P0/P1. Stability preserved.)*

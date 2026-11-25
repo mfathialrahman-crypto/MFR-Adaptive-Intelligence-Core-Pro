@@ -2,9 +2,10 @@
 
 ### Improved
 - Added `test_main_runs_demo` to cover the no-argument `main()` path that invokes `_demo()`. Coverage raised to 99.62% (38 tests). No functional change.
+- Made `test_main_permission_error` root-safe by mocking `builtins.open` instead of relying on chmod 000 (which root ignores).
 
 ### Verified
-- 38/38 pytest pass, 99.62% coverage, mypy --strict clean.
+- pytest pass, coverage ≥98%, mypy --strict clean.
 - No P0/P1 issues. Stability preserved.
 
 ## [2.1.77+pro] - 2026-11-24
