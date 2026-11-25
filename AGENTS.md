@@ -352,3 +352,5 @@ Raise the project each cycle without sacrificing what already works, and without
 *Last reviewed and confirmed in repository: 2026-11-25 14:20 +04 (cycle complete: local clone + pytest 38 passed, 99.62% coverage. Added main() demo path coverage test. No P0/P1. Stability preserved.)*
 
 *Last reviewed and confirmed in repository: 2026-11-25 14:30 +04 (cycle complete: local clone + pytest passed, coverage ≥98%. Made permission error test root-safe via mock. No P0/P1. Stability preserved.)*
+
+*Last reviewed and confirmed in repository: 2026-11-25 15:18 +04 (cycle complete: full inspection of public Core Pro and FathiMind HQ. AGENTS.md constitution confirmed present and aligned. Local clone + pytest 37 passed, 98% coverage. No P0/P1. File saved to GitHub. Stability preserved.)*
