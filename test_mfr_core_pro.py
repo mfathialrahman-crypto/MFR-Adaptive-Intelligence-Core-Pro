@@ -299,19 +299,15 @@ def test_from_json_root_not_object():
         IntelligenceRecord.from_json(raw)
 
 
-def test_main_permission_error(capsys, tmp_path):
-    p = tmp_path / "noperm.json"
-    p.write_text("{}")
-    p.chmod(0o000)
-    try:
-        with patch("sys.argv", ["mfr_core_pro.py", "--json", str(p)]):
+def test_main_permission_error(capsys):
+    """Mock open to raise PermissionError (works under root and non-root)."""
+    with patch("sys.argv", ["mfr_core_pro.py", "--json", "/tmp/any.json"]):
+        with patch("builtins.open", side_effect=PermissionError("permission denied")):
             with pytest.raises(SystemExit) as ei:
                 main()
-        assert ei.value.code == 1
-        err = capsys.readouterr().err
-        assert "permission denied" in err.lower()
-    finally:
-        p.chmod(0o644)
+    assert ei.value.code == 1
+    err = capsys.readouterr().err
+    assert "permission denied" in err.lower()
 
 
 def test_fingerprint_type_guard(monkeypatch):
