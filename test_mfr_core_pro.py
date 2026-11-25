@@ -396,3 +396,58 @@ def test_to_json_roundtrip():
     assert rec2.prior_belief == rec.prior_belief
     assert len(rec2.evidence) == 1
     assert rec2.alternatives == rec.alternatives
+
+
+def test_from_json_invalid_question():
+    """Regression: missing or non-string question raises ValueError."""
+    with pytest.raises(ValueError, match="missing or invalid 'question' field"):
+        IntelligenceRecord.from_json('{"evidence": []}')
+    with pytest.raises(ValueError, match="missing or invalid 'question' field"):
+        IntelligenceRecord.from_json('{"question": 123}')
+    with pytest.raises(ValueError, match="missing or invalid 'question' field"):
+        IntelligenceRecord.from_json('{"question": null}')
+
+
+def test_ci_non_overlap_suggestion():
+    """Cover strong separation path that emits CI non-overlap suggestion."""
+    # High mean claim with 3 independent high-reliability sources
+    high = [
+        Evidence("strong", "s1", 0.95, independent=True),
+        Evidence("strong", "s2", 0.92, independent=True),
+        Evidence("strong", "s3", 0.90, independent=True),
+    ]
+    # Low mean claim
+    low = [Evidence("weak", "s4", 0.2, independent=True)]
+    rec = IntelligenceRecord(question="Separated?", evidence=high + low, prior_belief=0.5)
+    report = rec.analyze()
+    assert any("Top claim 95% CI do not overlap" in s for s in report["suggestions"])
+    assert any("CI does not overlap" in a for a in report["audit_trail"])
+
+
+def test_main_generic_error(capsys):
+    """Cover the catch-all (ValueError/OSError/JSONDecodeError) path in main()."""
+    with patch("sys.argv", ["mfr_core_pro.py", "--json", "-"]):
+        with patch("sys.stdin.read", side_effect=OSError("stdin read failed")):
+            with pytest.raises(SystemExit) as ei:
+                main()
+    assert ei.value.code == 1
+    err = capsys.readouterr().err
+    assert "Error:" in err
+    assert "stdin read failed" in err
+
+
+def test_no_suggestions_fallback_path():
+    """Cover the fallback when no improvement suggestions are generated."""
+    evs = [
+        Evidence("only", "s1", 0.55, independent=True),
+        Evidence("only", "s2", 0.58, independent=True),
+        Evidence("only", "s3", 0.60, independent=True),
+    ]
+    rec = IntelligenceRecord(question="Weakish?", evidence=evs, prior_belief=0.4)
+    report = rec.analyze()
+    assert report["suggestions"] == ["No specific improvement suggestions at this time."]
+    assert report["status"] == "PROVISIONAL_FINDING"
+
+
+
+

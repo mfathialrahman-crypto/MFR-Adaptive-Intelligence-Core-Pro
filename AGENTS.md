@@ -360,3 +360,6 @@ Raise the project each cycle without sacrificing what already works, and without
 *Last reviewed and confirmed in repository: 2026-11-25 18:34 +04 (cycle complete: local clone + pytest 39 passed, 99% coverage. Added alternatives filter and to_json roundtrip tests. No P0/P1. Stability preserved. File confirmed on GitHub.)*
 
 *Last reviewed and confirmed in repository: 2026-11-25 19:20 +04 (cycle complete: local clone + pytest 40 passed, 99% coverage. Added from_json invalid question type regression test covering previously missed branch. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
+
+*Last reviewed and confirmed in repository: 2026-11-26 01:19 +04 (cycle complete: local clone + pytest 42 passed, 99.62% coverage. Added four regression tests covering previously missed branches (invalid question, CI non-overlap, generic main error, empty suggestions fallback). mypy --strict clean. No P0/P1. Stability preserved. Changes pushed to GitHub.)*
+

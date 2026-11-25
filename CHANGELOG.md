@@ -1,3 +1,17 @@
+## [2.1.77+pro] - 2026-11-26
+
+### Improved
+- Added `test_from_json_invalid_question` regression covering missing/non-string question (previously uncovered branch).
+- Added `test_ci_non_overlap_suggestion` covering strong-separation CI non-overlap path.
+- Added `test_main_generic_error` covering the catch-all error handler in `main()`.
+- Added `test_no_suggestions_fallback_path` covering the empty-suggestions fallback.
+- Coverage raised to 99.62% (42 tests). No functional change.
+
+### Verified
+- pytest 42 passed, coverage 99.62% (only `if __name__` line remains uncovered, as expected).
+- mypy --strict clean.
+- No P0/P1 issues. Stability preserved.
+
 ## [2.1.77+pro] - 2026-11-25
 
 ### Improved
@@ -7,6 +21,7 @@
 ### Verified
 - pytest pass, coverage ≥98%, mypy --strict clean.
 - No P0/P1 issues. Stability preserved.
+
 
 ## [2.1.77+pro] - 2026-11-24
 
