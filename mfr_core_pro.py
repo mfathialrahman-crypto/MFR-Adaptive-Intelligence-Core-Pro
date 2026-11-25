@@ -151,8 +151,6 @@ class IntelligenceRecord:
         )
 
     def analyze(self) -> Dict[str, Any]:
-        if len(self.evidence) > MAX_EVIDENCE_ITEMS:
-            raise ValueError("evidence list exceeds maximum")
 
         analyzed_at = datetime.now(timezone.utc).isoformat()
         audit: List[str] = []
