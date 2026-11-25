@@ -1,3 +1,13 @@
+## [2.1.78+pro] - 2026-11-25
+
+### Improved
+- Added regression tests for `from_json` missing/invalid question, exact empty-suggestions fallback path, and module entry point (`if __name__ == "__main__"` via runpy with clean argv).
+- Coverage raised to 100% (42 tests). No functional change to analysis logic.
+
+### Verified
+- pytest 42 passed, coverage 100%, mypy --strict clean (local).
+- No P0/P1 issues. Stability preserved.
+
 ## [2.1.77+pro] - 2026-11-25
 
 ### Improved
