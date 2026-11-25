@@ -348,3 +348,5 @@ Raise the project each cycle without sacrificing what already works, and without
 *Last reviewed and confirmed in repository: 2026-11-25 08:20 +04 (cycle complete: local clone + pytest 37 passed, 99% coverage. Added FileNotFoundError CLI regression. No P0/P1. AGENTS.md confirmed and updated in GitHub. Stability preserved.)*
 
 *Last reviewed and confirmed in repository: 2026-11-25 09:15 +04 (cycle complete: local clone + pytest 37 passed, 99% coverage on Python 3.10. mypy --strict clean. No P0/P1 issues. AGENTS.md review note updated. Stability preserved.)*
+
+*Last reviewed and confirmed in repository: 2026-11-25 10:20 +04 (cycle complete: local clone + pytest 39 passed, 99% coverage on Python 3.10. Added defensive analyze() max-evidence regression and no-arg CLI demo path. mypy --strict clean. No P0/P1. Stability preserved. AGENTS.md review note updated.)*
