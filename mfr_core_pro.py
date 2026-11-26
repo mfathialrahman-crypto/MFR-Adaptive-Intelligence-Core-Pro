@@ -33,6 +33,7 @@ MAX_SOURCE_LENGTH = 200
 MAX_QUESTION_LENGTH = 1000
 MAX_ALTERNATIVES = 20
 MAX_ALTERNATIVE_LENGTH = 200
+MAX_JSON_BYTES = 1_000_000  # 1 MiB hard limit on input JSON to bound memory
 
 PRIOR_STRENGTH = 2.0  # Beta prior strength
 INDEPENDENCE_PENALTY = 0.6  # multiplier for non-independent evidence
@@ -120,6 +121,8 @@ class IntelligenceRecord:
 
     @classmethod
     def from_json(cls, raw: str) -> "IntelligenceRecord":
+        if len(raw.encode("utf-8")) > MAX_JSON_BYTES:
+            raise ValueError("JSON payload exceeds maximum size")
         try:
             data = json.loads(raw)
         except json.JSONDecodeError as e:
@@ -423,6 +426,8 @@ def main() -> None:
             else:
                 with open(args.json) as f:
                     raw = f.read()
+            if len(raw.encode("utf-8")) > MAX_JSON_BYTES:
+                raise ValueError("JSON payload exceeds maximum size")
             print(json.dumps(analyze_json(raw), indent=2))
         except FileNotFoundError:
             print(f"Error: file not found: {args.json}", file=sys.stderr)

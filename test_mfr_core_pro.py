@@ -1,4 +1,4 @@
-"""Tests for MFR Adaptive Intelligence Core Pro. Target ≥90% coverage, 48+ cases covering edges."""
+"""Tests for MFR Adaptive Intelligence Core Pro. Target ≥90% coverage, 26+ cases covering edges including size limits and status paths."""
 import re
 
 import json
@@ -233,3 +233,75 @@ def test_cli_errors(tmp_path, capsys):
     with patch("sys.argv", ["mfr-core", "--json", str(bad)]):
         with pytest.raises(SystemExit):
             main()
+
+
+def test_evidence_list_exceeds_maximum():
+    from mfr_core_pro import MAX_EVIDENCE_ITEMS
+    many = [Evidence("c", f"s{i}", 0.5) for i in range(MAX_EVIDENCE_ITEMS + 1)]
+    with pytest.raises(ValueError, match="evidence list exceeds maximum"):
+        IntelligenceRecord("Q", evidence=many)
+
+
+def test_from_json_root_not_object():
+    with pytest.raises(ValueError, match="JSON root must be an object"):
+        IntelligenceRecord.from_json("[1, 2, 3]")
+    with pytest.raises(ValueError, match="JSON root must be an object"):
+        IntelligenceRecord.from_json("null")
+
+
+def test_from_json_prior_not_number():
+    with pytest.raises(ValueError, match="prior_belief must be a number"):
+        IntelligenceRecord.from_json('{"question": "q", "prior_belief": "high"}')
+
+
+def test_from_json_evidence_invalid_fields():
+    with pytest.raises(ValueError, match="evidence\\[0\\] invalid fields"):
+        IntelligenceRecord.from_json('{"question": "q", "evidence": [{"claim": "c", "source": "s", "extra": 1}]}')
+    with pytest.raises(ValueError, match="evidence\\[0\\] must be an object"):
+        IntelligenceRecord.from_json('{"question": "q", "evidence": ["notanobject"]}')
+
+
+def test_json_size_limit():
+    from mfr_core_pro import MAX_JSON_BYTES
+    huge = "x" * (MAX_JSON_BYTES + 10)
+    with pytest.raises(ValueError, match="JSON payload exceeds maximum size"):
+        IntelligenceRecord.from_json(huge)
+
+
+def test_stable_status_and_ci_nonoverlap():
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[
+            Evidence("yes", "a", 0.99, weight=5),
+            Evidence("yes", "b", 0.98, weight=5),
+            Evidence("yes", "c", 0.97, weight=5),
+            Evidence("no", "d", 0.1, weight=1),
+        ],
+    )
+    report = rec.analyze()
+    assert report["stability"] == "stable"
+    assert any("CI do not overlap" in s or "do not overlap" in s for s in report["suggestions"])
+    assert any("CI does not overlap" in a for a in report["audit_trail"])
+
+
+def test_cli_json_size_limit(tmp_path, capsys):
+    from mfr_core_pro import MAX_JSON_BYTES
+    huge = tmp_path / "huge.json"
+    huge.write_text("x" * (MAX_JSON_BYTES + 100))
+    with patch("sys.argv", ["mfr-core", "--json", str(huge)]):
+        with pytest.raises(SystemExit) as e:
+            main()
+        assert e.value.code == 1
+    err = capsys.readouterr().err
+    assert "exceeds maximum size" in err
+
+
+def test_cli_permission_error(tmp_path, capsys):
+    p = tmp_path / "ok.json"
+    p.write_text('{"question": "q"}')
+    with patch("sys.argv", ["mfr-core", "--json", str(p)]), patch("builtins.open", side_effect=PermissionError("denied")):
+        with pytest.raises(SystemExit) as e:
+            main()
+        assert e.value.code == 1
+    err = capsys.readouterr().err
+    assert "permission denied" in err

@@ -349,4 +349,6 @@ Raise the project each cycle without sacrificing what already works, and without
 
 *Last reviewed and confirmed in repository: 2026-11-26 07:20 +04 (cycle complete: full inspection of public surface (Core Pro + HQ). AGENTS.md constitution confirmed present, aligned with provided base + long horizon (section 23). Latest CI green (18 tests, ≥90% coverage). No P0/P1. Stability preserved. File updated and saved to GitHub.)*
 
+*Last reviewed and confirmed in repository: 2026-11-26 10:25 +04 (cycle complete: added 1 MiB JSON size limit in from_json and CLI for reliability; expanded tests to 26 cases (evidence max, JSON type edges, size/permission, stable+CI non-overlap). Local verification: 26 passed, 93% coverage. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
+
 *Last reviewed and confirmed in repository: 2026-11-26 09:16 +04 (cycle complete: full inspection of public surface (Core Pro). Local verification: 18 tests passed, 91% coverage. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
