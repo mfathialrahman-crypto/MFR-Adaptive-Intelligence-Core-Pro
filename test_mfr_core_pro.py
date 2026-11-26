@@ -100,3 +100,136 @@ def test_from_json_evidence_not_list():
         IntelligenceRecord.from_json('{"question": "q", "evidence": null}')
     with pytest.raises(ValueError, match="evidence must be a list"):
         IntelligenceRecord.from_json('{"question": "q", "evidence": {}}')
+
+
+def test_deduplication_keeps_strongest():
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[
+            Evidence("yes", "same", 0.6, weight=1.0),
+            Evidence("yes", "same", 0.9, weight=1.0),
+        ],
+    )
+    report = rec.analyze()
+    assert any("Deduplicated" in a for a in report["audit_trail"])
+    assert report["top_claim"]["evidence_count"] == 1
+
+
+def test_conflicting_evidence_status():
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[
+            Evidence("yes", "a", 0.9),
+            Evidence("yes", "b", 0.85),
+            Evidence("no", "c", 0.88),
+            Evidence("no", "d", 0.82),
+        ],
+    )
+    report = rec.analyze()
+    # Means should be close enough or CIs overlap to trigger CONFLICTING
+    assert report["status"] in ("CONFLICTING_EVIDENCE", "PROVISIONAL_FINDING")
+    assert len(report["competing_claims"]) >= 1
+
+
+def test_insufficient_weak_single():
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[Evidence("maybe", "weak", 0.4)],
+    )
+    report = rec.analyze()
+    assert report["status"] == "INSUFFICIENT_EVIDENCE"
+    assert report["stability"] == "unstable"
+
+
+def test_suggestions_and_stability():
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[
+            Evidence("yes", "a", 0.95, independent=True),
+            Evidence("yes", "b", 0.9, independent=True),
+            Evidence("yes", "c", 0.85, independent=False),
+        ],
+        alternatives=["alt1", "alt2"],
+    )
+    report = rec.analyze()
+    assert report["stability"] in ("stable", "provisional")
+    assert any("independent" in s.lower() or "alternatives" in s.lower() or "sample" in s.lower() for s in report["suggestions"])
+    assert report["decision_confidence"] >= 0.3
+
+
+def test_fingerprint_deterministic():
+    rec1 = IntelligenceRecord(
+        question="Same",
+        evidence=[Evidence("yes", "s", 0.8)],
+        prior_belief=0.5,
+    )
+    rec2 = IntelligenceRecord(
+        question="Same",
+        evidence=[Evidence("yes", "s", 0.8)],
+        prior_belief=0.5,
+    )
+    assert fingerprint(rec1) == fingerprint(rec2)
+    assert len(rec1.analyze()["fingerprint"]) == 64
+
+
+def test_from_json_roundtrip_and_analyze_json():
+    rec = IntelligenceRecord(
+        question="Roundtrip?",
+        evidence=[Evidence("ok", "src", 0.7)],
+        alternatives=["a", "b"],
+    )
+    raw = rec.to_json()
+    restored = IntelligenceRecord.from_json(raw)
+    assert restored.question == rec.question
+    assert len(restored.evidence) == 1
+    from mfr_core_pro import analyze_json
+    report = analyze_json(raw)
+    assert report["status"] == "PROVISIONAL_FINDING"
+
+
+def test_validate_analysis_report():
+    from mfr_core_pro import validate_analysis_report
+    good = IntelligenceRecord(question="Q", evidence=[Evidence("yes", "s", 0.8)]).analyze()
+    assert validate_analysis_report(good) == []
+    bad = {"status": "UNKNOWN"}
+    assert len(validate_analysis_report(bad)) > 0
+    assert len(validate_analysis_report("not a dict")) > 0
+
+
+def test_cli_version_and_demo(capsys):
+    with patch("sys.argv", ["mfr-core", "--version"]):
+        with pytest.raises(SystemExit) as e:
+            main()
+        assert e.value.code == 0
+    captured = capsys.readouterr()
+    assert VERSION in captured.out
+
+
+def test_cli_json_stdin_and_file(tmp_path, capsys):
+    rec_json = '{"question":"CLI?","evidence":[{"claim":"yes","source":"t","reliability":0.8}]}'
+    # file
+    p = tmp_path / "r.json"
+    p.write_text(rec_json)
+    with patch("sys.argv", ["mfr-core", "--json", str(p)]):
+        main()
+    out = capsys.readouterr().out
+    assert "PROVISIONAL_FINDING" in out or "confidence" in out
+    # stdin
+    with patch("sys.argv", ["mfr-core", "--json", "-"]), patch("sys.stdin", StringIO(rec_json)):
+        main()
+    assert "status" in capsys.readouterr().out
+
+
+def test_cli_errors(tmp_path, capsys):
+    with patch("sys.argv", ["mfr-core", "--json", "/nonexistent.json"]):
+        with pytest.raises(SystemExit) as e:
+            main()
+        assert e.value.code == 1
+    err = capsys.readouterr().err
+    assert "not found" in err
+    # invalid json
+    bad = tmp_path / "bad.json"
+    bad.write_text("not json")
+    with patch("sys.argv", ["mfr-core", "--json", str(bad)]):
+        with pytest.raises(SystemExit):
+            main()
