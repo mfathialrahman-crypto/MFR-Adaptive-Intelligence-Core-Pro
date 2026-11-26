@@ -272,3 +272,18 @@ def test_cli_validate_flag(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "fingerprint" in out
     # valid report exits 0 (no SystemExit raised)
+
+
+def test_cli_validate_flag_failure(tmp_path, capsys):
+    """--validate exits 2 and reports violations when contract check fails (mocked)."""
+    rec_json = '{"question":"validate-fail?","evidence":[{"claim":"ok","source":"t","reliability":0.9}]}'
+    p = tmp_path / "r.json"
+    p.write_text(rec_json)
+    with patch("mfr_core_pro.validate_analysis_report", return_value=["simulated violation"]):
+        with patch("sys.argv", ["mfr-core", "--json", str(p), "--validate"]):
+            with pytest.raises(SystemExit) as e:
+                main()
+            assert e.value.code == 2
+    err = capsys.readouterr().err
+    assert "Validation failed" in err
+    assert "simulated violation" in err
