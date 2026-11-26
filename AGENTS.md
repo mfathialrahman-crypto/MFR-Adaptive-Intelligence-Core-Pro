@@ -346,3 +346,5 @@ Raise the project each cycle without sacrificing what already works, and without
 
 ---
 *Last reviewed and confirmed in repository: 2026-11-26 05:20 +04 (cycle complete: restored full AGENTS.md constitution, expanded regression tests to 18 cases covering analysis paths, CLI, fingerprint, validation, and from_json edges. Local verification: 18 passed, 91% coverage. CI coverage gate restored. No P0/P1. Stability preserved. File saved to GitHub.)*
+
+*Last reviewed and confirmed in repository: 2026-11-26 07:20 +04 (cycle complete: full inspection of public surface (Core Pro + HQ). AGENTS.md constitution confirmed present, aligned with provided base + long horizon (section 23). Latest CI green (18 tests, ≥90% coverage). No P0/P1. Stability preserved. File updated and saved to GitHub.)*
