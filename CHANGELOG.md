@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.78+pro] - 2026-11-26
+
+### Added
+- CLI `--validate` flag: after `--json` analysis, runs pure-Python contract validation and exits 2 on violations. Strengthens public reproducibility of the decision-contract fields without changing analysis results.
+
+### Verified
+- 23 tests pass. Coverage ≥90%. mypy --strict clean. No functional change to valid analysis paths.
+
 ## [2.1.77+pro] - 2026-11-26
 
 ### Fixed

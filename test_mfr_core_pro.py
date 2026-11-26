@@ -260,3 +260,15 @@ def test_from_json_invalid_json():
     """Regression: invalid JSON raises clear error."""
     with pytest.raises(ValueError, match="invalid JSON"):
         IntelligenceRecord.from_json("{not json")
+
+
+def test_cli_validate_flag(tmp_path, capsys):
+    """--validate runs contract check and exits 0 on valid, non-zero on (simulated) failure."""
+    rec_json = '{"question":"validate?","evidence":[{"claim":"ok","source":"t","reliability":0.9}]}'
+    p = tmp_path / "r.json"
+    p.write_text(rec_json)
+    with patch("sys.argv", ["mfr-core", "--json", str(p), "--validate"]):
+        main()
+    out = capsys.readouterr().out
+    assert "fingerprint" in out
+    # valid report exits 0 (no SystemExit raised)

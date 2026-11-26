@@ -410,6 +410,11 @@ def main() -> None:
         metavar="FILE",
         help="analyze JSON record from FILE (or stdin if - or omitted)",
     )
+    parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="after analysis, validate the report against the public contract and exit non-zero on violations",
+    )
     args = parser.parse_args()
 
     if args.version:
@@ -423,7 +428,15 @@ def main() -> None:
             else:
                 with open(args.json) as f:
                     raw = f.read()
-            print(json.dumps(analyze_json(raw), indent=2))
+            report = analyze_json(raw)
+            if args.validate:
+                violations = validate_analysis_report(report)
+                if violations:
+                    print("Validation failed:", file=sys.stderr)
+                    for v in violations:
+                        print(f"  - {v}", file=sys.stderr)
+                    sys.exit(2)
+            print(json.dumps(report, indent=2))
         except FileNotFoundError:
             print(f"Error: file not found: {args.json}", file=sys.stderr)
             sys.exit(1)
