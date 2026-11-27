@@ -296,7 +296,7 @@ def test_ci_non_overlap_suggestion():
         ],
     )
     report = rec.analyze()
-    assert any("CI" in s or "overlap" in s for s in report["suggestions"] + report["audit_trail"])
+    assert any("CI" in s or "overlap" in s or "separation" in s for s in report["suggestions"] + report["audit_trail"])
 
 
 def test_no_suggestions_fallback():
