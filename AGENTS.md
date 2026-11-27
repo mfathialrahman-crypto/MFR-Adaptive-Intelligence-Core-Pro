@@ -345,29 +345,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-26 05:20 +04 (cycle complete: restored full AGENTS.md constitution, expanded regression tests to 18 cases covering analysis paths, CLI, fingerprint, validation, and from_json edges. Local verification: 18 passed, 91% coverage. CI coverage gate restored. No P0/P1. Stability preserved. File saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 07:20 +04 (cycle complete: full inspection of public surface (Core Pro + HQ). AGENTS.md constitution confirmed present, aligned with provided base + long horizon (section 23). Latest CI green (18 tests, ≥90% coverage). No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 09:16 +04 (cycle complete: full inspection of public surface (Core Pro). Local verification: 18 tests passed, 91% coverage. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 12:23 +04 (cycle complete: full inspection of public surface (Core Pro). Local verification: 18 tests passed, 91% coverage, mypy --strict clean. Latest CI green. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 14:16 +04 (cycle complete: full inspection of public surface (Core Pro). Local verification: 18 tests passed, 91% coverage, mypy --strict clean. Latest CI green. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 16:30 +04 (cycle complete: added CLI --validate flag for public contract enforcement after analysis. Local verification: 23 tests passed, ≥90% coverage, mypy --strict clean. Version bumped to 2.1.78+pro with aligned sources. No P0/P1. Stability preserved. Branch prepared for PR.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 17:35 +04 (cycle complete: full inspection of public surface (Core Pro). Merged PR #10 adding CLI --validate for contract enforcement. Local verification after merge: 23 tests passed, 91% coverage, mypy --strict clean. Version 2.1.78+pro aligned. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 18:42 +04 (cycle complete: full inspection of public Core Pro. AGENTS.md constitution present and aligned. Version 2.1.78+pro, 23 tests, coverage ≥90%, mypy --strict clean from prior verification. No P0/P1 issues. No open issues. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-26 20:25 +04 (cycle complete: full inspection of public Core Pro. Local verification: 23 tests passed, 91% coverage. Latest CI green. Version 2.1.78+pro aligned. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-27 08:20 +04 (cycle complete: full inspection of public Core Pro. Local verification: 25 tests passed, 92% coverage. Added regression tests for prior_belief type and evidence invalid fields. Latest CI green from prior. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-27 09:15 +04 (cycle complete: full inspection of public Core Pro. Local verification: 23 tests passed, 91% coverage, mypy --strict clean. AGENTS.md constitution confirmed present and aligned. Version 2.1.78+pro. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-*Last reviewed and confirmed in repository: 2026-11-27 10:20 +04 (cycle complete: full inspection of public Core Pro. Local verification: 30 tests passed, 96% coverage. Added targeted regression tests for prior type, invalid evidence fields, CI separation, stable status, and demo. Version bumped to 2.1.79+pro. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
-
-
-*Last reviewed and confirmed in repository: 2026-11-27 12:23 +04 (cycle complete: full inspection of public Core Pro. Local verification: 30 tests passed, 96% coverage, mypy --strict clean. Latest CI green (push on e517df9). Version 2.1.79+pro aligned across version.py, pyproject.toml, README. No P0/P1. No open issues. Stability preserved. File updated and saved to GitHub.)*
+*Last reviewed and confirmed in repository: 2026-11-27 13:17 +04 (cycle complete: full inspection of public Core Pro. Local verification: 30 tests passed, 96% coverage, mypy --strict clean. Version 2.1.79+pro aligned. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
