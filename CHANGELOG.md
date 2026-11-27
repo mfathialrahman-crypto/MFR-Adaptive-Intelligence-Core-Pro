@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.80+pro] - 2026-11-27
+
+### Fixed
+- CI separation messaging is now accurate: non-overlap message only when 95% CIs do not overlap; separate message for strong mean separation. No change to analysis results or decision fields.
+
+### Verified
+- 30 tests pass. Coverage ≥90%. mypy --strict clean. Version sources aligned.
+
 ## [2.1.79+pro] - 2026-11-27
 
 ### Added
