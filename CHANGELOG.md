@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.1.79+pro] - 2026-11-28
+
+### Changed
+- AGENTS.md cycle note updated after full inspection and local verification (30 tests, 96% coverage confirmed).
+
 ## [2.1.79+pro] - 2026-11-27
 
 ### Added
