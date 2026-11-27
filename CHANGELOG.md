@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.80+pro] - 2026-11-27
+
+### Added
+- Fingerprint now includes the analysis version so traces are bound to the exact code that produced them.
+- CLI `--summary` flag (with `--json`): prints a compact one-line result (`STATUS | conf=… | conclusion=… | fp=…`) instead of the full report. Full JSON remains the default.
+
+### Changed
+- Version aligned to 2.1.80+pro.
+- AGENTS.md cycle note updated.
+
 ## [2.1.79+pro] - 2026-11-27
 
 ### Added

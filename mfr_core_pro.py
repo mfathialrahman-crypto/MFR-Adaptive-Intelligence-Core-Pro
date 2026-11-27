@@ -319,6 +319,7 @@ class IntelligenceRecord:
     def _fingerprint(self, report: Dict[str, Any]) -> str:
         # Content-addressable: exclude timestamps and fingerprint itself
         payload = {
+            "version": VERSION,
             "question": self.question,
             "prior_belief": self.prior_belief,
             "alternatives": sorted(self.alternatives),
@@ -415,6 +416,11 @@ def main() -> None:
         action="store_true",
         help="after analysis, validate the report against the public contract and exit non-zero on violations",
     )
+    parser.add_argument(
+        "--summary",
+        action="store_true",
+        help="with --json: print a one-line summary (status|confidence|conclusion|fingerprint) instead of full JSON",
+    )
     args = parser.parse_args()
 
     if args.version:
@@ -436,7 +442,14 @@ def main() -> None:
                     for v in violations:
                         print(f"  - {v}", file=sys.stderr)
                     sys.exit(2)
-            print(json.dumps(report, indent=2))
+            if args.summary:
+                status = report.get("status", "?")
+                conf = report.get("confidence", 0)
+                concl = report.get("conclusion") or "-"
+                fp = report.get("fingerprint", "")[:12]
+                print(f"{status} | conf={conf:.4f} | conclusion={concl} | fp={fp}…")
+            else:
+                print(json.dumps(report, indent=2))
         except FileNotFoundError:
             print(f"Error: file not found: {args.json}", file=sys.stderr)
             sys.exit(1)

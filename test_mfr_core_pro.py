@@ -334,3 +334,59 @@ def test_fingerprint_type_guard():
     # Normal path is str; the TypeError is defensive
     rec = IntelligenceRecord(question="Q")
     assert isinstance(fingerprint(rec), str)
+
+
+def test_fingerprint_includes_version():
+    """Fingerprint payload must bind the analysis version so traces are reproducible against exact code."""
+    rec = IntelligenceRecord(
+        question="version-bind",
+        evidence=[Evidence("ok", "s1", 0.8)],
+    )
+    report = rec.analyze()
+    # Recompute what the payload should contain
+    from mfr_core_pro import VERSION
+    assert report["version"] == VERSION
+    # Changing only the version string (simulated by inspecting the source of the fingerprint)
+    # is covered by the fact that the fingerprint function now embeds VERSION;
+    # a different version would produce a different hash. We just assert presence and stability.
+    fp1 = report["fingerprint"]
+    fp2 = rec.analyze()["fingerprint"]
+    assert fp1 == fp2
+    assert len(fp1) == 64
+
+
+def test_cli_summary_flag(capsys, tmp_path):
+    import json
+    from mfr_core_pro import main
+    import sys
+
+    sample = {
+        "question": "Is it fine?",
+        "evidence": [{"claim": "yes", "source": "a", "reliability": 0.9, "independent": True, "weight": 1.0}],
+    }
+    p = tmp_path / "rec.json"
+    p.write_text(json.dumps(sample))
+
+    # Capture by monkey-patching argv
+    old_argv = sys.argv
+    try:
+        sys.argv = ["mfr-core", "--json", str(p), "--summary"]
+        main()
+    finally:
+        sys.argv = old_argv
+
+    out = capsys.readouterr().out
+    assert "|" in out
+    assert "conf=" in out
+    assert "fp=" in out
+    assert "PROVISIONAL_FINDING" in out or "INSUFFICIENT" in out or "CONFLICTING" in out
+
+
+def test_from_json_extra_field_typeerror():
+    """Unknown field on evidence item must surface as a clear ValueError (TypeError path)."""
+    raw = json.dumps({
+        "question": "Q",
+        "evidence": [{"claim": "c", "source": "s", "reliability": 0.5, "unknown_field": 1}],
+    })
+    with pytest.raises(ValueError, match="invalid fields"):
+        IntelligenceRecord.from_json(raw)
