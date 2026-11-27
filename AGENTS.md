@@ -368,3 +368,5 @@ Raise the project each cycle without sacrificing what already works, and without
 *Last reviewed and confirmed in repository: 2026-11-27 09:15 +04 (cycle complete: full inspection of public Core Pro. Local verification: 23 tests passed, 91% coverage, mypy --strict clean. AGENTS.md constitution confirmed present and aligned. Version 2.1.78+pro. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
 
 *Last reviewed and confirmed in repository: 2026-11-27 10:20 +04 (cycle complete: full inspection of public Core Pro. Local verification: 30 tests passed, 96% coverage. Added targeted regression tests for prior type, invalid evidence fields, CI separation, stable status, and demo. Version bumped to 2.1.79+pro. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
+
+*Last reviewed and confirmed in repository: 2026-11-27 11:30 +04 (cycle complete: full inspection of public Core Pro. Fixed CI separation messaging for accuracy (non-overlap vs strong mean separation). Version bumped to 2.1.80+pro. Local verification: 30 tests passed, 95% coverage, mypy --strict clean. No P0/P1. Stability preserved. File updated and saved to GitHub.)*
