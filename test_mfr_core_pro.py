@@ -334,3 +334,35 @@ def test_fingerprint_type_guard():
     # Normal path is str; the TypeError is defensive
     rec = IntelligenceRecord(question="Q")
     assert isinstance(fingerprint(rec), str)
+
+
+def test_validate_report_strengthened():
+    """Strengthened contract checks: CI ordering, decision_confidence range, hex fingerprint, top_claim structure."""
+    from mfr_core_pro import validate_analysis_report
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[Evidence("yes", "s", 0.9)],
+    )
+    report = rec.analyze()
+    assert validate_analysis_report(report) == []
+
+    # Break CI ordering
+    bad = dict(report)
+    bad["top_claim"] = dict(report["top_claim"])
+    bad["top_claim"]["ci_low"] = 0.9
+    bad["top_claim"]["mean"] = 0.5
+    bad["top_claim"]["ci_high"] = 0.6
+    viol = validate_analysis_report(bad)
+    assert any("CI ordering" in v for v in viol)
+
+    # Bad fingerprint
+    bad2 = dict(report)
+    bad2["fingerprint"] = "nothex"
+    viol2 = validate_analysis_report(bad2)
+    assert any("fingerprint" in v for v in viol2)
+
+    # Bad decision_confidence
+    bad3 = dict(report)
+    bad3["decision_confidence"] = 0.1  # below MIN
+    viol3 = validate_analysis_report(bad3)
+    assert any("decision_confidence" in v for v in viol3)
