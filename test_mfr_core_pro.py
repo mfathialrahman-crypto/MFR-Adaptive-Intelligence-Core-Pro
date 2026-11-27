@@ -272,3 +272,15 @@ def test_cli_validate_flag(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "fingerprint" in out
     # valid report exits 0 (no SystemExit raised)
+
+
+def test_cli_json_utf8_file(tmp_path, capsys):
+    """CLI --json reads UTF-8 encoded files correctly (non-ASCII content)."""
+    rec_json = '{"question":"هل النظام سليم؟","evidence":[{"claim":"سليم","source":"مراقب-أ","reliability":0.9}]}'
+    p = tmp_path / "utf8.json"
+    p.write_text(rec_json, encoding="utf-8")
+    with patch("sys.argv", ["mfr-core", "--json", str(p)]):
+        main()
+    out = capsys.readouterr().out
+    assert "سليم" in out or "PROVISIONAL_FINDING" in out or "INSUFFICIENT" in out
+    assert "fingerprint" in out

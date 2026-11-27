@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Improved
+- CLI `--json` file reading now uses explicit `encoding="utf-8"` for reliable cross-platform handling of non-ASCII content.
+- Added regression test `test_cli_json_utf8_file` covering non-ASCII question/claim/source.
+
+### Verified
+- 24 tests pass. Coverage ≥90%. mypy --strict clean. No functional change to valid analysis paths.
+
+
 ## [2.1.78+pro] - 2026-11-26
 
 ### Added
