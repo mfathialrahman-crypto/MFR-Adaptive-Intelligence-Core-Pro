@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.80+pro] - 2026-11-28
+
+### Changed
+- Strengthened `validate_analysis_report` with structural checks (CI ordering, decision_confidence range, hex fingerprint, top_claim keys).
+- Added `py.typed` marker for better typing support.
+- Version aligned across version.py, pyproject.toml, and README.
+
+### Verified
+- 31 tests pass. Coverage ≥90%. mypy --strict clean. Existing analysis behavior unchanged.
+
 ## [2.1.79+pro] - 2026-11-28
 
 ### Changed
