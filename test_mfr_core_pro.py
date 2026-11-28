@@ -334,3 +334,48 @@ def test_fingerprint_type_guard():
     # Normal path is str; the TypeError is defensive
     rec = IntelligenceRecord(question="Q")
     assert isinstance(fingerprint(rec), str)
+
+
+def test_from_json_evidence_value_error():
+    """Covers the ValueError re-raise path in from_json for Evidence validation."""
+    with pytest.raises(ValueError, match="evidence\\[0\\]:"):
+        IntelligenceRecord.from_json(
+            '{"question": "q", "evidence": [{"claim": "c", "source": "s", "reliability": 1.5}]}'
+        )
+
+
+def test_suggestions_fallback_no_specific():
+    """Forces the no-specific-suggestions fallback path."""
+    rec = IntelligenceRecord(
+        question="Q",
+        evidence=[
+            Evidence("yes", "a", 0.6, independent=True),
+            Evidence("yes", "b", 0.6, independent=True),
+            Evidence("yes", "c", 0.6, independent=True),
+        ],
+    )
+    report = rec.analyze()
+    assert report["suggestions"] == ["No specific improvement suggestions at this time."]
+
+
+def test_fingerprint_type_guard_raises():
+    """Defensive TypeError when fingerprint is not str (mocked)."""
+    rec = IntelligenceRecord(question="Q")
+    with patch.object(rec, "analyze", return_value={"fingerprint": 123}):
+        with pytest.raises(TypeError, match="fingerprint must be str"):
+            fingerprint(rec)
+
+
+def test_cli_validate_failures(tmp_path, capsys):
+    """Covers --validate failure exit path."""
+    rec_json = '{"question":"v","evidence":[{"claim":"ok","source":"t","reliability":0.9}]}'
+    p = tmp_path / "r.json"
+    p.write_text(rec_json)
+    with patch("sys.argv", ["mfr-core", "--json", str(p), "--validate"]):
+        with patch("mfr_core_pro.validate_analysis_report", return_value=["fake violation"]):
+            with pytest.raises(SystemExit) as e:
+                main()
+            assert e.value.code == 2
+    err = capsys.readouterr().err
+    assert "Validation failed" in err
+    assert "fake violation" in err
