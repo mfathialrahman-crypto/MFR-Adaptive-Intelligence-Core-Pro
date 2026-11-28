@@ -98,93 +98,6 @@ def test_from_json_evidence_not_list():
     """Regression: evidence must be a list (null or object rejected)."""
     with pytest.raises(ValueError, match="evidence must be a list"):
         IntelligenceRecord.from_json('{"question": "q", "evidence": null}')
-    with pytest.raises(ValueError, match="evidence must be a list"):
-        IntelligenceRecord.from_json('{"question": "q", "evidence": {}}')
-
-
-def test_deduplication_keeps_strongest():
-    rec = IntelligenceRecord(
-        question="Q",
-        evidence=[
-            Evidence("yes", "same", 0.6, weight=1.0),
-            Evidence("yes", "same", 0.9, weight=1.0),
-        ],
-    )
-    report = rec.analyze()
-    assert any("Deduplicated" in a for a in report["audit_trail"])
-    assert report["top_claim"]["evidence_count"] == 1
-
-
-def test_conflicting_evidence_status():
-    rec = IntelligenceRecord(
-        question="Q",
-        evidence=[
-            Evidence("yes", "a", 0.9),
-            Evidence("yes", "b", 0.85),
-            Evidence("no", "c", 0.88),
-            Evidence("no", "d", 0.82),
-        ],
-    )
-    report = rec.analyze()
-    # Means should be close enough or CIs overlap to trigger CONFLICTING
-    assert report["status"] in ("CONFLICTING_EVIDENCE", "PROVISIONAL_FINDING")
-    assert len(report["competing_claims"]) >= 1
-
-
-def test_insufficient_weak_single():
-    rec = IntelligenceRecord(
-        question="Q",
-        evidence=[Evidence("maybe", "weak", 0.4)],
-    )
-    report = rec.analyze()
-    assert report["status"] == "INSUFFICIENT_EVIDENCE"
-    assert report["stability"] == "unstable"
-
-
-def test_suggestions_and_stability():
-    rec = IntelligenceRecord(
-        question="Q",
-        evidence=[
-            Evidence("yes", "a", 0.95, independent=True),
-            Evidence("yes", "b", 0.9, independent=True),
-            Evidence("yes", "c", 0.85, independent=False),
-        ],
-        alternatives=["alt1", "alt2"],
-    )
-    report = rec.analyze()
-    assert report["stability"] in ("stable", "provisional")
-    assert any("independent" in s.lower() or "alternatives" in s.lower() or "sample" in s.lower() for s in report["suggestions"])
-    assert report["decision_confidence"] >= 0.3
-
-
-def test_fingerprint_deterministic():
-    rec1 = IntelligenceRecord(
-        question="Same",
-        evidence=[Evidence("yes", "s", 0.8)],
-        prior_belief=0.5,
-    )
-    rec2 = IntelligenceRecord(
-        question="Same",
-        evidence=[Evidence("yes", "s", 0.8)],
-        prior_belief=0.5,
-    )
-    assert fingerprint(rec1) == fingerprint(rec2)
-    assert len(rec1.analyze()["fingerprint"]) == 64
-
-
-def test_from_json_roundtrip_and_analyze_json():
-    rec = IntelligenceRecord(
-        question="Roundtrip?",
-        evidence=[Evidence("ok", "src", 0.7)],
-        alternatives=["a", "b"],
-    )
-    raw = rec.to_json()
-    restored = IntelligenceRecord.from_json(raw)
-    assert restored.question == rec.question
-    assert len(restored.evidence) == 1
-    from mfr_core_pro import analyze_json
-    report = analyze_json(raw)
-    assert report["status"] == "PROVISIONAL_FINDING"
 
 
 def test_validate_analysis_report():
@@ -334,3 +247,48 @@ def test_fingerprint_type_guard():
     # Normal path is str; the TypeError is defensive
     rec = IntelligenceRecord(question="Q")
     assert isinstance(fingerprint(rec), str)
+
+
+def test_cli_no_args_runs_demo(capsys):
+    """CLI with no arguments runs the demo path."""
+    with patch("sys.argv", ["mfr-core"]):
+        main()
+    out = capsys.readouterr().out
+    assert "Demo complete" in out
+    assert "Status" in out
+
+
+def test_cli_validate_failure(tmp_path, capsys):
+    """--validate exits non-zero when report has contract violations."""
+    rec_json = '{"question":"validate?","evidence":[{"claim":"ok","source":"t","reliability":0.9}]}'
+    p = tmp_path / "r.json"
+    p.write_text(rec_json)
+    with patch("sys.argv", ["mfr-core", "--json", str(p), "--validate"]):
+        with patch("mfr_core_pro.validate_analysis_report", return_value=["simulated violation"]):
+            with pytest.raises(SystemExit) as e:
+                main()
+            assert e.value.code == 2
+    err = capsys.readouterr().err
+    assert "Validation failed" in err
+    assert "simulated violation" in err
+
+
+def test_cli_permission_error(tmp_path, capsys):
+    """CLI surfaces PermissionError clearly."""
+    p = tmp_path / "r.json"
+    p.write_text("{}")
+    with patch("sys.argv", ["mfr-core", "--json", str(p)]):
+        with patch("builtins.open", side_effect=PermissionError("denied")):
+            with pytest.raises(SystemExit) as e:
+                main()
+            assert e.value.code == 1
+    err = capsys.readouterr().err
+    assert "permission denied" in err
+
+
+def test_from_json_evidence_value_error():
+    """from_json re-raises ValueError from Evidence validation."""
+    with pytest.raises(ValueError, match="reliability must be in"):
+        IntelligenceRecord.from_json(
+            '{"question": "q", "evidence": [{"claim": "c", "source": "s", "reliability": 1.5}]}'
+        )

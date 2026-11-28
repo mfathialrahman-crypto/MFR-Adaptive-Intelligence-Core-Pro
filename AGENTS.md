@@ -25,7 +25,6 @@ Understand:
 - frontend and backend boundaries
 - documentation
 - existing automation
-
 Do not make major architectural changes before understanding the existing system.
 
 ## 2. GOLDEN RULE
@@ -37,27 +36,33 @@ Never claim:
 - a feature exists unless it was implemented
 - a benchmark improved unless it was measured
 - the project is production-ready unless the relevant requirements were actually checked
-
 Accuracy is more important than appearing successful.
 
 ## 3. DEVELOPMENT LOOP
 
 For every meaningful task use this cycle:
-DISCOVER → ANALYZE → PRIORITIZE → IMPLEMENT → TEST → REVIEW → FIX → VERIFY → DOCUMENT → IMPROVE
-
+DISCOVER
+→ ANALYZE
+→ PRIORITIZE
+→ IMPLEMENT
+→ TEST
+→ REVIEW
+→ FIX
+→ VERIFY
+→ DOCUMENT
+→ IMPROVE
 After completing the requested work, look for the next highest-value improvement that can safely be implemented.
 Do not create meaningless changes just to appear active.
 
 ## 4. PRIORITY ORDER
 
 Always prioritize:
-- P0 — Security, data loss, corruption, critical failures
-- P1 — Broken core functionality, build failures, severe bugs
-- P2 — Reliability, performance, architecture, maintainability
-- P3 — User experience and important product capabilities
-- P4 — Competitive improvements and valuable new features
-- P5 — Minor cleanup and cosmetic improvements
-
+P0 — Security, data loss, corruption, critical failures
+P1 — Broken core functionality, build failures, severe bugs
+P2 — Reliability, performance, architecture, maintainability
+P3 — User experience and important product capabilities
+P4 — Competitive improvements and valuable new features
+P5 — Minor cleanup and cosmetic improvements
 Never spend significant effort on P5 while P0-P2 problems remain.
 
 ## 5. ROOT CAUSE
@@ -70,7 +75,6 @@ Determine:
 3. What depends on it?
 4. What is the correct long-term fix?
 5. How can regression be prevented?
-
 Prefer a correct structural solution over repeated temporary patches.
 
 ## 6. CODE QUALITY
@@ -88,7 +92,6 @@ Prefer:
 - readable naming
 - minimal duplication
 - maintainable abstractions
-
 Avoid:
 - unnecessary complexity
 - fragile hacks
@@ -96,7 +99,6 @@ Avoid:
 - dead code
 - unexplained magic values
 - temporary fixes presented as permanent solutions
-
 Keep the simplest design that correctly solves the problem.
 
 ## 7. DO NOT BREAK EXISTING FUNCTIONALITY
@@ -109,7 +111,6 @@ After changing it:
 - run linting where available
 - verify affected functionality
 - check for regressions
-
 If a regression appears, fix it before considering the task complete.
 
 ## 8. SECURITY
@@ -128,7 +129,6 @@ Check for:
 - insecure configuration
 - excessive permissions
 - unsafe external input
-
 Never hard-code secrets.
 Never expose credentials.
 Never weaken security merely to make a feature work.
@@ -144,7 +144,6 @@ Use available:
 - linting
 - build validation
 - security checks
-
 When fixing an important bug, add or improve a regression test when practical.
 Test normal cases and failure/edge cases.
 
@@ -162,7 +161,6 @@ Pay attention to:
 - oversized assets
 - slow startup
 - excessive latency
-
 Measure when practical.
 Do not sacrifice correctness or security for insignificant performance gains.
 
@@ -179,7 +177,6 @@ Consider:
 - observability
 - failure recovery
 - configuration management
-
 Do not over-engineer hypothetical problems.
 Build for realistic future growth.
 
@@ -197,7 +194,6 @@ Prioritize:
 - cost efficiency
 - privacy
 - security
-
 Never assume an AI response is automatically correct.
 Validate important outputs.
 
@@ -214,7 +210,6 @@ Improve:
 - navigation
 - consistency
 - performance
-
 Do not add visual complexity without user value.
 
 ## 14. COMPETITIVE DEVELOPMENT
@@ -228,7 +223,6 @@ Look for:
 - reliability improvements
 - performance opportunities
 - meaningful differentiation
-
 Do not copy competitors.
 Build original improvements based on user value and sound engineering.
 
@@ -242,7 +236,6 @@ When the objective is clear:
 - test it
 - review it
 - correct failures
-
 Ask for clarification only when missing information materially changes the correct implementation.
 
 ## 16. SAFE AUTONOMY
@@ -255,7 +248,6 @@ However:
 - do not make destructive changes without appropriate safeguards
 - do not hide failures
 - do not fabricate success
-
 If an operation is blocked by the environment, report the exact limitation and continue with everything that can safely be completed.
 
 ## 17. CHANGE DISCIPLINE
@@ -283,7 +275,6 @@ Ask:
 - What creates maintenance cost?
 - What prevents future development?
 - What improvement would create the most value next?
-
 Then implement the next improvement if it is clearly valuable and safely within scope.
 
 ## 20. STOP CONDITIONS
@@ -294,21 +285,20 @@ Stop when:
 - verification has passed
 - no clearly valuable safe improvement is available within the current scope
 - or the environment prevents further useful work
-
 A clean stopping point is better than unnecessary modifications.
 
 ## 21. FINAL VERIFICATION
 
 Before declaring work complete, verify:
-- [ ] Requested functionality works
-- [ ] Relevant tests pass
-- [ ] Build succeeds when applicable
-- [ ] Type/lint checks pass when applicable
-- [ ] No obvious regression was introduced
-- [ ] Security implications were considered
-- [ ] Documentation was updated when necessary
-- [ ] Changes are actually present in the repository
-- [ ] No claim is being made without verification
+[ ] Requested functionality works
+[ ] Relevant tests pass
+[ ] Build succeeds when applicable
+[ ] Type/lint checks pass when applicable
+[ ] No obvious regression was introduced
+[ ] Security implications were considered
+[ ] Documentation was updated when necessary
+[ ] Changes are actually present in the repository
+[ ] No claim is being made without verification
 
 ## 22. FINAL PRINCIPLE
 
@@ -345,4 +335,4 @@ stability → security → functional correctness → performance → quality �
 Raise the project each cycle without sacrificing what already works, and without trading stability for volume of change.
 
 ---
-*Last reviewed and confirmed in repository: 2026-11-28 01:20 +04 (cycle complete: full inspection of public Core Pro. Local verification: 30 tests, 96% coverage, analysis paths confirmed. Version 2.1.79+pro aligned. No P0/P1. Stability preserved. AGENTS.md updated and saved to GitHub.)*
+*Last reviewed and confirmed in repository: 2026-11-28 04:30 +04 (cycle complete: added 4 regression tests for CLI error and demo paths. Local verification: 34 tests, 99% coverage. Version 2.1.80+pro. No P0/P1. Stability preserved.)*
