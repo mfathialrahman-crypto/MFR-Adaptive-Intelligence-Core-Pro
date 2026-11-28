@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.80+pro] - 2026-11-28
+
+### Added
+- Four regression tests covering Evidence ValueError re-raise in from_json, suggestions fallback path, fingerprint TypeError guard, and CLI --validate failure exit.
+- Coverage raised to 99% (verified locally).
+
+### Changed
+- AGENTS.md cycle note updated after verified test expansion.
+
+### Verified
+- 34 tests passed. mypy --strict clean. No functional change to valid analysis paths.
+
 ## [2.1.79+pro] - 2026-11-28
 
 ### Changed
